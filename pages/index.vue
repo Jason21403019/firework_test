@@ -90,12 +90,12 @@ const loginUrl = computed(() => {
   // 根據當前 URL 判斷重定向目標
   let redirectUrl;
   if (currentUrl.includes("lab-event.udn.com")) {
-    redirectUrl = "https://lab-event.udn.com/bd_fate2025_test/?lab_return=1";
+    redirectUrl = "https://lab-event.udn.com/bd_fate2025_test/";
   } else if (currentUrl.includes("event.udn.com")) {
     redirectUrl = "https://event.udn.com/bd_fate2025/";
   } else {
     // 本機開發環境下，重定向到測試環境
-    redirectUrl = "https://lab-event.udn.com/bd_fate2025_test/?lab_return=1";
+    redirectUrl = "https://lab-event.udn.com/bd_fate2025_test/";
   }
 
   return `https://member.udn.com/member/login.jsp?site=bd_fate2025&again=y&redirect=${redirectUrl}`;
@@ -174,9 +174,18 @@ function renderTurnstile() {
       sitekey: TURNSTILE_SITE_KEY,
       theme: "light",
       callback: function (token) {
-        // 驗證成功
+        console.log(
+          "Turnstile 驗證成功，取得 token:",
+          token.substring(0, 10) + "...",
+        );
+
+        // 驗證成功，保存 token
         turnstileToken.value = token;
         isTurnstileVerified.value = true;
+
+        // 為確保可靠性，將 token 同時保存到 window 對象和 sessionStorage
+        window.temp_turnstile_token = token;
+        sessionStorage.setItem("turnstile_token", token);
 
         // 啟用繼續按鈕
         const verifyBtn = document.getElementById("verify-continue-btn");
@@ -186,8 +195,11 @@ function renderTurnstile() {
         }
       },
       "expired-callback": function () {
+        console.warn("Turnstile token 已過期");
         turnstileToken.value = null;
         isTurnstileVerified.value = false;
+        window.temp_turnstile_token = null;
+        sessionStorage.removeItem("turnstile_token");
 
         // 禁用繼續按鈕
         const verifyBtn = document.getElementById("verify-continue-btn");
@@ -349,6 +361,9 @@ async function startDivination() {
     // 4. 設置 session storage 標記，表示用戶剛開始進行登入流程
     sessionStorage.setItem("fate2025_just_logged_in", "true");
 
+    // 新增: 設置標記表示使用正確路徑進入登入流程
+    localStorage.setItem("fate2025_normal_flow", "true");
+
     console.log("正在跳轉到登入頁面...");
     // 跳轉到登入頁面
     window.location.href = loginUrl.value;
@@ -369,8 +384,20 @@ async function proceedToPerformDivination() {
     sessionStorage.removeItem("fate2025_just_logged_in");
 
     console.log("檢查安全令牌...");
-    // 從 localStorage 獲取先前保存的 token
-    const authToken = localStorage.getItem("fate2025_auth_token");
+    // 從 localStorage 或 sessionStorage 備份中獲取令牌
+    let authToken = localStorage.getItem("fate2025_auth_token");
+
+    // 如果 localStorage 中沒有找到，嘗試從備份中恢復
+    if (!authToken) {
+      console.log("嘗試從備份恢復安全令牌...");
+      authToken = sessionStorage.getItem("fate2025_auth_backup");
+
+      // 如果從備份中恢復成功，則回寫到 localStorage
+      if (authToken) {
+        console.log("從備份成功恢復安全令牌");
+        localStorage.setItem("fate2025_auth_token", authToken);
+      }
+    }
 
     // 如果沒有令牌，嘗試重新開始占卜流程
     if (!authToken) {
@@ -388,9 +415,14 @@ async function proceedToPerformDivination() {
       return;
     }
 
-    console.log("令牌存在，繼續占卜流程");
-    // 使用完後立即清除
-    localStorage.removeItem("fate2025_auth_token");
+    // 檢查 Turnstile token 是否存在
+    if (!turnstileToken.value && !isDevelopment.value) {
+      console.error("Turnstile token 不存在，需要重新驗證");
+      showPostLoginVerificationDialog(); // 再次顯示驗證對話框
+      return;
+    }
+
+    console.log("所有令牌就緒，繼續占卜流程");
 
     // 顯示處理中訊息
     Swal.fire({
@@ -403,13 +435,21 @@ async function proceedToPerformDivination() {
       },
     });
 
-    // 暫時保存令牌
+    // 暫時保存令牌以便 saveUserData 使用
     window.temp_auth_token = authToken;
     window.temp_turnstile_token = turnstileToken.value;
+
+    console.log("驗證令牌已保存:", {
+      auth_token: !!window.temp_auth_token,
+      turnstile_token: !!window.temp_turnstile_token,
+    });
 
     // 保存用戶資料
     console.log("正在發送占卜資料...");
     const result = await saveUserData();
+
+    localStorage.removeItem("fate2025_auth_token");
+    sessionStorage.removeItem("fate2025_auth_backup");
 
     // 清除暫存數據
     delete window.temp_auth_token;
@@ -418,10 +458,56 @@ async function proceedToPerformDivination() {
     // 關閉處理中訊息
     Swal.close();
 
-    console.log("API 回應成功:", result);
+    console.log("API 回應:", result);
 
     // 檢查回應
     if (result.status === "error") {
+      // 檢查是否為驗證失敗錯誤
+      if (result.message && result.message.includes("機器人驗證失敗")) {
+        Swal.fire({
+          icon: "warning",
+          title: "機器人驗證失敗",
+          text: "請重新進行驗證",
+          confirmButtonText: "重新驗證",
+        }).then(() => {
+          // 重新顯示驗證對話框
+          showPostLoginVerificationDialog();
+        });
+        return;
+      }
+
+      // 檢查是否為bot自動化行為相關的錯誤
+      if (result.message && result.message.includes("系統檢測到自動化行為")) {
+        Swal.fire({
+          icon: "error",
+          title: "安全警告",
+          text: "系統檢測到自動化行為，請勿使用機器人或腳本，請使用正常瀏覽器操作。",
+          confirmButtonText: "重新驗證",
+          confirmButtonColor: "#ff4d4f",
+        }).then(() => {
+          // 重新顯示驗證對話框
+          showPostLoginVerificationDialog();
+        });
+        return;
+      }
+
+      // 檢查是否為timeout或重複提交的錯誤
+      if (
+        result.message &&
+        result.message.includes("請勿重複提交或驗證已過期")
+      ) {
+        Swal.fire({
+          icon: "warning",
+          title: "驗證已過期",
+          text: "請勿重複提交或驗證已過期，請重新進行驗證。",
+          confirmButtonText: "重新驗證",
+        }).then(() => {
+          // 重新顯示驗證對話框
+          showPostLoginVerificationDialog();
+        });
+        return;
+      }
+
       throw new Error(result.message || "伺服器錯誤");
     }
 
@@ -482,26 +568,33 @@ async function saveUserData() {
   try {
     console.log("開始執行 saveUserData 函數");
 
+    // 檢查 turnstile token 存在性
+    const turnstileTokenValue =
+      window.temp_turnstile_token ||
+      turnstileToken.value ||
+      sessionStorage.getItem("turnstile_token") ||
+      null;
+    console.log("Turnstile Token 狀態:", !!turnstileTokenValue);
+
+    if (!turnstileTokenValue && !isDevelopment.value) {
+      console.error("缺少 Turnstile Token");
+      throw new Error("機器人驗證資料不完整，請重新驗證");
+    }
+
     const apiUrl = getApiUrl("saveUserData.php");
     console.log("使用的 API 路徑:", apiUrl);
 
     // 從 cookie 中取得會員資料
     const udnmember = getCookieValue("udnmember") || "";
     const um2 = getCookieValue("um2") || "";
-    let nickname =
-      getCookieValue("nickname") ||
-      "未知用戶" + Math.floor(Math.random() * 10000);
     let email = udnmember || `user_${Date.now()}@example.com`;
 
     const userData = {
       udnmember,
       um2,
-      username: nickname,
       email,
-      // 修正: 使用暫存在 window 對象中的令牌，而不是直接引用 authToken
       session_token: window.temp_auth_token || null,
-      turnstile_token:
-        window.temp_turnstile_token || turnstileToken.value || null,
+      turnstile_token: turnstileTokenValue || null,
     };
 
     console.log("準備發送的用戶數據:", userData);
@@ -510,7 +603,7 @@ async function saveUserData() {
     const response = await axios.post(apiUrl, userData, {
       headers: { "Content-Type": "application/json" },
       withCredentials: true,
-      timeout: 10000, // 10秒超時
+      timeout: 60000, // 60秒超時
     });
 
     console.log("API 回應成功:", response.data);
@@ -532,6 +625,22 @@ async function saveUserData() {
     } else {
       console.error("請求錯誤:", error.message);
       errorMessage = `請求錯誤: ${error.message}`;
+    }
+    if (error.response && error.response.data) {
+      const responseData = error.response.data;
+
+      // 檢查特定的錯誤條件
+      if (
+        responseData.message &&
+        responseData.message.includes("系統檢測到自動化行為")
+      ) {
+        errorMessage = "安全警告：系統檢測到自動化行為，請使用正常的瀏覽器操作";
+      } else if (
+        responseData.message &&
+        responseData.message.includes("驗證已過期")
+      ) {
+        errorMessage = "驗證已過期，請重新驗證";
+      }
     }
 
     return { status: "error", error: errorMessage, message: errorMessage };
@@ -583,11 +692,20 @@ function showFortuneResult(fortuneData) {
       title: "custom-title-class",
       content: "custom-content-class",
     },
+  }).then(() => {
+    clearCookiesAfterDivination();
   });
 }
 
 // 登入後的驗證對話框
 function showPostLoginVerificationDialog() {
+  // 先檢查並保存當前的 auth token，避免後續操作丟失它
+  const currentAuthToken = localStorage.getItem("fate2025_auth_token");
+  if (currentAuthToken) {
+    // 保存到 sessionStorage 作為備份
+    sessionStorage.setItem("fate2025_auth_backup", currentAuthToken);
+  }
+
   Swal.fire({
     title: "安全驗證",
     html: `
@@ -599,7 +717,7 @@ function showPostLoginVerificationDialog() {
     `,
     showConfirmButton: false,
     showCloseButton: true,
-    allowOutsideClick: false, // 防止用戶點擊外部關閉
+    allowOutsideClick: false,
     didOpen: () => {
       // 載入 Turnstile
       loadTurnstileScript();
@@ -608,9 +726,9 @@ function showPostLoginVerificationDialog() {
       const continueBtn = Swal.getPopup().querySelector("#verify-continue-btn");
       if (continueBtn) {
         continueBtn.addEventListener("click", () => {
-          if (isTurnstileVerified.value) {
+          if (isTurnstileVerified.value && turnstileToken.value) {
             try {
-              // 設置驗證成功狀態
+              // 立即設置驗證成功狀態
               setVerificationSuccess();
               // 關閉彈窗
               Swal.close();
@@ -632,9 +750,7 @@ function showPostLoginVerificationDialog() {
       ) {
         try {
           window.turnstile.remove(turnstileWidgetId.value);
-        } catch (e) {
-          // 忽略錯誤
-        }
+        } catch (e) {}
       }
     },
   });
@@ -866,7 +982,92 @@ function logout() {
       window.location.pathname + "?t=" + new Date().getTime();
   });
 }
+// 修改 clearCookiesAfterDivination 函數
+function clearCookiesAfterDivination() {
+  if (typeof window === "undefined") return;
 
+  try {
+    console.log("清除占卜後的 cookie...");
+
+    // 保存用戶的 udnmember 以便仍然可以記錄他們今天已經占卜過
+    const udnmember = getCookieValue("udnmember") || "";
+
+    // 不同的方法清除 cookie
+    const cookieNames = ["udnmember", "um2", "nickname", "fg_mail"];
+
+    // 方法 1: 直接設置過期時間為過去
+    cookieNames.forEach((name) => {
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+    });
+
+    // 方法 2: 使用更多的域名組合
+    const domains = [
+      window.location.hostname,
+      `.${window.location.hostname}`,
+      "udn.com",
+      ".udn.com",
+      "event.udn.com",
+      ".event.udn.com",
+      "lab-event.udn.com",
+      ".lab-event.udn.com",
+    ];
+
+    const paths = ["/", "/bd_fate2025/", "/bd_fate2025_test/"];
+
+    domains.forEach((domain) => {
+      paths.forEach((path) => {
+        cookieNames.forEach((name) => {
+          // 透過設置空值和過期時間來清除 cookie
+          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=${path}; domain=${domain}`;
+          // 同時嘗試帶 secure 屬性的版本
+          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=${path}; domain=${domain}; secure`;
+        });
+      });
+    });
+
+    // 方法 3: 對於 UDN 域名的特殊處理
+    cookieNames.forEach((name) => {
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.udn.com`;
+    });
+
+    // 特別處理：清除驗證相關的資料，但保留已占卜記錄
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      // 不清除該用戶的占卜記錄
+      if (key && key.includes("fate2025") && !key.includes("last_played")) {
+        keysToRemove.push(key);
+      }
+    }
+
+    // 避免在迭代過程中修改集合
+    keysToRemove.forEach((key) => {
+      localStorage.removeItem(key);
+    });
+
+    // 新增: 清除流程標記
+    localStorage.removeItem("fate2025_normal_flow");
+
+    // 清除 session storage (同樣收集後再刪除)
+    const sessionKeysToRemove = [];
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const key = sessionStorage.key(i);
+      sessionKeysToRemove.push(key);
+    }
+
+    sessionKeysToRemove.forEach((key) => {
+      sessionStorage.removeItem(key);
+    });
+
+    // 更新 UI 狀態，但保留已占卜狀態
+    isTurnstileVerified.value = false;
+    isLoggedIn.value = false;
+
+    console.log("已清除占卜後的 cookie 和認證資料");
+  } catch (e) {
+    console.error("清除 Cookie 過程中發生錯誤:", e);
+  }
+}
 // ==================== 生命週期鉤子 ====================
 onMounted(async () => {
   // 設置 Shift + D 組合鍵顯示開發工具
@@ -916,6 +1117,31 @@ onMounted(async () => {
   // 檢查是否從登入頁面返回
   if (justLoggedIn && isLoggedIn.value) {
     console.log("檢測到從登入頁面返回");
+
+    // 新增: 檢查是否使用了正確的流程
+    const isNormalFlow =
+      localStorage.getItem("fate2025_normal_flow") === "true";
+
+    // 如果不是正常流程，顯示提示訊息
+    if (!isNormalFlow) {
+      Swal.fire({
+        icon: "warning",
+        title: "請使用正確的占卜流程",
+        text: "請從活動首頁點擊「立即占卜」按鈕來完成占卜流程，直接使用登入網址將無法取得占卜結果。",
+        confirmButtonText: "我知道了",
+        confirmButtonColor: "#1890ff",
+      }).then(() => {
+        // 可選: 導回首頁
+        window.location.href =
+          window.location.origin + window.location.pathname;
+      });
+
+      // 清除登入標記
+      sessionStorage.removeItem("fate2025_just_logged_in");
+      localStorage.removeItem("fate2025_auth_token");
+      sessionStorage.removeItem("fate2025_auth_token");
+      return;
+    }
 
     try {
       // 等待檢查占卜狀態

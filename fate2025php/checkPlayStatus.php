@@ -42,18 +42,29 @@ if (empty($udnmember)) {
 }
 
 try {
-    // 簡化的處理 - 直接使用 udnmember 而不調用複雜的函數
-    $email = $udnmember . '@example.com'; // 簡單的預設值
+    // 使用 getMemberMail 函數獲取真實 email
+    $memberData = getMemberMail($udnmember);
+    $email = '';
+    
+    // 如果成功獲取到驗證的 email，使用它
+    if ($memberData['verified'] && !empty($memberData['email'])) {
+        $email = $memberData['email'];
+        error_log("使用 API 取得的真實 email: $email");
+    } else {
+        // 如果無法獲取真實 email，使用默認值
+        $email = $udnmember . '@example.com';
+        error_log("使用預設 email: $email");
+    }
     
     // 取得當天日期
     $today = date('Y-m-d');
     
     error_log("檢查用戶: $udnmember, email: $email, 日期: $today");
     
-// 檢查用戶今天是否已經占卜過 - 只使用存在的欄位
-$sql = "SELECT * FROM test_fate_event WHERE email = ? AND DATE(updated_at) = ?";
-$stmt = $pdo->prepare($sql);
-$stmt->execute([$email, $today]);
+    // 檢查用戶今天是否已經占卜過 - 使用更靈活的查詢方式
+    $sql = "SELECT * FROM test_fate_event WHERE email = ? AND DATE(updated_at) = ?";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$email, $today]);
     
     if ($stmt->rowCount() > 0) {
         // 用戶今天已經占卜過
@@ -71,5 +82,82 @@ $stmt->execute([$email, $today]);
 } catch(Exception $e) {
     error_log("系統錯誤: " . $e->getMessage());
     echo json_encode(['status' => 'error', 'message' => '系統錯誤: ' . $e->getMessage()]);
+}
+
+/**
+ * 添加會員數據同步函數 - 用於獲取真實 email
+ */
+function getMemberMail($memberId)
+{
+    // 檢查 Cookie 取得會員信箱
+    $email = null;
+    $apiUrl = "https://umapi.udn.com/member/wbs/MemberUm2Check";
+
+    // 優先使用 udnmember，如果不存在則嘗試使用 udnland
+    $udnmember = !empty($_COOKIE['udnmember']) ? $_COOKIE['udnmember'] : $_COOKIE['udnland'] ?? '';
+    $um2 = $_COOKIE['um2'] ?? '';
+
+    // 如果有必要的 cookie 值
+    if (!empty($udnmember) && !empty($um2)) {
+        $um2Encoded = urlencode($um2);
+
+        // 準備 API 請求數據 - 更新配置
+        $data = [
+            'account' => $udnmember,
+            'um2' => $um2Encoded,
+            'json' => 'Y',
+            'site' => 'fate_event',  // 網站代碼，限制20字元
+            'check_ts' => 'S'        // 檢查cookie時效是否超過30分鐘
+        ];
+
+        // 從會員系統 API 獲取資料
+        $ch = curl_init();
+
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $apiUrl,
+            CURLOPT_POSTFIELDS => http_build_query($data),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false
+        ]);
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        // 解析 API 回應
+        $data = json_decode($response, true);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            // 檢查 API 響應狀態
+            if (isset($data['response']) && isset($data['response']['status']) && $data['response']['status'] === 'success') {
+                if (isset($data['response']['email'])) {
+                    $email = filter_var($data['response']['email'], FILTER_SANITIZE_EMAIL);
+                }
+                // 驗證成功的狀態
+                $verified = true;
+            } else {
+                // 驗證失敗
+                $verified = false;
+                error_log("Member verification failed: " . json_encode($data));
+            }
+        } else {
+            $verified = false;
+            error_log("Failed to parse member API response: " . $response);
+        }
+    } else {
+        $verified = false;
+    }
+
+    // 如果API請求失敗，嘗試從 fg_mail cookie 獲取
+    if (empty($email) && isset($_COOKIE['fg_mail'])) {
+        $email = filter_var(urldecode($_COOKIE['fg_mail']), FILTER_SANITIZE_EMAIL);
+    }
+
+    // 記錄會員信箱到日誌
+    error_log("Member email fetched: " . ($email ?: 'NULL') . " for ID: " . $memberId);
+
+    return [
+        'member_id' => $memberId,
+        'email' => $email,
+        'verified' => $verified ?? false
+    ];
 }
 ?>

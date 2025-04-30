@@ -47,7 +47,6 @@ $data = json_decode($json, true);
 
 $udnmember = isset($data['udnmember']) ? $data['udnmember'] : null;
 $um2 = isset($data['um2']) ? $data['um2'] : null;
-$frontend_username = isset($data['username']) ? $data['username'] : null;
 $turnstileToken = isset($data['turnstile_token']) ? $data['turnstile_token'] : null;
 $session_token = isset($data['session_token']) ? $data['session_token'] : null;
 
@@ -60,14 +59,33 @@ if (empty($session_token) || !isset($_SESSION['auth_token']) || $_SESSION['auth_
     exit;
 }
 
-// 一次性使用，驗證後立即清除
-unset($_SESSION['auth_token']);
 
-// [步驟 7] 驗證 Turnstile token (可選)
+// [步驟 7] 驗證 Turnstile token 
 if (!empty($turnstileToken)) {
-    $verified = verifyTurnstileToken($turnstileToken);
-    if (!$verified) {
-        echo json_encode(['status' => 'error', 'message' => '機器人驗證失敗，請重試']);
+    $verificationResult = verifyTurnstileToken($turnstileToken);
+    
+    if (!is_array($verificationResult) || !isset($verificationResult['success']) || !$verificationResult['success']) {
+        $errorMessage = '機器人驗證失敗';
+        
+        // 如果是數組且包含錯誤代碼，提供更具體的錯誤訊息
+        if (is_array($verificationResult) && isset($verificationResult['error_codes'])) {
+            $errorCodes = implode(', ', $verificationResult['error_codes']);
+            $errorMessage .= "：{$errorCodes}";
+            
+            // 特定錯誤的處理
+            if (in_array('timeout-or-duplicate', $verificationResult['error_codes'])) {
+                $errorMessage = '請勿重複提交或驗證已過期，請刷新頁面重試';
+            } else if (in_array('invalid-input-response', $verificationResult['error_codes'])) {
+                $errorMessage = '驗證碼無效，請重新驗證';
+            }
+        }
+        
+        // 對於機器人，給出特定警告
+        if (is_array($verificationResult) && isset($verificationResult['is_bot']) && $verificationResult['is_bot']) {
+            $errorMessage = '系統檢測到自動化行為，請勿使用機器人或腳本';
+        }
+        
+        echo json_encode(['status' => 'error', 'message' => $errorMessage]);
         exit;
     }
 }
@@ -79,12 +97,8 @@ if (empty($udnmember) || empty($um2)) {
 }
 
 try {
-    // 優先使用前端傳來的用戶名
-    if (!empty($frontend_username)) {
-        $username = $frontend_username;
-    } else {
-        $username = '未知用戶_' . rand(1000, 9999);
-    }
+    // 直接使用 udnmember 作為用戶名
+    $username = $udnmember;
     
     // 獲取會員 Email
     $email = '';
@@ -256,7 +270,7 @@ try {
  * Turnstile token 驗證函數
  */
 function verifyTurnstileToken($token) {
-    $secret = "0x4AAAAAAA5howw-D6z-rI8z"; // 應該配置在安全的環境變數中
+    $secret = TURNSTILE_SECRET_KEY; // 應該配置在安全的環境變數中
     $ip = getIP();
     
     $url = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
@@ -278,7 +292,28 @@ function verifyTurnstileToken($token) {
     $result = file_get_contents($url, false, $context);
     $response = json_decode($result, true);
     
-    return isset($response['success']) && $response['success'] === true;
+    // 記錄完整回應以供調試
+    error_log("Turnstile API response: " . print_r($response, true));
+    
+    if (!isset($response['success']) || $response['success'] !== true) {
+        // 獲取錯誤代碼並記錄
+        $errorCodes = $response['error-codes'] ?? ['unknown_error'];
+        error_log("Turnstile validation failed: " . implode(', ', $errorCodes));
+        
+        // 返回更詳細的錯誤信息
+        return [
+            'success' => false,
+            'error_codes' => $errorCodes,
+            'is_bot' => true
+        ];
+    }
+    
+    return [
+        'success' => true,
+        'cdata' => $response['cdata'] ?? null,  // 客戶數據
+        'hostname' => $response['hostname'] ?? null,  // 主機名稱
+        'challenge_ts' => $response['challenge_ts'] ?? null  // 挑戰時間戳
+    ];
 }
 
 /**
