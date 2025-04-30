@@ -958,6 +958,9 @@ function logout() {
       }
     }
 
+    // 清除登入檢查標記
+    sessionStorage.removeItem("login_checked");
+
     sessionStorage.clear();
 
     // 立即更新 UI 狀態
@@ -1045,6 +1048,9 @@ function clearCookiesAfterDivination() {
       localStorage.removeItem(key);
     });
 
+    // 清除登入檢查標記
+    sessionStorage.removeItem("login_checked");
+
     // 新增: 清除流程標記
     localStorage.removeItem("fate2025_normal_flow");
 
@@ -1087,6 +1093,13 @@ onMounted(async () => {
   // 初始化占卜狀態
   try {
     await updatePlayedStatus();
+
+    // 新增: 如果已登入並且今天已經占卜過，立即顯示提示
+    if (isLoggedIn.value && hasPlayed.value) {
+      console.log("檢測到用戶今天已經占卜過了");
+      showAlreadyPlayedMessage();
+      return;
+    }
   } catch (err) {
     console.error("更新占卜狀態錯誤:", err);
   }
@@ -1097,32 +1110,59 @@ onMounted(async () => {
       localStorage.getItem("fate2025_verified") === "true";
   }
 
+  // 檢查用戶是否剛剛登入成功
+  const isNewlyLoggedIn =
+    isLoggedIn.value && !sessionStorage.getItem("login_checked");
+
+  // 只要用戶登入了，就檢查他們是否走了正確的流程
+  if (isLoggedIn.value) {
+    // 標記已經檢查過登入狀態
+    sessionStorage.setItem("login_checked", "true");
+
+    // 檢查是否通過正常流程登入
+    const isNormalFlow =
+      localStorage.getItem("fate2025_normal_flow") === "true";
+
+    // 如果沒有通過正確流程但已經登入，顯示提示
+    if (!isNormalFlow) {
+      console.log("檢測到用戶不是從正常流程登入");
+
+      Swal.fire({
+        icon: "warning",
+        title: "請使用正確的占卜流程",
+        text: "請從活動首頁點擊「立即占卜」按鈕來完成占卜流程，直接使用登入網址將無法取得占卜結果。",
+        confirmButtonText: "我知道了",
+        confirmButtonColor: "#1890ff",
+      });
+
+      return;
+    }
+  }
+
   // 檢查是否從會員登入跳轉回來
   const justLoggedIn =
     sessionStorage.getItem("fate2025_just_logged_in") === "true";
 
-  // 檢查是否有備份的令牌需要還原
-  if (
-    justLoggedIn &&
-    !localStorage.getItem("fate2025_auth_token") &&
-    sessionStorage.getItem("fate2025_auth_token")
-  ) {
-    console.log("從 sessionStorage 恢復安全令牌");
-    localStorage.setItem(
-      "fate2025_auth_token",
-      sessionStorage.getItem("fate2025_auth_token"),
-    );
-  }
-
-  // 檢查是否從登入頁面返回
+  // 原有的登入後流程檢查邏輯保持不變
   if (justLoggedIn && isLoggedIn.value) {
     console.log("檢測到從登入頁面返回");
 
-    // 新增: 檢查是否使用了正確的流程
+    // 檢查是否有備份的令牌需要還原
+    if (
+      !localStorage.getItem("fate2025_auth_token") &&
+      sessionStorage.getItem("fate2025_auth_token")
+    ) {
+      console.log("從 sessionStorage 恢復安全令牌");
+      localStorage.setItem(
+        "fate2025_auth_token",
+        sessionStorage.getItem("fate2025_auth_token"),
+      );
+    }
+
+    // 檢查是否使用了正確的流程
     const isNormalFlow =
       localStorage.getItem("fate2025_normal_flow") === "true";
 
-    // 如果不是正常流程，顯示提示訊息
     if (!isNormalFlow) {
       Swal.fire({
         icon: "warning",
@@ -1131,7 +1171,6 @@ onMounted(async () => {
         confirmButtonText: "我知道了",
         confirmButtonColor: "#1890ff",
       }).then(() => {
-        // 可選: 導回首頁
         window.location.href =
           window.location.origin + window.location.pathname;
       });
@@ -1147,43 +1186,28 @@ onMounted(async () => {
       // 等待檢查占卜狀態
       const alreadyPlayed = await hasPlayedToday();
 
+      // 如果已經占卜過，顯示提示訊息
       if (alreadyPlayed) {
-        console.log("用戶今天已經占卜過");
         showAlreadyPlayedMessage();
-        // 清除登入標記
-        sessionStorage.removeItem("fate2025_just_logged_in");
-        // 清除所有令牌
-        localStorage.removeItem("fate2025_auth_token");
-        sessionStorage.removeItem("fate2025_auth_token");
-      } else {
-        console.log("用戶今天尚未占卜，檢查驗證狀態");
-        // 檢查是開發環境或已經驗證過
-        const isVerified = await checkSecurityVerification();
+        return;
+      }
 
-        if (!isVerified && !isDevelopment.value) {
-          console.log("需要安全驗證");
-          // 顯示 Cloudflare Turnstile 驗證彈窗
-          showPostLoginVerificationDialog();
-        } else {
-          console.log("已通過驗證或處於開發環境，直接進行占卜");
-          // 已驗證過或是開發環境，直接進行占卜
-          proceedToPerformDivination();
-        }
+      // 如果還沒有占卜過且已經通過驗證，進行占卜
+      const verified = await checkSecurityVerification();
+
+      if (verified) {
+        proceedToPerformDivination();
+      } else {
+        // 需要再次驗證
+        showPostLoginVerificationDialog();
       }
     } catch (error) {
       console.error("登入後流程錯誤:", error);
       Swal.fire({
         icon: "error",
-        title: "處理錯誤",
-        text: "登入後處理過程發生錯誤，請重試",
-        confirmButtonText: "重新開始",
-      }).then(() => {
-        // 清除所有 session 和臨時數據
-        sessionStorage.removeItem("fate2025_just_logged_in");
-        localStorage.removeItem("fate2025_auth_token");
-        sessionStorage.removeItem("fate2025_auth_token");
-        // 重載頁面
-        window.location.reload();
+        title: "系統錯誤",
+        text: "執行占卜流程時發生錯誤: " + (error.message || "未知錯誤"),
+        confirmButtonText: "確定",
       });
     }
   }
