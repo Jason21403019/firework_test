@@ -75,7 +75,7 @@ const isTurnstileVerified = ref(false);
 const hasPlayed = ref(false);
 const isLoggedIn = ref(false);
 const totalPlayCount = ref(0);
-const milestones = [1, 3, 5, 7, 10];
+const milestones = [1, 2, 3, 4, 5];
 let lastAchievedMilestone = ref(0);
 
 // 判斷是否為開發環境
@@ -135,12 +135,6 @@ function getCookieValue(name) {
     }
   }
   return null;
-}
-
-// 檢查是否登入
-function checkLogin() {
-  updateLoginStatus();
-  return isLoggedIn.value;
 }
 
 // 更新登入狀態
@@ -262,63 +256,54 @@ async function hasPlayedToday() {
 
   // 獲取當前登入的會員 ID
   const udnmember = getCookieValue("udnmember") || "";
+  const um2 = getCookieValue("um2") || "";
 
-  // 如果已登入，優先檢查資料庫記錄
-  if (checkLogin() && udnmember) {
-    try {
-      const apiUrl = getApiUrl("checkPlayStatus.php");
-      const um2 = getCookieValue("um2") || "";
+  // 如果未登入，直接返回 false
+  if (!udnmember || !um2) {
+    console.log("用戶未登入，無法檢查占卜狀態");
+    return false;
+  }
 
-      const response = await axios.post(
-        apiUrl,
-        { udnmember, um2 },
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        },
-      );
+  try {
+    const apiUrl = getApiUrl("checkPlayStatus.php");
 
-      if (
-        response.data.status === "success" &&
-        response.data.played_today === true
-      ) {
-        // 如果服務器確認用戶今天已占卜過，更新本地存儲
-        const storageKey = `fate2025_last_played_${udnmember}`;
-        const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD 格式
-        localStorage.setItem(storageKey, today);
-        return true;
-      }
+    console.log("從資料庫檢查占卜狀態...");
+    const response = await axios.post(
+      apiUrl,
+      { udnmember, um2 },
+      {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
+      },
+    );
 
-      // 如果資料庫顯示尚未占卜，再檢查本地儲存
-      const storageKey = `fate2025_last_played_${udnmember}`;
-      const lastPlayedDate = localStorage.getItem(storageKey);
-      const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD 格式
-      if (lastPlayedDate === today) return true;
-
-      // 兩者都沒有記錄，代表尚未占卜過
-      return false;
-    } catch (error) {
-      console.error("檢查占卜狀態時發生錯誤:", error);
-
-      // 出錯時，退回到本地存儲的結果
-      const storageKey = `fate2025_last_played_${udnmember}`;
-      const lastPlayedDate = localStorage.getItem(storageKey);
-      const today = new Date().toISOString().split("T")[0];
-      return lastPlayedDate === today;
+    if (
+      response.data.status === "success" &&
+      response.data.played_today === true
+    ) {
+      console.log("資料庫確認：用戶今天已占卜過");
+      return true;
     }
-  } else {
-    // 未登入時使用本地存儲判斷
-    const storageKey = udnmember
-      ? `fate2025_last_played_${udnmember}`
-      : "fate2025_last_played";
-    const lastPlayedDate = localStorage.getItem(storageKey);
-    const today = new Date().toISOString().split("T")[0];
-    return lastPlayedDate === today;
+
+    console.log("資料庫確認：用戶今天尚未占卜");
+    return false;
+  } catch (error) {
+    console.error("檢查占卜狀態時發生錯誤:", error);
+
+    // API 出錯時，為安全起見返回 false，避免阻止用戶占卜
+    return false;
   }
 }
 
 // 更新已玩過狀態
 async function updatePlayedStatus() {
+  // 如果未登入，直接設為 false
+  if (!isLoggedIn.value) {
+    hasPlayed.value = false;
+    return;
+  }
+
+  // 只有登入用戶才檢查占卜狀態
   hasPlayed.value = await hasPlayedToday();
 }
 
@@ -326,14 +311,11 @@ async function updatePlayedStatus() {
 function recordPlayToday() {
   if (typeof window === "undefined") return;
 
-  const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD 格式
-  const udnmember = getCookieValue("udnmember") || "";
-  const storageKey = udnmember
-    ? `fate2025_last_played_${udnmember}`
-    : "fate2025_last_played";
-
-  localStorage.setItem(storageKey, today);
+  // 只更新狀態變量，不寫入 localStorage
   hasPlayed.value = true;
+
+  // 資料庫記錄已經在 saveUserData API 中由後端完成
+  console.log("占卜記錄已更新至資料庫");
 }
 
 // 檢查並顯示成就達成訊息 - 只在首次占卜時顯示
@@ -354,7 +336,7 @@ function checkMilestoneAchievement(newCount, oldCount, isFirstTime) {
 }
 
 // 顯示里程碑達成訊息
-function showMilestoneMessage(milestone) {
+function showMilestoneMessage() {
   Swal.fire({
     title: `恭喜完成第一次占卜!`,
     text: `您已獲得抽獎資格！`,
@@ -1155,9 +1137,6 @@ function clearCookiesAfterDivination() {
   try {
     console.log("清除占卜後的 cookie...");
 
-    // 保存用戶的 udnmember 以便仍然可以記錄他們今天已經占卜過
-    const udnmember = getCookieValue("udnmember") || "";
-
     // 不同的方法清除 cookie
     const cookieNames = ["udnmember", "um2", "nickname", "fg_mail"];
 
@@ -1185,7 +1164,6 @@ function clearCookiesAfterDivination() {
         cookieNames.forEach((name) => {
           // 透過設置空值和過期時間來清除 cookie
           document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=${path}; domain=${domain}`;
-          // 同時嘗試帶 secure 屬性的版本
           document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=${path}; domain=${domain}; secure`;
         });
       });
@@ -1196,41 +1174,26 @@ function clearCookiesAfterDivination() {
       document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.udn.com`;
     });
 
-    // 特別處理：清除驗證相關的資料，但保留已占卜記錄
+    // 清除所有驗證相關的本地存儲（但移除了對 last_played 的特殊處理）
     const keysToRemove = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      // 不清除該用戶的占卜記錄
-      if (key && key.includes("fate2025") && !key.includes("last_played")) {
+      if (key && key.includes("fate2025")) {
         keysToRemove.push(key);
       }
     }
 
-    // 避免在迭代過程中修改集合
     keysToRemove.forEach((key) => {
       localStorage.removeItem(key);
     });
 
-    // 清除登入檢查標記
-    sessionStorage.removeItem("login_checked");
+    // 清除 session storage
+    sessionStorage.clear();
 
-    // 新增: 清除流程標記
-    localStorage.removeItem("fate2025_normal_flow");
-
-    // 清除 session storage (同樣收集後再刪除)
-    const sessionKeysToRemove = [];
-    for (let i = 0; i < sessionStorage.length; i++) {
-      const key = sessionStorage.key(i);
-      sessionKeysToRemove.push(key);
-    }
-
-    sessionKeysToRemove.forEach((key) => {
-      sessionStorage.removeItem(key);
-    });
-
-    // 更新 UI 狀態，但保留已占卜狀態
+    // 更新 UI 狀態
     isTurnstileVerified.value = false;
     isLoggedIn.value = false;
+    // 注意：不清除 hasPlayed.value，因為這會在下次更新時從資料庫重新獲取
 
     console.log("已清除占卜後的 cookie 和認證資料");
   } catch (e) {
