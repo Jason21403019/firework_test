@@ -75,6 +75,21 @@ try {
         error_log("用戶今天尚未占卜");
         echo json_encode(['status' => 'success', 'played_today' => false]);
     }
+    if ($stmt->rowCount() > 0) {
+        // 用戶存在，返回累計次數和是否今天已占卜
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $lastPlayedDate = date('Y-m-d', strtotime($row['updated_at']));
+        $today = date('Y-m-d');
+        
+        echo json_encode([
+            'status' => 'success', 
+            'played_today' => ($lastPlayedDate === $today), 
+            'play_times_total' => $row['play_times_total']
+        ]);
+    } else {
+        // 用戶不存在，返回未占卜過和次數為0
+        echo json_encode(['status' => 'success', 'played_today' => false, 'play_times_total' => 0]);
+    }
     
 } catch(PDOException $e) {
     error_log("資料庫錯誤: " . $e->getMessage());

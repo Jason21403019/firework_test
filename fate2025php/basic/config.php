@@ -3,7 +3,6 @@ date_default_timezone_set("Asia/Taipei");
 header('Content-Type: application/json charset=utf-8');
 
 // Cloudflare Turnstile 設定
-define('TURNSTILE_SITE_KEY', '0x4AAAAAAA5howw-D6z-rI8z'); 
 define('TURNSTILE_SECRET_KEY', '0x4AAAAAAA5ho0moD45CWi2cFX9SYn9fBjc'); 
 
 // 活動期間

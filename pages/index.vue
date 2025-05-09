@@ -8,14 +8,35 @@
     <!-- 主要占卜按鈕 -->
     <button @click="startDivination" class="fortune-btn">立即占卜</button>
 
+    <!-- 占卜次數顯示 -->
+    <div class="play-count-info">
+      <p>
+        您已累計占卜 <span class="count-number">{{ totalPlayCount }}</span> 次
+      </p>
+    </div>
+
+    <!-- 里程碑數字顯示 -->
+    <div class="play-count-info">
+      <div class="milestones-container">
+        <div
+          v-for="milestone in milestones"
+          :key="milestone"
+          class="milestone-item"
+          :class="{ achieved: totalPlayCount >= milestone }"
+        >
+          {{ milestone }}
+        </div>
+      </div>
+    </div>
+
     <!-- 開發工具區域 - 按 Shift+D 顯示 -->
     <div v-if="showDebugTools" class="debug-tools">
       <h3>開發測試工具</h3>
       <div class="debug-actions">
-        <button @click="clearPlayRecord" class="debug-btn">清除占卜記錄</button>
-        <button @click="resetDatabase" class="debug-btn danger">
+        <!-- <button @click="clearPlayRecord" class="debug-btn">清除占卜記錄</button>/ -->
+        <!-- <button @click="resetDatabase" class="debug-btn danger">
           重置資料庫
-        </button>
+        </button> -->
         <button @click="logout" class="debug-btn logout">登出</button>
       </div>
       <div class="debug-info">
@@ -53,6 +74,9 @@ const turnstileWidgetId = ref(null);
 const isTurnstileVerified = ref(false);
 const hasPlayed = ref(false);
 const isLoggedIn = ref(false);
+const totalPlayCount = ref(0);
+const milestones = [1, 3, 5, 7, 10];
+let lastAchievedMilestone = ref(0);
 
 // 判斷是否為開發環境
 const isDevelopment = computed(() => {
@@ -60,9 +84,7 @@ const isDevelopment = computed(() => {
 });
 
 // Cloudflare Turnstile 配置
-const TURNSTILE_SITE_KEY = isDevelopment.value
-  ? "1x00000000000000000000AA" // 測試用 key (總是通過)
-  : "0x4AAAAAAA5howw-D6z-rI8z"; // 實際 key
+const TURNSTILE_SITE_KEY = "0x4AAAAAAA5howw-D6z-rI8z"; // 實際 key
 
 // ==================== API URL 管理 ====================
 // 根據環境生成適當的 API URL
@@ -227,7 +249,7 @@ async function checkSecurityVerification() {
     // 在實際環境中，可以向後端發送請求檢查驗證狀態
     // 這裡簡化為使用本地記錄
     const isVerified = localStorage.getItem("fate2025_verified") === "true";
-    return isVerified || isDevelopment.value; // 開發環境始終視為已驗證
+    // return isVerified || isDevelopment.value; // 開發環境始終視為已驗證
   } catch (error) {
     return false;
   }
@@ -312,6 +334,34 @@ function recordPlayToday() {
 
   localStorage.setItem(storageKey, today);
   hasPlayed.value = true;
+}
+
+// 檢查並顯示成就達成訊息 - 只在首次占卜時顯示
+function checkMilestoneAchievement(newCount, oldCount, isFirstTime) {
+  // 找出新達成的里程碑
+  const newAchieved = milestones.find((m) => oldCount < m && newCount >= m);
+
+  // 只有在是首次占卜時才顯示里程碑成就訊息
+  if (newAchieved && newAchieved > lastAchievedMilestone.value && isFirstTime) {
+    lastAchievedMilestone.value = newAchieved;
+    showMilestoneMessage(newAchieved);
+  } else {
+    // 如果不是首次，只更新里程碑狀態，不顯示訊息
+    if (newAchieved && newAchieved > lastAchievedMilestone.value) {
+      lastAchievedMilestone.value = newAchieved;
+    }
+  }
+}
+
+// 顯示里程碑達成訊息
+function showMilestoneMessage(milestone) {
+  Swal.fire({
+    title: `恭喜完成第一次占卜!`,
+    text: `您已獲得抽獎資格！`,
+    icon: "success",
+    confirmButtonText: "太棒了!",
+    confirmButtonColor: "#fa541c",
+  });
 }
 
 // ==================== 流程控制函數 ====================
@@ -535,6 +585,84 @@ async function proceedToPerformDivination() {
       };
       showFortuneResult(defaultFortuneData);
     }
+    // 從第一次調用的結果中獲取 db_info
+    if (result.db_info && result.db_info.play_times_total !== undefined) {
+      const oldCount = totalPlayCount.value;
+      totalPlayCount.value = parseInt(result.db_info.play_times_total);
+      console.log("累計占卜次數更新為:", totalPlayCount.value);
+
+      // 判斷是否是首次占卜
+      const isFirstTime =
+        result.message && result.message.includes("首次占卜成功");
+
+      // 傳入 isFirstTime 參數給 checkMilestoneAchievement
+      checkMilestoneAchievement(totalPlayCount.value, oldCount, isFirstTime);
+    } else {
+      // 如果API沒有返回次數，本地增加計數
+      const oldCount = totalPlayCount.value;
+      totalPlayCount.value++;
+      console.log("本地更新累計占卜次數為:", totalPlayCount.value);
+
+      // 這裡假定不是首次占卜
+      checkMilestoneAchievement(totalPlayCount.value, oldCount, false);
+    }
+    // 更精確判斷是否是首次占卜
+    if (result.db_info) {
+      const oldCount = totalPlayCount.value;
+      totalPlayCount.value = parseInt(result.db_info.play_times_total || 1);
+
+      // 判斷是否是首次占卜 - 通過創建時間和更新時間判斷
+      const createdDate = result.db_info.created_at
+        ? new Date(result.db_info.created_at).toDateString()
+        : null;
+      const updatedDate = result.db_info.updated_at
+        ? new Date(result.db_info.updated_at).toDateString()
+        : null;
+
+      // 如果創建日期和更新日期在同一天，或者 play_times_total 為 1，認為是首次占卜
+      const isFirstTime =
+        createdDate === updatedDate || totalPlayCount.value === 1;
+
+      console.log("會員占卜資訊:", {
+        createdDate,
+        updatedDate,
+        isFirstTime,
+        totalPlayCount: totalPlayCount.value,
+      });
+
+      checkMilestoneAchievement(totalPlayCount.value, oldCount, isFirstTime);
+    }
+    // 從 result 中獲取創建時間，判斷是否為首次註冊用戶
+    if (result.db_info) {
+      const createdAt = new Date(result.db_info.created_at);
+      const updatedAt = new Date(result.db_info.updated_at);
+
+      // 檢查創建日期和今天是否是同一天
+      const today = new Date();
+      const isCreatedToday =
+        createdAt.getDate() === today.getDate() &&
+        createdAt.getMonth() === today.getMonth() &&
+        createdAt.getFullYear() === today.getFullYear();
+
+      // 如果是今天創建的帳號，標記為新用戶
+      if (isCreatedToday) {
+        const udnmember = getCookieValue("udnmember") || "";
+        if (udnmember) {
+          localStorage.setItem(`fate2025_new_user_${udnmember}`, "true");
+          console.log("已標記為新用戶 (首次註冊當天)");
+
+          // 設置今天結束時自動清除新用戶標記
+          const endOfDay = new Date();
+          endOfDay.setHours(23, 59, 59, 999);
+          const timeUntilEndOfDay = endOfDay.getTime() - Date.now();
+
+          setTimeout(() => {
+            localStorage.removeItem(`fate2025_new_user_${udnmember}`);
+            console.log("已自動清除新用戶標記");
+          }, timeUntilEndOfDay);
+        }
+      }
+    }
 
     // 更新狀態
     await updatePlayedStatus();
@@ -648,21 +776,41 @@ async function saveUserData() {
 }
 
 // ==================== 用戶界面函數 ====================
-// 顯示「今天已經玩過」的提示
+// 顯示「今天已經玩過」的提示，區分是否為新會員首日占卜
 function showAlreadyPlayedMessage() {
+  // 獲取用戶ID
+  const udnmember = getCookieValue("udnmember") || "";
+
+  let title = "您今天已經占卜過了";
+  let message = "";
+
+  // 根據占卜次數決定顯示不同的訊息內容
+  if (totalPlayCount.value === 1) {
+    message =
+      "恭喜獲得 LINE Points 5點抽獎資格！每人每天只能占卜一次，請明天再來！";
+  } else if (totalPlayCount.value >= 2 && totalPlayCount.value <= 4) {
+    message = "占卜完成！明天可以再來占卜";
+  } else if (totalPlayCount.value >= 5) {
+    message = "太棒了，占卜完成！祝您有美好的一天";
+  } else {
+    message = "每人每天只能占卜一次，請明天再來！";
+  }
+
   Swal.fire({
-    title: "您今天已經占卜過了",
-    text: "每人每天只能占卜一次，請明天再來！",
+    title: title,
+    html: `
+      <div class="special-message">
+        <p>${message}</p>
+      </div>
+    `,
     icon: "info",
     confirmButtonText: "我知道了",
     confirmButtonColor: "#1890ff",
-
-    // 在開發環境中添加重置按鈕
     showDenyButton: isDevelopment.value,
     denyButtonText: "開發模式：重置記錄",
     denyButtonColor: "#ff4d4f",
   }).then((result) => {
-    if (result.isDenied) {
+    if (result.isDenied && isDevelopment.value) {
       clearPlayRecord();
     }
   });
@@ -670,6 +818,17 @@ function showAlreadyPlayedMessage() {
 
 // 顯示占卜結果
 function showFortuneResult(fortuneData) {
+  // 依據占卜次數判斷要顯示的訊息
+  let resultMessage = "";
+
+  if (totalPlayCount.value === 1) {
+    resultMessage = "<p>恭喜獲得 LINE Points 5點抽獎資格！</p>";
+  } else if (totalPlayCount.value >= 2 && totalPlayCount.value <= 4) {
+    resultMessage = "<p>明天可以再來占卜</p>";
+  } else if (totalPlayCount.value >= 5) {
+    resultMessage = "<p>太棒了，占卜完成！祝您有美好的一天</p>";
+  }
+
   Swal.fire({
     title: fortuneData.title || "您的占卜結果",
     html: `
@@ -677,6 +836,7 @@ function showFortuneResult(fortuneData) {
         <p>${fortuneData.description || "您的運勢將會非常好！"}</p>
         <p>幸運數字: ${fortuneData.lucky_number || "8"}</p>
         <p>幸運顏色: ${fortuneData.lucky_color || "紅色"}</p>
+        ${resultMessage}
       </div>
     `,
     imageUrl: fortuneData.image_url || "https://example.com/fortune-image.jpg",
@@ -763,34 +923,37 @@ function toggleDebugTools() {
 
 // ==================== 調試功能 ====================
 // 清除占卜記錄 (用於測試)
-async function clearPlayRecord() {
-  if (typeof window === "undefined") return;
+// async function clearPlayRecord() {
+//   if (typeof window === "undefined") return;
 
-  const udnmember = getCookieValue("udnmember") || "";
-  const storageKey = udnmember
-    ? `fate2025_last_played_${udnmember}`
-    : "fate2025_last_played";
+//   const udnmember = getCookieValue("udnmember") || "";
+//   const storageKey = udnmember
+//     ? `fate2025_last_played_${udnmember}`
+//     : "fate2025_last_played";
 
-  localStorage.removeItem(storageKey);
+//   localStorage.removeItem(storageKey);
 
-  // 重要：立即更新占卜狀態
-  hasPlayed.value = false;
+//   // 重要：立即更新占卜狀態
+//   hasPlayed.value = false;
 
-  Swal.fire({
-    toast: true,
-    icon: "success",
-    title: "占卜記錄已清除",
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 1500,
-  });
-}
+//   Swal.fire({
+//     toast: true,
+//     icon: "success",
+//     title: "占卜記錄已清除",
+//     position: "top-end",
+//     showConfirmButton: false,
+//     timer: 1500,
+//   });
+// }
 
 // 檢查資料庫狀態
 async function debugCheckDatabase() {
   try {
     const udnmember = getCookieValue("udnmember") || "";
     const um2 = getCookieValue("um2") || "";
+    const isNewUser =
+      localStorage.getItem(`fate2025_new_user_${udnmember}`) === "true";
+    console.log(`是否為新用戶 (首次註冊當天): ${isNewUser}`);
 
     if (!udnmember) {
       Swal.fire({
@@ -866,60 +1029,60 @@ ${JSON.stringify(response.data, null, 2)}
 }
 
 // 重置資料庫 - 刪除所有記錄並重置 ID
-async function resetDatabase() {
-  if (typeof window === "undefined") return;
+// async function resetDatabase() {
+//   if (typeof window === "undefined") return;
 
-  const result = await Swal.fire({
-    title: "確定要重置資料庫?",
-    text: "這將刪除所有記錄並重置 ID！這個操作無法撤銷！",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonText: "是，重置！",
-    cancelButtonText: "取消",
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-  });
+//   const result = await Swal.fire({
+//     title: "確定要重置資料庫?",
+//     text: "這將刪除所有記錄並重置 ID！這個操作無法撤銷！",
+//     icon: "warning",
+//     showCancelButton: true,
+//     confirmButtonText: "是，重置！",
+//     cancelButtonText: "取消",
+//     confirmButtonColor: "#d33",
+//     cancelButtonColor: "#3085d6",
+//   });
 
-  if (!result.isConfirmed) return;
+//   if (!result.isConfirmed) return;
 
-  try {
-    const apiUrl = getApiUrl("resetDatabase.php");
+//   try {
+//     const apiUrl = getApiUrl("resetDatabase.php");
 
-    // 發送重置請求，包含安全密鑰
-    const response = await axios.post(
-      apiUrl,
-      { security_key: "reset2025fate" },
-      {
-        headers: { "Content-Type": "application/json" },
-      },
-    );
+//     // 發送重置請求，包含安全密鑰
+//     const response = await axios.post(
+//       apiUrl,
+//       { security_key: "reset2025fate" },
+//       {
+//         headers: { "Content-Type": "application/json" },
+//       },
+//     );
 
-    if (response.data.status === "success") {
-      Swal.fire({
-        title: "重置成功",
-        text: "資料庫已成功重置。",
-        icon: "success",
-        confirmButtonText: "確定",
-      });
+//     if (response.data.status === "success") {
+//       Swal.fire({
+//         title: "重置成功",
+//         text: "資料庫已成功重置。",
+//         icon: "success",
+//         confirmButtonText: "確定",
+//       });
 
-      // 同時清除本地存儲
-      localStorage.clear();
+//       // 同時清除本地存儲
+//       localStorage.clear();
 
-      // 重新載入頁面
-      setTimeout(() => window.location.reload(), 1500);
-    } else {
-      throw new Error(response.data.message || "重置失敗");
-    }
-  } catch (error) {
-    console.error("重置資料庫時發生錯誤:", error);
-    Swal.fire({
-      title: "重置失敗",
-      text: `發生錯誤: ${error.message}`,
-      icon: "error",
-      confirmButtonText: "確定",
-    });
-  }
-}
+//       // 重新載入頁面
+//       setTimeout(() => window.location.reload(), 1500);
+//     } else {
+//       throw new Error(response.data.message || "重置失敗");
+//     }
+//   } catch (error) {
+//     console.error("重置資料庫時發生錯誤:", error);
+//     Swal.fire({
+//       title: "重置失敗",
+//       text: `發生錯誤: ${error.message}`,
+//       icon: "error",
+//       confirmButtonText: "確定",
+//     });
+//   }
+// }
 
 // 登出功能
 function logout() {
@@ -1090,6 +1253,74 @@ onMounted(async () => {
   // 設置定期檢查登入狀態
   const loginCheckInterval = setInterval(updateLoginStatus, 5000);
 
+  // 優先獲取累計占卜次數，不管是否已經占卜過
+  if (isLoggedIn.value) {
+    try {
+      console.log("開始獲取累計占卜次數...");
+      const apiUrl = getApiUrl("checkPlayStatus.php");
+      const udnmember = getCookieValue("udnmember") || "";
+      const um2 = getCookieValue("um2") || "";
+
+      console.log("API路徑:", apiUrl);
+      console.log("用戶ID:", udnmember);
+
+      const response = await axios.post(
+        apiUrl,
+        { udnmember, um2 },
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        },
+      );
+
+      console.log("完整API回應:", response.data);
+
+      // 嘗試查找累計次數資訊
+      if (response.data.status === "success") {
+        if (response.data.play_times_total !== undefined) {
+          totalPlayCount.value = parseInt(response.data.play_times_total);
+          console.log("✅ 已獲取累計占卜次數:", totalPlayCount.value);
+        } else {
+          console.log("⚠️ API回應中沒有找到 play_times_total 欄位");
+          console.log("可用的欄位有:", Object.keys(response.data).join(", "));
+        }
+      }
+      // 嘗試查找是否為新用戶
+      if (response.data.status === "success" && response.data.db_info) {
+        const createdAt = new Date(response.data.db_info.created_at);
+        const today = new Date();
+
+        const isCreatedToday =
+          createdAt.getDate() === today.getDate() &&
+          createdAt.getMonth() === today.getMonth() &&
+          createdAt.getFullYear() === today.getFullYear();
+
+        if (isCreatedToday) {
+          const udnmember = getCookieValue("udnmember") || "";
+          if (udnmember) {
+            localStorage.setItem(`fate2025_new_user_${udnmember}`, "true");
+            console.log("已標記為新用戶 (首次註冊當天)");
+          }
+        }
+      }
+
+      // 初始化已完成的最高里程碑
+      if (totalPlayCount.value > 0) {
+        for (let i = milestones.length - 1; i >= 0; i--) {
+          if (totalPlayCount.value >= milestones[i]) {
+            lastAchievedMilestone.value = milestones[i];
+            break;
+          }
+        }
+        console.log("初始化已完成的最高里程碑:", lastAchievedMilestone.value);
+      }
+    } catch (error) {
+      console.error("❌ 獲取累計占卜次數錯誤:", error);
+    }
+  } else {
+    console.log("用戶未登入，無法獲取累計次數");
+  }
+
   // 初始化占卜狀態
   try {
     await updatePlayedStatus();
@@ -1110,12 +1341,11 @@ onMounted(async () => {
       localStorage.getItem("fate2025_verified") === "true";
   }
 
-  // 檢查用戶是否剛剛登入成功
-  const isNewlyLoggedIn =
-    isLoggedIn.value && !sessionStorage.getItem("login_checked");
+  // 檢查使用者是否已登入但未經過檢查
+  const isFirstTimeCheck = !sessionStorage.getItem("login_checked");
 
   // 只要用戶登入了，就檢查他們是否走了正確的流程
-  if (isLoggedIn.value) {
+  if (isLoggedIn.value && isFirstTimeCheck) {
     // 標記已經檢查過登入狀態
     sessionStorage.setItem("login_checked", "true");
 
@@ -1162,8 +1392,15 @@ onMounted(async () => {
     // 檢查是否使用了正確的流程
     const isNormalFlow =
       localStorage.getItem("fate2025_normal_flow") === "true";
+    const justLoggedIn =
+      sessionStorage.getItem("fate2025_just_logged_in") === "true";
 
-    if (!isNormalFlow) {
+    // 或者是直接從登入頁面進來的（有 normal_flow 但沒有 just_logged_in 標記）
+    if (!isNormalFlow || (isLoggedIn.value && !justLoggedIn)) {
+      // 清除可能錯誤設置的正常流程標記
+      localStorage.removeItem("fate2025_normal_flow");
+
+      console.log("檢測到用戶未經過正確占卜流程");
       Swal.fire({
         icon: "warning",
         title: "請使用正確的占卜流程",
@@ -1257,6 +1494,56 @@ onMounted(async () => {
     background-color: #fa541c;
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(255, 122, 69, 0.5);
+  }
+}
+.play-count-info {
+  margin-top: 15px;
+  font-size: 16px;
+  color: #666;
+
+  .count-number {
+    font-weight: bold;
+    color: #fa541c;
+    font-size: 18px;
+  }
+}
+
+.play-count-info {
+  margin-top: 15px;
+  font-size: 16px;
+  color: #666;
+
+  .count-number {
+    font-weight: bold;
+    color: #fa541c;
+    font-size: 18px;
+  }
+
+  .milestones-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    gap: 20px;
+
+    .milestone-item {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #999;
+      transition: all 0.3s ease;
+
+      &.achieved {
+        background-color: #fa541c;
+        color: white;
+        transform: scale(1.1);
+        box-shadow: 0 2px 8px rgba(250, 84, 28, 0.5);
+      }
+    }
   }
 }
 
@@ -1368,5 +1655,20 @@ onMounted(async () => {
 :global(.divination-content) {
   padding: 15px;
   text-align: center;
+}
+
+/* 特殊訊息樣式 */
+:global(.special-message) {
+  margin: 15px 0;
+
+  p {
+    margin: 10px 0;
+  }
+
+  .small-text {
+    font-size: 14px;
+    color: #666;
+    margin-top: 15px;
+  }
 }
 </style>

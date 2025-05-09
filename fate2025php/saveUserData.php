@@ -320,29 +320,62 @@ function verifyTurnstileToken($token) {
  * 產生占卜結果（模擬）
  */
 function generateFortuneData() {
-    // 這裡實際應用中可以從資料庫獲取或隨機生成占卜結果
+    // 定義占卜結果及其權重（機率百分比）
     $fortunes = [
         [
+            'id' => 'fortune_1',
             'title' => '財運亨通',
             'description' => '今年財運亨通，可能會有意外之財。投資謹慎，避免衝動決策。',
             'lucky_number' => mt_rand(1, 99),
-            'lucky_color' => ['紅色', '金色', '紫色'][mt_rand(0, 2)]
+            'lucky_color' => ['紅色', '金色', '紫色'][mt_rand(0, 2)],
+            'weight' => 40  // 40% 機率
         ],
         [
+            'id' => 'fortune_2',
             'title' => '事業有成',
             'description' => '工作上將遇到貴人相助，把握機會表現自己，升職加薪指日可待。',
             'lucky_number' => mt_rand(1, 99),
-            'lucky_color' => ['藍色', '綠色', '黑色'][mt_rand(0, 2)]
+            'lucky_color' => ['藍色', '綠色', '黑色'][mt_rand(0, 2)],
+            'weight' => 30  // 30% 機率
         ],
         [
+            'id' => 'fortune_3',
             'title' => '桃花朵朵',
             'description' => '感情生活甜蜜，單身者有機會遇到心儀對象，已有伴侶者關係更加穩固。',
             'lucky_number' => mt_rand(1, 99),
-            'lucky_color' => ['粉色', '白色', '黃色'][mt_rand(0, 2)]
+            'lucky_color' => ['粉色', '白色', '黃色'][mt_rand(0, 2)],
+            'weight' => 20  // 20% 機率
+        ],
+        [
+            'id' => 'fortune_4',
+            'title' => '健康平安',
+            'description' => '身體健康狀況良好，注意作息規律，適度運動。心情愉悅，遠離煩惱。',
+            'lucky_number' => mt_rand(1, 99),
+            'lucky_color' => ['湖水綠', '淺藍', '米白'][mt_rand(0, 2)],
+            'weight' => 10  // 10% 機率
         ]
     ];
     
-    return $fortunes[mt_rand(0, 2)];
+    // 計算權重總和
+    $totalWeight = array_sum(array_column($fortunes, 'weight'));
+    
+    // 產生隨機數
+    $randomValue = mt_rand(1, $totalWeight);
+    
+    // 根據權重選擇結果
+    $currentWeight = 0;
+    foreach ($fortunes as $fortune) {
+        $currentWeight += $fortune['weight'];
+        if ($randomValue <= $currentWeight) {
+            // 移除 weight 欄位，不需要返回給前端
+            unset($fortune['weight']);
+            return $fortune;
+        }
+    }
+    
+    // 預設情況下返回第一個結果（理論上不會執行到這裡）
+    unset($fortunes[0]['weight']);
+    return $fortunes[0];
 }
 
 /**
