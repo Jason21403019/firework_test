@@ -78,6 +78,41 @@ const totalPlayCount = ref(0);
 const milestones = [1, 2, 3, 4, 5];
 let lastAchievedMilestone = ref(0);
 
+const fortuneResults = ref([
+  {
+    id: "fortune_1",
+    title: "心型煙火 | 幸運指數:91%",
+    description:
+      "今日你愛情能量報表!特別適合告白、約會，\n你的魅力讓你閃閃發光。",
+    image_url: "./imgs/heart.png",
+    weight: 20,
+  },
+  {
+    id: "fortune_2",
+    title: "金浪煙火 | 幸運指數:88%",
+    description:
+      "財務上有不錯的直覺和機會，適合投資、\n做小額理財規劃。也有機會獲得意外之財或小獎喔!",
+    image_url: "./imgs/goldwave.png",
+    weight: 20,
+  },
+  {
+    id: "fortune_3",
+    title: "療癒煙火 | 幸運指數:75%",
+    description:
+      "今天適合慢下腳步，讓身心放鬆，\n多親近自然或早點休息，補充滿滿能量!",
+    image_url: "./imgs/healing.png",
+    weight: 40,
+  },
+  {
+    id: "fortune_4",
+    title: "金光煙火 | 幸運指數:80%",
+    description:
+      "你的工作運極佳，有重要會議或報告時表現亮眼，\n適合發展實力的好日子。",
+    image_url: "./imgs/goldlight.png",
+    weight: 20,
+  },
+]);
+
 // 判斷是否為開發環境
 const isDevelopment = computed(() => {
   return import.meta.env?.DEV || false;
@@ -203,12 +238,10 @@ function renderTurnstile() {
         window.temp_turnstile_token = token;
         sessionStorage.setItem("turnstile_token", token);
 
-        // 啟用繼續按鈕
-        const verifyBtn = document.getElementById("verify-continue-btn");
-        if (verifyBtn) {
-          verifyBtn.disabled = false;
-          verifyBtn.classList.add("verified");
-        }
+        // 驗證成功後直接關閉彈窗並執行占卜流程
+        setVerificationSuccess();
+        Swal.close();
+        proceedToPerformDivination();
       },
       "expired-callback": function () {
         console.warn("Turnstile token 已過期");
@@ -216,13 +249,6 @@ function renderTurnstile() {
         isTurnstileVerified.value = false;
         window.temp_turnstile_token = null;
         sessionStorage.removeItem("turnstile_token");
-
-        // 禁用繼續按鈕
-        const verifyBtn = document.getElementById("verify-continue-btn");
-        if (verifyBtn) {
-          verifyBtn.disabled = true;
-          verifyBtn.classList.remove("verified");
-        }
       },
     });
   } catch (error) {
@@ -346,6 +372,34 @@ function showMilestoneMessage() {
   });
 }
 
+// 產生占卜結果
+function generateFortuneResult() {
+  // 計算權重總和
+  const totalWeight = fortuneResults.value.reduce(
+    (sum, fortune) => sum + fortune.weight,
+    0,
+  );
+
+  // 產生隨機數
+  const randomValue = Math.floor(Math.random() * totalWeight) + 1;
+
+  // 根據權重選擇結果
+  let currentWeight = 0;
+  for (const fortune of fortuneResults.value) {
+    currentWeight += fortune.weight;
+    if (randomValue <= currentWeight) {
+      // 回傳一個拷貝，去掉 weight 欄位
+      const result = { ...fortune };
+      delete result.weight;
+      return result;
+    }
+  }
+
+  // 預設情況下返回第一個結果
+  const defaultResult = { ...fortuneResults.value[0] };
+  delete defaultResult.weight;
+  return defaultResult;
+}
 // ==================== 流程控制函數 ====================
 // 1. 占卜流程啟動函數
 async function startDivination() {
@@ -441,7 +495,6 @@ async function proceedToPerformDivination() {
         confirmButtonText: "重新開始",
         showCancelButton: false,
       }).then(() => {
-        // 重新開始占卜
         startDivination();
       });
       return;
@@ -450,7 +503,7 @@ async function proceedToPerformDivination() {
     // 檢查 Turnstile token 是否存在
     if (!turnstileToken.value && !isDevelopment.value) {
       console.error("Turnstile token 不存在，需要重新驗證");
-      showPostLoginVerificationDialog(); // 再次顯示驗證對話框
+      showPostLoginVerificationDialog();
       return;
     }
 
@@ -552,21 +605,10 @@ async function proceedToPerformDivination() {
     // 記錄占卜成功
     recordPlayToday();
 
-    // 使用 showFortuneResult 展示占卜結果
-    if (result.fortune_data) {
-      showFortuneResult(result.fortune_data);
-    } else {
-      // 如果後端沒有返回占卜結果，生成一個默認結果
-      const defaultFortuneData = {
-        title: "今日運勢",
-        description: "今天是個好日子，財運亨通，事事順利！",
-        lucky_number: Math.floor(Math.random() * 100),
-        lucky_color: ["紅色", "藍色", "綠色", "黃色"][
-          Math.floor(Math.random() * 4)
-        ],
-      };
-      showFortuneResult(defaultFortuneData);
-    }
+    // 直接在前端生成占卜結果
+    const fortuneData = generateFortuneResult();
+    showFortuneResult(fortuneData);
+
     // 從第一次調用的結果中獲取 db_info
     if (result.db_info && result.db_info.play_times_total !== undefined) {
       const oldCount = totalPlayCount.value;
@@ -717,6 +759,7 @@ async function saveUserData() {
     });
 
     console.log("API 回應成功:", response.data);
+
     return response.data;
   } catch (error) {
     console.error("保存用戶數據失敗:", error);
@@ -765,24 +808,28 @@ function showAlreadyPlayedMessage() {
 
   let title = "您今天已經占卜過了";
   let message = "";
+  let imgUrl = "";
 
+  if (totalPlayCount.value < 5) {
+    imgUrl = "./imgs/one_four.png";
+  } else {
+    imgUrl = "./imgs/five.png";
+  }
   // 根據占卜次數決定顯示不同的訊息內容
   if (totalPlayCount.value === 1) {
     message =
       "恭喜獲得 LINE Points 5點抽獎資格！每人每天只能占卜一次，請明天再來！";
-  } else if (totalPlayCount.value >= 2 && totalPlayCount.value <= 4) {
-    message = "占卜完成！明天可以再來占卜";
-  } else if (totalPlayCount.value >= 5) {
-    message = "太棒了，占卜完成！祝您有美好的一天";
-  } else {
-    message = "每人每天只能占卜一次，請明天再來！";
   }
 
   Swal.fire({
     title: title,
     html: `
       <div class="special-message">
-        <p>${message}</p>
+        <div class="already-played-image">
+          <img src="${imgUrl}" alt="今日已參加過囉!" style="max-width: 100%; margin-bottom: 15px;">
+        </div>
+        ${message ? `<p class="points-message">${message}</p>` : ""}
+        <p>小提醒:天天能占卜，還可抽65錯LED、Dyson、咖啡機等好禮喔!</p>
       </div>
     `,
     icon: "info",
@@ -804,35 +851,58 @@ function showFortuneResult(fortuneData) {
   let resultMessage = "";
 
   if (totalPlayCount.value === 1) {
-    resultMessage = "<p>恭喜獲得 LINE Points 5點抽獎資格！</p>";
+    resultMessage =
+      "<div class='glowing-message'>占卜完成!<br>恭喜獲得 LINE Points 5點抽獎資格！</div>";
   } else if (totalPlayCount.value >= 2 && totalPlayCount.value <= 4) {
-    resultMessage = "<p>明天可以再來占卜</p>";
+    resultMessage =
+      "<div class='glowing-message'>占卜完成!<br>明天可以再來占卜</div>";
   } else if (totalPlayCount.value >= 5) {
-    resultMessage = "<p>太棒了，占卜完成！祝您有美好的一天</p>";
+    resultMessage =
+      "<div class='glowing-message'>太棒了，占卜完成！<br>祝您有美好的一天</div>";
   }
 
+  // 準備 LINE 分享的文本和 URL
+  const shareTitle = `我在「2025蛇年運勢占卜」中得到了「${fortuneData.title.split("|")[0].trim()}」`;
+  const shareUrl = window.location.href;
+
+  // 建立 LINE 分享連結
+  const lineShareUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareTitle)}`;
+
   Swal.fire({
+    // 使用完整的標題，已經包含了幸運指數
     title: fortuneData.title || "您的占卜結果",
     html: `
       <div class="divination-content">
         <p>${fortuneData.description || "您的運勢將會非常好！"}</p>
-        <p>幸運數字: ${fortuneData.lucky_number || "8"}</p>
-        <p>幸運顏色: ${fortuneData.lucky_color || "紅色"}</p>
-        ${resultMessage}
+        <p>${resultMessage}</p>
+        <div class="share-buttons">
+          <button id="line-share-btn" class="line-share-button">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/LINE_logo.svg" alt="LINE" width="20" height="20">
+            分享占卜結果
+          </button>
+        </div>
       </div>
     `,
     imageUrl: fortuneData.image_url || "https://example.com/fortune-image.jpg",
     imageWidth: 200,
     imageHeight: 300,
     imageAlt: "占卜卡片",
+    showConfirmButton: false, // 移除繼續按鈕
     showCloseButton: true,
-    confirmButtonText: "了解",
-    confirmButtonColor: "#1890ff",
     backdrop: `rgba(0,0,123,0.4)`,
     customClass: {
       popup: "custom-popup-class",
       title: "custom-title-class",
       content: "custom-content-class",
+    },
+    didOpen: () => {
+      // 綁定 LINE 分享按鈕事件
+      const lineShareBtn = document.getElementById("line-share-btn");
+      if (lineShareBtn) {
+        lineShareBtn.addEventListener("click", () => {
+          window.open(lineShareUrl, "_blank", "width=600,height=600");
+        });
+      }
     },
   }).then(() => {
     clearCookiesAfterDivination();
@@ -854,7 +924,7 @@ function showPostLoginVerificationDialog() {
       <div class="verification-content">
         <p>請先完成下方安全驗證以繼續占卜</p>
         <div id="turnstile-container" class="turnstile-wrapper"></div>
-        <button id="verify-continue-btn" class="continue-btn" disabled>繼續占卜</button>
+        <p class="verify-hint">驗證完成後將自動進行占卜</p>
       </div>
     `,
     showConfirmButton: false,
@@ -863,25 +933,6 @@ function showPostLoginVerificationDialog() {
     didOpen: () => {
       // 載入 Turnstile
       loadTurnstileScript();
-
-      // 綁定繼續按鈕事件
-      const continueBtn = Swal.getPopup().querySelector("#verify-continue-btn");
-      if (continueBtn) {
-        continueBtn.addEventListener("click", () => {
-          if (isTurnstileVerified.value && turnstileToken.value) {
-            try {
-              // 立即設置驗證成功狀態
-              setVerificationSuccess();
-              // 關閉彈窗
-              Swal.close();
-              // 執行占卜流程
-              proceedToPerformDivination();
-            } catch (e) {
-              console.error("驗證成功處理錯誤:", e);
-            }
-          }
-        });
-      }
     },
     willClose: () => {
       // 清理 Turnstile
@@ -1632,6 +1683,73 @@ onMounted(async () => {
     font-size: 14px;
     color: #666;
     margin-top: 15px;
+  }
+}
+
+/* 分享按鈕樣式 */
+:global(.share-buttons) {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+:global(.line-share-button) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #06c755;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #05a548;
+  }
+
+  img {
+    margin-right: 4px;
+  }
+}
+
+:global(.verify-hint) {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #666;
+  font-style: italic;
+}
+
+/* 發光的黃色外框訊息樣式 */
+:global(.glowing-message) {
+  padding: 15px;
+  margin: 20px auto;
+  border-radius: 8px;
+  border: 2px solid #ffcc00;
+  color: #d4380d;
+  font-weight: bold;
+  box-shadow:
+    0 0 10px #ffcc00,
+    0 0 20px rgba(255, 204, 0, 0.5);
+  animation: glowing 1.5s infinite alternate;
+  max-width: 90%;
+  text-align: center;
+}
+
+@keyframes glowing {
+  from {
+    box-shadow:
+      0 0 10px #ffcc00,
+      0 0 15px rgba(255, 204, 0, 0.5);
+  }
+  to {
+    box-shadow:
+      0 0 15px #ffcc00,
+      0 0 25px rgba(255, 204, 0, 0.7);
   }
 }
 </style>
