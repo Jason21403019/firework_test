@@ -39,6 +39,9 @@
         </button> -->
         <button @click="logout" class="debug-btn logout">登出</button>
       </div>
+      <button @click="showTestFortuneResult" class="debug-btn">
+        測試占卜結果
+      </button>
       <div class="debug-info">
         <p>登入狀態: {{ isLoggedIn ? "已登入" : "未登入" }}</p>
         <p>
@@ -275,6 +278,173 @@ async function checkSecurityVerification() {
   }
 }
 
+// ==================== 安全令牌管理模組 ====================
+const securityManager = {
+  // 流程令牌相關方法
+  flow: {
+    // 生成和儲存流程令牌
+    async generate() {
+      try {
+        const apiUrl = getApiUrl("auth_token.php");
+        console.log("正在獲取流程安全令牌...");
+
+        const response = await axios.get(apiUrl, {
+          withCredentials: true,
+          headers: { "X-Requested-With": "XMLHttpRequest" },
+        });
+
+        if (response.data.status !== "success") {
+          throw new Error("無法生成流程令牌");
+        }
+
+        const token = response.data.token;
+        // 改用 sessionStorage 保存，安全性更高
+        sessionStorage.setItem("fate2025_flow_token", token);
+
+        // 設置過期時間（10分鐘）
+        const expiryTime = Date.now() + 10 * 60 * 1000;
+        sessionStorage.setItem(
+          "fate2025_flow_token_expiry",
+          String(expiryTime),
+        );
+
+        console.log("流程令牌獲取成功:", token.substring(0, 10) + "...");
+        return token;
+      } catch (error) {
+        console.error("生成流程令牌錯誤:", error);
+        throw error;
+      }
+    },
+
+    // 獲取已存儲的流程令牌
+    get() {
+      // 檢查令牌是否過期
+      const expiryTime = parseInt(
+        sessionStorage.getItem("fate2025_flow_token_expiry") || "0",
+      );
+
+      // 增加5分鐘寬限期
+      const graceTime = 5 * 60 * 1000;
+
+      if (expiryTime + graceTime < Date.now()) {
+        // 令牌已過期，清除
+        console.warn("流程令牌已過期");
+        this.clear();
+        return null;
+      }
+
+      return sessionStorage.getItem("fate2025_flow_token");
+    },
+
+    // 清除流程令牌
+    clear() {
+      sessionStorage.removeItem("fate2025_flow_token");
+      sessionStorage.removeItem("fate2025_flow_token_expiry");
+    },
+  },
+
+  // CSRF 保護相關方法
+  csrf: {
+    // 生成新的 CSRF 令牌
+    async generate(action) {
+      try {
+        const apiUrl = getApiUrl("csrf_token.php");
+        const response = await axios.get(apiUrl, {
+          params: { action },
+          withCredentials: true,
+          headers: { "X-Requested-With": "XMLHttpRequest" },
+        });
+
+        if (response.data.status !== "success") {
+          throw new Error("無法生成 CSRF 令牌");
+        }
+
+        const token = response.data.token;
+        // 以操作類型為鍵存儲 CSRF 令牌
+        sessionStorage.setItem(`fate2025_csrf_${action}`, token);
+
+        return token;
+      } catch (error) {
+        console.error(`生成 ${action} CSRF 令牌錯誤:`, error);
+        throw error;
+      }
+    },
+
+    // 獲取特定操作的 CSRF 令牌
+    get(action) {
+      return sessionStorage.getItem(`fate2025_csrf_${action}`);
+    },
+
+    // 清除所有 CSRF 令牌
+    clearAll() {
+      // 清除所有 CSRF 相關令牌
+      for (let i = 0; i < sessionStorage.length; i++) {
+        const key = sessionStorage.key(i);
+        if (key && key.startsWith("fate2025_csrf_")) {
+          sessionStorage.removeItem(key);
+        }
+      }
+    },
+  },
+
+  // 清理所有安全相關的存儲
+  clearAll() {
+    this.flow.clear();
+    this.csrf.clearAll();
+  },
+};
+
+// 設置全局的 CSRF 保護攔截器
+function setupCSRFProtection() {
+  axios.interceptors.request.use(async (config) => {
+    // 只為修改資料的請求添加保護
+    if (["post", "put", "delete"].includes(config.method?.toLowerCase())) {
+      try {
+        // 從 URL 提取操作類型
+        const url = config.url || "";
+        let action = "default";
+
+        if (url.includes("auth_token.php")) action = "auth";
+        else if (url.includes("saveUserData.php")) action = "save";
+        else if (url.includes("checkPlayStatus.php")) action = "check";
+
+        // 獲取或生成 CSRF 令牌（改為非阻塞，允許請求繼續）
+        let token = securityManager.csrf.get(action);
+        if (!token) {
+          try {
+            token = await securityManager.csrf.generate(action);
+          } catch (e) {
+            console.warn("無法生成 CSRF 令牌，請求將繼續但可能不安全", e);
+          }
+        }
+
+        // 添加 CSRF 令牌到請求中
+        if (token) {
+          // 添加到 header
+          config.headers["X-CSRF-Token"] = token;
+
+          // 同時加到資料中
+          if (config.data instanceof FormData) {
+            config.data.append("csrf_token", token);
+          } else if (typeof config.data === "object") {
+            config.data = { ...config.data, csrf_token: token };
+          } else if (!config.data) {
+            config.data = { csrf_token: token };
+          }
+        }
+      } catch (error) {
+        // 錯誤時仍然允許請求繼續，避免阻斷功能
+        console.error("設置 CSRF 令牌時出錯:", error);
+      }
+
+      // 無論如何都添加防 XSS 請求標頭
+      config.headers["X-Requested-With"] = "XMLHttpRequest";
+    }
+
+    return config;
+  });
+}
+
 // ==================== 占卜相關功能 ====================
 // 檢查用戶今天是否已經占卜過
 async function hasPlayedToday() {
@@ -291,17 +461,37 @@ async function hasPlayedToday() {
   }
 
   try {
+    // 先確保有 CSRF 令牌
+    let csrfToken;
+    try {
+      csrfToken = await securityManager.csrf.generate("check");
+    } catch (csrfError) {
+      console.warn(
+        "無法生成 CSRF 令牌，將繼續檢查但可能存在安全風險",
+        csrfError,
+      );
+      // 如果無法生成令牌，則繼續但不使用 CSRF 保護
+    }
+
     const apiUrl = getApiUrl("checkPlayStatus.php");
 
     console.log("從資料庫檢查占卜狀態...");
-    const response = await axios.post(
-      apiUrl,
-      { udnmember, um2 },
-      {
-        headers: { "Content-Type": "application/json" },
-        withCredentials: true,
-      },
-    );
+
+    // 準備請求數據
+    const requestData = { udnmember, um2 };
+    const headers = { "Content-Type": "application/json" };
+
+    // 如果有 CSRF 令牌則添加
+    if (csrfToken) {
+      requestData.csrf_token = csrfToken;
+      headers["X-CSRF-Token"] = csrfToken;
+    }
+
+    // 發送請求
+    const response = await axios.post(apiUrl, requestData, {
+      headers,
+      withCredentials: true,
+    });
 
     if (
       response.data.status === "success" &&
@@ -315,7 +505,6 @@ async function hasPlayedToday() {
     return false;
   } catch (error) {
     console.error("檢查占卜狀態時發生錯誤:", error);
-
     // API 出錯時，為安全起見返回 false，避免阻止用戶占卜
     return false;
   }
@@ -400,6 +589,32 @@ function generateFortuneResult() {
   delete defaultResult.weight;
   return defaultResult;
 }
+
+// 用於測試顯示占卜結果的函數
+function showTestFortuneResult() {
+  const fortuneData = generateFortuneResult();
+
+  // 測試時也根據當前 totalPlayCount 生成適當的訊息
+  let testResultMessage = "";
+  if (totalPlayCount.value === 1) {
+    testResultMessage =
+      "<div class='glowing-message'>占卜完成!<br>恭喜獲得 LINE Points 5點抽獎資格！</div>";
+  } else if (totalPlayCount.value >= 2 && totalPlayCount.value <= 4) {
+    testResultMessage =
+      "<div class='glowing-message'>占卜完成!<br>明天可以再來占卜</div>";
+  } else if (totalPlayCount.value >= 5) {
+    testResultMessage =
+      "<div class='glowing-message'>太棒了，占卜完成！<br>祝您有美好的一天</div>";
+  } else {
+    // 防止 totalPlayCount 為 0 的情況
+    testResultMessage =
+      "<div class='glowing-message'>測試模式: 占卜完成!</div>";
+  }
+
+  console.log("測試函數 - totalPlayCount:", totalPlayCount.value);
+  console.log("測試函數 - 生成訊息:", testResultMessage);
+  showFortuneResult(fortuneData, testResultMessage);
+}
 // ==================== 流程控制函數 ====================
 // 1. 占卜流程啟動函數
 async function startDivination() {
@@ -427,28 +642,14 @@ async function startDivination() {
       return;
     }
 
-    // 3. 獲取 session token
-    const apiUrl = getApiUrl("auth_token.php");
+    // 3. 生成流程安全令牌
+    await securityManager.flow.generate();
 
-    console.log("正在獲取安全令牌...");
-    const tokenResponse = await axios.get(apiUrl, { withCredentials: true });
-
-    if (tokenResponse.data.status !== "success") {
-      throw new Error("無法生成安全令牌");
-    }
-
-    console.log("安全令牌獲取成功");
-    // 保存 token 到 localStorage 以便登入後使用
-    localStorage.setItem("fate2025_auth_token", tokenResponse.data.token);
-
-    // 同時也保存到 sessionStorage 作為備份
-    sessionStorage.setItem("fate2025_auth_token", tokenResponse.data.token);
-
-    // 4. 設置 session storage 標記，表示用戶剛開始進行登入流程
+    // 4. 設置流程標記
     sessionStorage.setItem("fate2025_just_logged_in", "true");
 
-    // 新增: 設置標記表示使用正確路徑進入登入流程
-    localStorage.setItem("fate2025_normal_flow", "true");
+    // 標記為正常流程
+    sessionStorage.setItem("fate2025_normal_flow", "true");
 
     console.log("正在跳轉到登入頁面...");
     // 跳轉到登入頁面
@@ -469,29 +670,17 @@ async function proceedToPerformDivination() {
     // 清除登入標記，確保一次性使用
     sessionStorage.removeItem("fate2025_just_logged_in");
 
-    console.log("檢查安全令牌...");
-    // 從 localStorage 或 sessionStorage 備份中獲取令牌
-    let authToken = localStorage.getItem("fate2025_auth_token");
-
-    // 如果 localStorage 中沒有找到，嘗試從備份中恢復
-    if (!authToken) {
-      console.log("嘗試從備份恢復安全令牌...");
-      authToken = sessionStorage.getItem("fate2025_auth_backup");
-
-      // 如果從備份中恢復成功，則回寫到 localStorage
-      if (authToken) {
-        console.log("從備份成功恢復安全令牌");
-        localStorage.setItem("fate2025_auth_token", authToken);
-      }
-    }
+    console.log("檢查流程安全令牌...");
+    // 獲取令牌
+    const flowToken = securityManager.flow.get();
 
     // 如果沒有令牌，嘗試重新開始占卜流程
-    if (!authToken) {
-      console.error("安全令牌不存在，嘗試重新開始占卜流程");
+    if (!flowToken) {
+      console.error("流程安全令牌不存在或已過期，需要重新開始占卜流程");
       Swal.fire({
         icon: "warning",
         title: "安全驗證失敗",
-        text: "需要重新開始占卜流程",
+        text: "驗證已過期，需要重新開始占卜流程",
         confirmButtonText: "重新開始",
         showCancelButton: false,
       }).then(() => {
@@ -520,25 +709,16 @@ async function proceedToPerformDivination() {
       },
     });
 
-    // 暫時保存令牌以便 saveUserData 使用
-    window.temp_auth_token = authToken;
-    window.temp_turnstile_token = turnstileToken.value;
-
-    console.log("驗證令牌已保存:", {
-      auth_token: !!window.temp_auth_token,
-      turnstile_token: !!window.temp_turnstile_token,
-    });
+    // 臨時保存 Turnstile token
+    sessionStorage.setItem("temp_turnstile_token", turnstileToken.value || "");
 
     // 保存用戶資料
     console.log("正在發送占卜資料...");
     const result = await saveUserData();
 
-    localStorage.removeItem("fate2025_auth_token");
-    sessionStorage.removeItem("fate2025_auth_backup");
-
-    // 清除暫存數據
-    delete window.temp_auth_token;
-    delete window.temp_turnstile_token;
+    // 清理令牌
+    securityManager.flow.clear();
+    sessionStorage.removeItem("temp_turnstile_token");
 
     // 關閉處理中訊息
     Swal.close();
@@ -598,16 +778,9 @@ async function proceedToPerformDivination() {
 
     // 如果已經占卜過
     if (result.already_played) {
-      showAlreadyPlayedMessage();
-      return;
+      // showAlreadyPlayedMessage();
+      // return;
     }
-
-    // 記錄占卜成功
-    recordPlayToday();
-
-    // 直接在前端生成占卜結果
-    const fortuneData = generateFortuneResult();
-    showFortuneResult(fortuneData);
 
     // 從第一次調用的結果中獲取 db_info
     if (result.db_info && result.db_info.play_times_total !== undefined) {
@@ -630,6 +803,27 @@ async function proceedToPerformDivination() {
       // 這裡假定不是首次占卜
       checkMilestoneAchievement(totalPlayCount.value, oldCount, false);
     }
+    // 記錄占卜成功
+    recordPlayToday();
+
+    // 直接在前端生成占卜結果
+    const fortuneData = generateFortuneResult();
+
+    let resultMessage = "";
+    if (totalPlayCount.value === 1) {
+      resultMessage =
+        "<div class='glowing-message'>占卜完成!<br>恭喜獲得 LINE Points 5點抽獎資格！</div>";
+    } else if (totalPlayCount.value >= 2 && totalPlayCount.value <= 4) {
+      resultMessage =
+        "<div class='glowing-message'>占卜完成!<br>明天可以再來占卜</div>";
+    } else if (totalPlayCount.value >= 5) {
+      resultMessage =
+        "<div class='glowing-message'>太棒了，占卜完成！<br>祝您有美好的一天</div>";
+    }
+    console.log("準備顯示結果，當前 totalPlayCount:", totalPlayCount.value);
+    console.log("生成的 resultMessage:", resultMessage);
+    showFortuneResult(fortuneData, resultMessage);
+
     // 更精確判斷是否是首次占卜
     if (result.db_info) {
       const oldCount = totalPlayCount.value;
@@ -722,15 +916,29 @@ async function saveUserData() {
 
     // 檢查 turnstile token 存在性
     const turnstileTokenValue =
-      window.temp_turnstile_token ||
       turnstileToken.value ||
-      sessionStorage.getItem("turnstile_token") ||
+      sessionStorage.getItem("temp_turnstile_token") ||
       null;
+
     console.log("Turnstile Token 狀態:", !!turnstileTokenValue);
 
     if (!turnstileTokenValue && !isDevelopment.value) {
       console.error("缺少 Turnstile Token");
       throw new Error("機器人驗證資料不完整，請重新驗證");
+    }
+
+    // 獲取流程令牌
+    const flowToken = securityManager.flow.get();
+    if (!flowToken && !isDevelopment.value) {
+      throw new Error("流程驗證失效，請重新開始占卜");
+    }
+
+    // 確保有 CSRF 令牌
+    let csrfToken;
+    try {
+      csrfToken = await securityManager.csrf.generate("save");
+    } catch (csrfError) {
+      console.warn("無法生成 CSRF 令牌，將繼續但可能存在安全風險", csrfError);
     }
 
     const apiUrl = getApiUrl("saveUserData.php");
@@ -741,25 +949,35 @@ async function saveUserData() {
     const um2 = getCookieValue("um2") || "";
     let email = udnmember || `user_${Date.now()}@example.com`;
 
+    // 準備要發送的數據 - 使用 flow_token 作為身份驗證令牌
     const userData = {
       udnmember,
       um2,
       email,
-      session_token: window.temp_auth_token || null,
+      flow_token: flowToken, // 這是關鍵點，確保使用 flow_token
       turnstile_token: turnstileTokenValue || null,
     };
 
+    // 如果有 CSRF 令牌，添加它
+    if (csrfToken) {
+      userData.csrf_token = csrfToken;
+    }
+
     console.log("準備發送的用戶數據:", userData);
 
+    // 發送請求
     console.log("開始發送 API 請求...");
     const response = await axios.post(apiUrl, userData, {
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+        ...(csrfToken ? { "X-CSRF-Token": csrfToken } : {}),
+      },
       withCredentials: true,
       timeout: 60000, // 60秒超時
     });
 
     console.log("API 回應成功:", response.data);
-
     return response.data;
   } catch (error) {
     console.error("保存用戶數據失敗:", error);
@@ -846,20 +1064,15 @@ function showAlreadyPlayedMessage() {
 }
 
 // 顯示占卜結果
-function showFortuneResult(fortuneData) {
-  // 依據占卜次數判斷要顯示的訊息
-  let resultMessage = "";
+function showFortuneResult(fortuneData, customResultMessage) {
+  // 直接使用傳入的訊息，不再重新宣告
+  console.log("showFortuneResult - totalPlayCount 值:", totalPlayCount.value);
+  console.log("showFortuneResult - customResultMessage:", customResultMessage);
 
-  if (totalPlayCount.value === 1) {
-    resultMessage =
-      "<div class='glowing-message'>占卜完成!<br>恭喜獲得 LINE Points 5點抽獎資格！</div>";
-  } else if (totalPlayCount.value >= 2 && totalPlayCount.value <= 4) {
-    resultMessage =
-      "<div class='glowing-message'>占卜完成!<br>明天可以再來占卜</div>";
-  } else if (totalPlayCount.value >= 5) {
-    resultMessage =
-      "<div class='glowing-message'>太棒了，占卜完成！<br>祝您有美好的一天</div>";
-  }
+  // 增加檢查，如果 customResultMessage 為空，則加上默認訊息
+  const messageToShow =
+    customResultMessage || "<div class='glowing-message'>占卜已完成！</div>";
+  console.log("最終顯示的訊息:", messageToShow);
 
   // 準備 LINE 分享的文本和 URL
   const shareTitle = `我在「2025蛇年運勢占卜」中得到了「${fortuneData.title.split("|")[0].trim()}」`;
@@ -874,7 +1087,7 @@ function showFortuneResult(fortuneData) {
     html: `
       <div class="divination-content">
         <p>${fortuneData.description || "您的運勢將會非常好！"}</p>
-        <p>${resultMessage}</p>
+        ${messageToShow}
         <div class="share-buttons">
           <button id="line-share-btn" class="line-share-button">
             <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/LINE_logo.svg" alt="LINE" width="20" height="20">
@@ -884,16 +1097,17 @@ function showFortuneResult(fortuneData) {
       </div>
     `,
     imageUrl: fortuneData.image_url || "https://example.com/fortune-image.jpg",
-    imageWidth: 200,
-    imageHeight: 300,
+    imageWidth: 440,
+    imageHeight: 340,
     imageAlt: "占卜卡片",
-    showConfirmButton: false, // 移除繼續按鈕
+    showConfirmButton: false,
     showCloseButton: true,
-    backdrop: `rgba(0,0,123,0.4)`,
+    backdrop: `rgb(0,0,0,0.5)`,
     customClass: {
       popup: "custom-popup-class",
       title: "custom-title-class",
       content: "custom-content-class",
+      image: "custom-image-class",
     },
     didOpen: () => {
       // 綁定 LINE 分享按鈕事件
@@ -1253,7 +1467,12 @@ function clearCookiesAfterDivination() {
 }
 // ==================== 生命週期鉤子 ====================
 onMounted(async () => {
-  // 設置 Shift + D 組合鍵顯示開發工具
+  // 第1部分：基本初始化設置
+  // ------------------------------------------
+  // 初始化全局 CSRF 保護機制
+  setupCSRFProtection();
+
+  // 註冊開發工具鍵盤快捷鍵
   const handleKeyDown = (event) => {
     if (event.shiftKey && event.key === "D") {
       toggleDebugTools();
@@ -1261,85 +1480,40 @@ onMounted(async () => {
   };
   window.addEventListener("keydown", handleKeyDown);
 
-  // 初始化: 更新登入狀態
-  updateLoginStatus();
-
-  // 設置定期檢查登入狀態
+  // 設置定期檢查登入狀態的計時器
   const loginCheckInterval = setInterval(updateLoginStatus, 5000);
 
-  // 優先獲取累計占卜次數，不管是否已經占卜過
+  // 組件卸載時清理資源
+  onBeforeUnmount(() => {
+    window.removeEventListener("keydown", handleKeyDown);
+    clearInterval(loginCheckInterval);
+  });
+
+  // 第2部分：更新用戶狀態
+  // ------------------------------------------
+  // 更新登入狀態
+  updateLoginStatus();
+
+  // 讀取驗證狀態
+  if (typeof window !== "undefined") {
+    isTurnstileVerified.value =
+      localStorage.getItem("fate2025_verified") === "true";
+  }
+
+  // 第3部分：獲取占卜次數與用戶資料
+  // ------------------------------------------
   if (isLoggedIn.value) {
-    try {
-      console.log("開始獲取累計占卜次數...");
-      const apiUrl = getApiUrl("checkPlayStatus.php");
-      const udnmember = getCookieValue("udnmember") || "";
-      const um2 = getCookieValue("um2") || "";
-
-      console.log("API路徑:", apiUrl);
-      console.log("用戶ID:", udnmember);
-
-      const response = await axios.post(
-        apiUrl,
-        { udnmember, um2 },
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        },
-      );
-
-      console.log("完整API回應:", response.data);
-
-      // 嘗試查找累計次數資訊
-      if (response.data.status === "success") {
-        if (response.data.play_times_total !== undefined) {
-          totalPlayCount.value = parseInt(response.data.play_times_total);
-          console.log("✅ 已獲取累計占卜次數:", totalPlayCount.value);
-        } else {
-          console.log("⚠️ API回應中沒有找到 play_times_total 欄位");
-          console.log("可用的欄位有:", Object.keys(response.data).join(", "));
-        }
-      }
-      // 嘗試查找是否為新用戶
-      if (response.data.status === "success" && response.data.db_info) {
-        const createdAt = new Date(response.data.db_info.created_at);
-        const today = new Date();
-
-        const isCreatedToday =
-          createdAt.getDate() === today.getDate() &&
-          createdAt.getMonth() === today.getMonth() &&
-          createdAt.getFullYear() === today.getFullYear();
-
-        if (isCreatedToday) {
-          const udnmember = getCookieValue("udnmember") || "";
-          if (udnmember) {
-            localStorage.setItem(`fate2025_new_user_${udnmember}`, "true");
-            console.log("已標記為新用戶 (首次註冊當天)");
-          }
-        }
-      }
-
-      // 初始化已完成的最高里程碑
-      if (totalPlayCount.value > 0) {
-        for (let i = milestones.length - 1; i >= 0; i--) {
-          if (totalPlayCount.value >= milestones[i]) {
-            lastAchievedMilestone.value = milestones[i];
-            break;
-          }
-        }
-        console.log("初始化已完成的最高里程碑:", lastAchievedMilestone.value);
-      }
-    } catch (error) {
-      console.error("❌ 獲取累計占卜次數錯誤:", error);
-    }
+    await fetchUserPlayData();
   } else {
     console.log("用戶未登入，無法獲取累計次數");
   }
 
-  // 初始化占卜狀態
+  // 第4部分：檢查占卜狀態
+  // ------------------------------------------
   try {
     await updatePlayedStatus();
 
-    // 新增: 如果已登入並且今天已經占卜過，立即顯示提示
+    // 如果已登入並且今天已占卜過，顯示提示
     if (isLoggedIn.value && hasPlayed.value) {
       console.log("檢測到用戶今天已經占卜過了");
       showAlreadyPlayedMessage();
@@ -1349,126 +1523,229 @@ onMounted(async () => {
     console.error("更新占卜狀態錯誤:", err);
   }
 
-  // 從 localStorage 中讀取驗證狀態
-  if (typeof window !== "undefined") {
-    isTurnstileVerified.value =
-      localStorage.getItem("fate2025_verified") === "true";
-  }
-
-  // 檢查使用者是否已登入但未經過檢查
+  // 第5部分：登入流程檢查
+  // ------------------------------------------
+  // 檢查是否首次訪問頁面
   const isFirstTimeCheck = !sessionStorage.getItem("login_checked");
 
-  // 只要用戶登入了，就檢查他們是否走了正確的流程
+  // 處理非正常流程登入的情況
   if (isLoggedIn.value && isFirstTimeCheck) {
-    // 標記已經檢查過登入狀態
-    sessionStorage.setItem("login_checked", "true");
-
-    // 檢查是否通過正常流程登入
-    const isNormalFlow =
-      localStorage.getItem("fate2025_normal_flow") === "true";
-
-    // 如果沒有通過正確流程但已經登入，顯示提示
-    if (!isNormalFlow) {
-      console.log("檢測到用戶不是從正常流程登入");
-
-      Swal.fire({
-        icon: "warning",
-        title: "請使用正確的占卜流程",
-        text: "請從活動首頁點擊「立即占卜」按鈕來完成占卜流程，直接使用登入網址將無法取得占卜結果。",
-        confirmButtonText: "我知道了",
-        confirmButtonColor: "#1890ff",
-      });
-
-      return;
-    }
+    await handleNonNormalLogin();
   }
 
-  // 檢查是否從會員登入跳轉回來
+  // 第6部分：從登入頁返回的處理
+  // ------------------------------------------
+  // 檢查是否從會員登入頁面返回
   const justLoggedIn =
     sessionStorage.getItem("fate2025_just_logged_in") === "true";
 
-  // 原有的登入後流程檢查邏輯保持不變
   if (justLoggedIn && isLoggedIn.value) {
-    console.log("檢測到從登入頁面返回");
+    await handlePostLoginProcess();
+  }
+});
 
-    // 檢查是否有備份的令牌需要還原
-    if (
-      !localStorage.getItem("fate2025_auth_token") &&
-      sessionStorage.getItem("fate2025_auth_token")
-    ) {
-      console.log("從 sessionStorage 恢復安全令牌");
-      localStorage.setItem(
-        "fate2025_auth_token",
-        sessionStorage.getItem("fate2025_auth_token"),
-      );
+// ==================== 提取的輔助函數 ====================
+
+// 獲取用戶占卜數據
+async function fetchUserPlayData() {
+  try {
+    console.log("開始獲取累計占卜次數...");
+    const apiUrl = getApiUrl("checkPlayStatus.php");
+    const udnmember = getCookieValue("udnmember") || "";
+    const um2 = getCookieValue("um2") || "";
+
+    console.log("API路徑:", apiUrl);
+    console.log("用戶ID:", udnmember);
+
+    const response = await axios.post(
+      apiUrl,
+      { udnmember, um2 },
+      {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
+      },
+    );
+
+    console.log("完整API回應:", response.data);
+
+    // 處理累計次數資訊
+    if (response.data.status === "success") {
+      if (response.data.play_times_total !== undefined) {
+        totalPlayCount.value = parseInt(response.data.play_times_total);
+        console.log("✅ 已獲取累計占卜次數:", totalPlayCount.value);
+      } else {
+        console.log("⚠️ API回應中沒有找到 play_times_total 欄位");
+      }
     }
 
-    // 檢查是否使用了正確的流程
-    const isNormalFlow =
-      localStorage.getItem("fate2025_normal_flow") === "true";
-    const justLoggedIn =
-      sessionStorage.getItem("fate2025_just_logged_in") === "true";
+    // 處理新用戶檢測
+    if (response.data.status === "success" && response.data.db_info) {
+      checkNewUserStatus(response.data.db_info);
+    }
 
-    // 或者是直接從登入頁面進來的（有 normal_flow 但沒有 just_logged_in 標記）
-    if (!isNormalFlow || (isLoggedIn.value && !justLoggedIn)) {
-      // 清除可能錯誤設置的正常流程標記
-      localStorage.removeItem("fate2025_normal_flow");
+    // 初始化已完成的最高里程碑
+    initializeAchievedMilestone();
+  } catch (error) {
+    console.error("❌ 獲取累計占卜次數錯誤:", error);
+  }
+}
 
-      console.log("檢測到用戶未經過正確占卜流程");
-      Swal.fire({
-        icon: "warning",
-        title: "請使用正確的占卜流程",
-        text: "請從活動首頁點擊「立即占卜」按鈕來完成占卜流程，直接使用登入網址將無法取得占卜結果。",
-        confirmButtonText: "我知道了",
-        confirmButtonColor: "#1890ff",
-      }).then(() => {
-        window.location.href =
-          window.location.origin + window.location.pathname;
-      });
+// 檢查是否為新用戶
+function checkNewUserStatus(dbInfo) {
+  if (!dbInfo || !dbInfo.created_at) return;
 
-      // 清除登入標記
-      sessionStorage.removeItem("fate2025_just_logged_in");
-      localStorage.removeItem("fate2025_auth_token");
-      sessionStorage.removeItem("fate2025_auth_token");
+  const createdAt = new Date(dbInfo.created_at);
+  const today = new Date();
+
+  const isCreatedToday =
+    createdAt.getDate() === today.getDate() &&
+    createdAt.getMonth() === today.getMonth() &&
+    createdAt.getFullYear() === today.getFullYear();
+
+  if (isCreatedToday) {
+    const udnmember = getCookieValue("udnmember") || "";
+    if (udnmember) {
+      localStorage.setItem(`fate2025_new_user_${udnmember}`, "true");
+      console.log("已標記為新用戶 (首次註冊當天)");
+    }
+  }
+}
+
+// 初始化已完成的最高里程碑
+function initializeAchievedMilestone() {
+  if (totalPlayCount.value > 0) {
+    for (let i = milestones.length - 1; i >= 0; i--) {
+      if (totalPlayCount.value >= milestones[i]) {
+        lastAchievedMilestone.value = milestones[i];
+        break;
+      }
+    }
+    console.log("初始化已完成的最高里程碑:", lastAchievedMilestone.value);
+  }
+}
+
+// 處理非正常流程登入
+async function handleNonNormalLogin() {
+  // 標記已經檢查過登入狀態
+  sessionStorage.setItem("login_checked", "true");
+
+  // 檢查是否通過正常流程登入
+  const isNormalFlow = localStorage.getItem("fate2025_normal_flow") === "true";
+
+  // 如果沒有通過正確流程但已經登入，顯示提示
+  if (!isNormalFlow) {
+    console.log("檢測到用戶不是從正常流程登入");
+
+    Swal.fire({
+      icon: "warning",
+      title: "請使用正確的占卜流程",
+      text: "請從活動首頁點擊「立即占卜」按鈕來完成占卜流程，直接使用登入網址將無法取得占卜結果。",
+      confirmButtonText: "我知道了",
+      confirmButtonColor: "#1890ff",
+    });
+  }
+}
+
+// 處理登入後返回的流程
+async function handlePostLoginProcess() {
+  console.log("檢測到從登入頁面返回");
+
+  // 檢查並恢復令牌
+  restoreTokenIfNeeded();
+
+  // 檢查流程有效性 - 優先使用 flow_token
+  const hasFlowToken = !!securityManager.flow.get();
+  const isNormalFlow =
+    sessionStorage.getItem("fate2025_normal_flow") === "true" ||
+    localStorage.getItem("fate2025_normal_flow") === "true";
+
+  console.log("流程檢查結果:", {
+    hasFlowToken,
+    isNormalFlow,
+    flowToken: securityManager.flow.get(),
+  });
+
+  // 處理非正常流程
+  if (!isNormalFlow && !hasFlowToken) {
+    handleInvalidFlow();
+    return;
+  }
+
+  // 正常流程處理
+  try {
+    // 檢查占卜狀態
+    const alreadyPlayed = await hasPlayedToday();
+
+    // 如果已經占卜過，顯示提示訊息
+    if (alreadyPlayed) {
+      showAlreadyPlayedMessage();
       return;
     }
 
-    try {
-      // 等待檢查占卜狀態
-      const alreadyPlayed = await hasPlayedToday();
-
-      // 如果已經占卜過，顯示提示訊息
-      if (alreadyPlayed) {
-        showAlreadyPlayedMessage();
-        return;
-      }
-
-      // 如果還沒有占卜過且已經通過驗證，進行占卜
-      const verified = await checkSecurityVerification();
-
-      if (verified) {
-        proceedToPerformDivination();
-      } else {
-        // 需要再次驗證
-        showPostLoginVerificationDialog();
-      }
-    } catch (error) {
-      console.error("登入後流程錯誤:", error);
-      Swal.fire({
-        icon: "error",
-        title: "系統錯誤",
-        text: "執行占卜流程時發生錯誤: " + (error.message || "未知錯誤"),
-        confirmButtonText: "確定",
-      });
-    }
+    // 檢查安全驗證狀態 - 這裡不再需要進行第二次驗證
+    // 直接顯示驗證對話框
+    showPostLoginVerificationDialog();
+  } catch (error) {
+    console.error("登入後流程錯誤:", error);
+    Swal.fire({
+      icon: "error",
+      title: "系統錯誤",
+      text: "執行占卜流程時發生錯誤: " + (error.message || "未知錯誤"),
+      confirmButtonText: "確定",
+    });
   }
+}
 
-  // 組件卸載時移除事件監聽器和清理定時器
-  onBeforeUnmount(() => {
-    window.removeEventListener("keydown", handleKeyDown);
-    clearInterval(loginCheckInterval);
+// 檢查並恢復令牌
+function restoreTokenIfNeeded() {
+  if (
+    !localStorage.getItem("fate2025_auth_token") &&
+    sessionStorage.getItem("fate2025_auth_token")
+  ) {
+    console.log("從 sessionStorage 恢復安全令牌");
+    localStorage.setItem(
+      "fate2025_auth_token",
+      sessionStorage.getItem("fate2025_auth_token"),
+    );
+
+    // 設置過期時間（10分鐘）
+    const expiryTime = Date.now() + 10 * 60 * 1000;
+    sessionStorage.setItem("fate2025_flow_token_expiry", String(expiryTime));
+  }
+}
+
+// 處理無效的流程
+function handleInvalidFlow() {
+  // 清除可能錯誤設置的標記
+  localStorage.removeItem("fate2025_normal_flow");
+  sessionStorage.removeItem("fate2025_normal_flow");
+
+  console.log("檢測到用戶未經過正確占卜流程");
+
+  // 顯示警告但給用戶選擇繼續的機會
+  Swal.fire({
+    icon: "warning",
+    title: "請注意",
+    text: "建議從活動首頁點擊「立即占卜」按鈕開始。您要繼續嗎？",
+    confirmButtonText: "繼續占卜",
+    confirmButtonColor: "#1890ff",
+    showCancelButton: true,
+    cancelButtonText: "返回首頁",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // 用戶選擇繼續，生成臨時令牌
+      securityManager.flow.generate().then(() => {
+        // 設置流程標記
+        sessionStorage.setItem("fate2025_normal_flow", "true");
+        // 顯示驗證對話框
+        showPostLoginVerificationDialog();
+      });
+    } else {
+      // 返回首頁
+      window.location.href = window.location.origin + window.location.pathname;
+    }
   });
-});
+}
 </script>
 
 <style lang="scss" scoped>
@@ -1730,14 +2007,18 @@ onMounted(async () => {
   margin: 20px auto;
   border-radius: 8px;
   border: 2px solid #ffcc00;
-  color: #d4380d;
+  background-color: rgba(255, 250, 230, 0.9); /* 改為淡黃色背景 */
+  color: #d4380d; /* 紅色文字 */
   font-weight: bold;
   box-shadow:
     0 0 10px #ffcc00,
     0 0 20px rgba(255, 204, 0, 0.5);
   animation: glowing 1.5s infinite alternate;
-  max-width: 90%;
+  max-width: 90%; /* 改為百分比值，增加寬度 */
   text-align: center;
+  font-size: 16px; /* 添加字體大小 */
+  display: block; /* 確保它是區塊元素 */
+  line-height: 1.5; /* 合適的行高 */
 }
 
 @keyframes glowing {
