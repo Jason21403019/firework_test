@@ -1,11 +1,20 @@
 <?php
-// 設置允許的請求來源
-header("Access-Control-Allow-Origin: https://lab-event.udn.com");
-header("Access-Control-Allow-Credentials: true");
-header("Content-Type: application/json; charset=UTF-8");
+// csrf_token.php - 生成 CSRF 令牌
 
-// 開啟會話
+// 設置允許的請求來源
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: https://lab-event.udn.com'); 
+header('Access-Control-Allow-Methods: GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Credentials: true');
+
+// 啟用 session
 session_start();
+
+// 處理 OPTIONS 請求
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    exit(0);
+}
 
 // 檢查是否為 AJAX 請求
 $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
@@ -17,10 +26,10 @@ if (!$isAjax) {
     exit();
 }
 
-// 檢查請求參數
+// 獲取操作類型參數
 $action = isset($_GET['action']) ? preg_replace('/[^a-z_]/', '', $_GET['action']) : 'default';
 
-// 生成一個強隨機令牌
+// 生成安全的隨機令牌
 function generateSecureToken($length = 32) {
     if (function_exists('random_bytes')) {
         return bin2hex(random_bytes($length));
@@ -38,12 +47,14 @@ function generateSecureToken($length = 32) {
     return $token;
 }
 
-// 生成CSRF令牌
+// 生成 CSRF 令牌
 $token = generateSecureToken();
 
 // 把令牌與會話綁定，根據操作類型區分
 $_SESSION['fate2025_csrf_' . $action] = $token;
-$_SESSION['fate2025_csrf_' . $action . '_time'] = time();
+
+// 記錄生成的令牌
+error_log("為 {$action} 操作生成了 CSRF 令牌: {$token}");
 
 // 返回令牌給客戶端
 echo json_encode([

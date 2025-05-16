@@ -10,10 +10,11 @@ session_start();
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Headers: Content-Type, X-CSRF-Token, X-Requested-With');
 
 // 記錄請求
-error_log("收到 checkPlayStatus 請求");
+error_log("收到 checkPlayStatus 請求, 方法: " . $_SERVER['REQUEST_METHOD']);
+error_log("Headers: " . json_encode(getallheaders()));
 
 // 處理 OPTIONS 請求
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -34,6 +35,26 @@ error_log("接收到的數據: " . $json);
 
 $udnmember = isset($data['udnmember']) ? $data['udnmember'] : null;
 $um2 = isset($data['um2']) ? $data['um2'] : null;
+$csrf_token = isset($data['csrf_token']) ? $data['csrf_token'] : null;
+
+// 添加 CSRF 檢查 (如果存在)
+if (!empty($csrf_token)) {
+    $csrf_header = isset($_SERVER['HTTP_X_CSRF_TOKEN']) ? $_SERVER['HTTP_X_CSRF_TOKEN'] : '';
+    $csrf_to_check = !empty($csrf_header) ? $csrf_header : $csrf_token;
+    
+    // 檢查 CSRF 令牌 - 僅記錄不拒絕請求
+    if (isset($_SESSION['fate2025_csrf_check']) && $_SESSION['fate2025_csrf_check'] !== $csrf_to_check) {
+        error_log("CSRF 令牌不匹配: 預期 " . $_SESSION['fate2025_csrf_check'] . ", 收到 " . $csrf_to_check);
+        // 不阻止請求繼續，但記錄此情況
+    } else {
+        error_log("CSRF 令牌驗證成功或不需要");
+    }
+    
+    // 使用後清除令牌
+    if (isset($_SESSION['fate2025_csrf_check'])) {
+        unset($_SESSION['fate2025_csrf_check']);
+    }
+}
 
 // 驗證必要參數
 if (empty($udnmember)) {

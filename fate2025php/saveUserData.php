@@ -6,9 +6,12 @@ session_start(); // 啟用 session
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: https://lab-event.udn.com'); 
 header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Headers: Content-Type, X-CSRF-Token, X-Requested-With');
 header('Access-Control-Allow-Credentials: true');
 
+// 記錄所有請求以方便調試
+error_log("saveUserData.php 收到請求 - Method: " . $_SERVER['REQUEST_METHOD']);
+error_log("Headers: " . json_encode(getallheaders()));
 
 // 處理 OPTIONS 請求
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -45,20 +48,66 @@ if (!$refererValid && !preg_match('/localhost|127\.0\.0\.1|192\.168\.|dev/i', $_
 $json = file_get_contents('php://input');
 $data = json_decode($json, true);
 
-$udnmember = isset($data['udnmember']) ? $data['udnmember'] : null;
-$um2 = isset($data['um2']) ? $data['um2'] : null;
-$turnstileToken = isset($data['turnstile_token']) ? $data['turnstile_token'] : null;
-$session_token = isset($data['session_token']) ? $data['session_token'] : null;
-
 // 記錄收到的數據
 error_log("收到的請求數據: " . $json);
 
-// [步驟 6] 驗證 session token
-if (empty($session_token) || !isset($_SESSION['auth_token']) || $_SESSION['auth_token'] !== $session_token) {
-    echo json_encode(['status' => 'error', 'message' => '安全驗證失敗，請重新開始占卜流程']);
+// 從請求中獲取關鍵參數
+$udnmember = isset($data['udnmember']) ? $data['udnmember'] : null;
+$um2 = isset($data['um2']) ? $data['um2'] : null;
+$turnstileToken = isset($data['turnstile_token']) ? $data['turnstile_token'] : null;
+$session_token = isset($data['flow_token']) ? $data['flow_token'] : null; // 修改使用 flow_token 作為 session_token
+$csrf_token = isset($data['csrf_token']) ? $data['csrf_token'] : null;
+
+// 添加 CSRF 檢查 (如果存在)
+if (!empty($csrf_token)) {
+    $csrf_header = isset($_SERVER['HTTP_X_CSRF_TOKEN']) ? $_SERVER['HTTP_X_CSRF_TOKEN'] : '';
+    $csrf_to_check = !empty($csrf_header) ? $csrf_header : $csrf_token;
+    
+    // 檢查 CSRF 令牌 - 僅記錄不拒絕請求
+    if (isset($_SESSION['fate2025_csrf_save']) && $_SESSION['fate2025_csrf_save'] !== $csrf_to_check) {
+        error_log("CSRF 令牌不匹配: 預期 " . $_SESSION['fate2025_csrf_save'] . ", 收到 " . $csrf_to_check);
+        // 不阻止請求繼續，但記錄此情況
+    } else {
+        error_log("CSRF 令牌驗證成功");
+    }
+    
+    // 使用後清除令牌
+    if (isset($_SESSION['fate2025_csrf_save'])) {
+        unset($_SESSION['fate2025_csrf_save']);
+    }
+}
+
+// 更改為檢查 flow_token 而非 auth_token
+// [步驟 6] 驗證 session token - 更靈活的檢查
+if (empty($session_token)) {
+    error_log("缺少 flow_token");
+    echo json_encode(['status' => 'error', 'message' => '安全驗證失敗，請重新開始占卜流程 (缺少令牌)']);
     exit;
 }
 
+// 檢查 session 中是否有 fate2025_flow_token - 更改檢查的 session 鍵名
+if (!isset($_SESSION['fate2025_flow_token'])) {
+    // 如果沒有 flow_token，檢查 auth_token 作為備用
+    if (!isset($_SESSION['auth_token'])) {
+        error_log("Session 中沒有 fate2025_flow_token 或 auth_token");
+        echo json_encode(['status' => 'error', 'message' => '安全驗證失敗，請重新開始占卜流程 (會話令牌無效)']);
+        exit;
+    } else {
+        // 使用 auth_token
+        if ($_SESSION['auth_token'] !== $session_token) {
+            error_log("auth_token 不匹配: " . $_SESSION['auth_token'] . " vs " . $session_token);
+            echo json_encode(['status' => 'error', 'message' => '安全驗證失敗，請重新開始占卜流程 (令牌不匹配)']);
+            exit;
+        }
+    }
+} else {
+    // 優先使用 fate2025_flow_token
+    if ($_SESSION['fate2025_flow_token'] !== $session_token) {
+        error_log("flow_token 不匹配: " . $_SESSION['fate2025_flow_token'] . " vs " . $session_token);
+        echo json_encode(['status' => 'error', 'message' => '安全驗證失敗，請重新開始占卜流程 (令牌不匹配)']);
+        exit;
+    }
+}
 
 // [步驟 7] 驗證 Turnstile token 
 if (!empty($turnstileToken)) {
