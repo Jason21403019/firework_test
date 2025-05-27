@@ -33,10 +33,10 @@
     <div v-if="showDebugTools" class="debug-tools">
       <h3>開發測試工具</h3>
       <div class="debug-actions">
-        <!-- <button @click="clearPlayRecord" class="debug-btn">清除占卜記錄</button>/ -->
-        <!-- <button @click="resetDatabase" class="debug-btn danger">
+        <button @click="clearPlayRecord" class="debug-btn">清除占卜記錄</button>
+        <button @click="resetDatabase" class="debug-btn danger">
           重置資料庫
-        </button> -->
+        </button>
         <button @click="logout" class="debug-btn logout">登出</button>
       </div>
       <button @click="showTestFortuneResult" class="debug-btn">
@@ -226,7 +226,7 @@ function renderTurnstile() {
   try {
     turnstileWidgetId.value = window.turnstile.render("#turnstile-container", {
       sitekey: TURNSTILE_SITE_KEY,
-      theme: "light",
+      theme: "dark",
       callback: function (token) {
         console.log(
           "Turnstile 驗證成功，取得 token:",
@@ -266,18 +266,6 @@ function setVerificationSuccess() {
   isTurnstileVerified.value = true;
 }
 
-// 確認安全驗證狀態
-async function checkSecurityVerification() {
-  try {
-    // 在實際環境中，可以向後端發送請求檢查驗證狀態
-    // 這裡簡化為使用本地記錄
-    const isVerified = localStorage.getItem("fate2025_verified") === "true";
-    // return isVerified || isDevelopment.value; // 開發環境始終視為已驗證
-  } catch (error) {
-    return false;
-  }
-}
-
 // ==================== 安全令牌管理模組 ====================
 const securityManager = {
   // 流程令牌相關方法
@@ -301,8 +289,8 @@ const securityManager = {
         // 改用 sessionStorage 保存，安全性更高
         sessionStorage.setItem("fate2025_flow_token", token);
 
-        // 設置過期時間（10分鐘）
-        const expiryTime = Date.now() + 10 * 60 * 1000;
+        // 設置過期時間（5分鐘）
+        const expiryTime = Date.now() + 5 * 60 * 1000;
         sessionStorage.setItem(
           "fate2025_flow_token_expiry",
           String(expiryTime),
@@ -323,8 +311,8 @@ const securityManager = {
         sessionStorage.getItem("fate2025_flow_token_expiry") || "0",
       );
 
-      // 增加5分鐘寬限期
-      const graceTime = 5 * 60 * 1000;
+      // 增加2分鐘寬限期
+      const graceTime = 2 * 60 * 1000;
 
       if (expiryTime + graceTime < Date.now()) {
         // 令牌已過期，清除
@@ -343,106 +331,38 @@ const securityManager = {
     },
   },
 
-  // CSRF 保護相關方法
-  csrf: {
-    // 生成新的 CSRF 令牌
-    async generate(action) {
-      try {
-        const apiUrl = getApiUrl("csrf_token.php");
-        const response = await axios.get(apiUrl, {
-          params: { action },
-          withCredentials: true,
-          headers: { "X-Requested-With": "XMLHttpRequest" },
-        });
-
-        if (response.data.status !== "success") {
-          throw new Error("無法生成 CSRF 令牌");
-        }
-
-        const token = response.data.token;
-        // 以操作類型為鍵存儲 CSRF 令牌
-        sessionStorage.setItem(`fate2025_csrf_${action}`, token);
-
-        return token;
-      } catch (error) {
-        console.error(`生成 ${action} CSRF 令牌錯誤:`, error);
-        throw error;
-      }
-    },
-
-    // 獲取特定操作的 CSRF 令牌
-    get(action) {
-      return sessionStorage.getItem(`fate2025_csrf_${action}`);
-    },
-
-    // 清除所有 CSRF 令牌
-    clearAll() {
-      // 清除所有 CSRF 相關令牌
-      for (let i = 0; i < sessionStorage.length; i++) {
-        const key = sessionStorage.key(i);
-        if (key && key.startsWith("fate2025_csrf_")) {
-          sessionStorage.removeItem(key);
-        }
-      }
-    },
-  },
-
   // 清理所有安全相關的存儲
   clearAll() {
     this.flow.clear();
-    this.csrf.clearAll();
   },
 };
 
-// 設置全局的 CSRF 保護攔截器
-function setupCSRFProtection() {
-  axios.interceptors.request.use(async (config) => {
-    // 只為修改資料的請求添加保護
-    if (["post", "put", "delete"].includes(config.method?.toLowerCase())) {
-      try {
-        // 從 URL 提取操作類型
-        const url = config.url || "";
-        let action = "default";
+// 處理 API 請求
+async function apiRequest(endpoint, method = "GET", data = null) {
+  try {
+    // 配置請求選項
+    const options = {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      withCredentials: true, // 重要：允許傳送 cookies
+    };
 
-        if (url.includes("auth_token.php")) action = "auth";
-        else if (url.includes("saveUserData.php")) action = "save";
-        else if (url.includes("checkPlayStatus.php")) action = "check";
-
-        // 獲取或生成 CSRF 令牌（改為非阻塞，允許請求繼續）
-        let token = securityManager.csrf.get(action);
-        if (!token) {
-          try {
-            token = await securityManager.csrf.generate(action);
-          } catch (e) {
-            console.warn("無法生成 CSRF 令牌，請求將繼續但可能不安全", e);
-          }
-        }
-
-        // 添加 CSRF 令牌到請求中
-        if (token) {
-          // 添加到 header
-          config.headers["X-CSRF-Token"] = token;
-
-          // 同時加到資料中
-          if (config.data instanceof FormData) {
-            config.data.append("csrf_token", token);
-          } else if (typeof config.data === "object") {
-            config.data = { ...config.data, csrf_token: token };
-          } else if (!config.data) {
-            config.data = { csrf_token: token };
-          }
-        }
-      } catch (error) {
-        // 錯誤時仍然允許請求繼續，避免阻斷功能
-        console.error("設置 CSRF 令牌時出錯:", error);
-      }
-
-      // 無論如何都添加防 XSS 請求標頭
-      config.headers["X-Requested-With"] = "XMLHttpRequest";
+    // 如果有數據，添加到請求中
+    if (data) {
+      options.data = data;
     }
 
-    return config;
-  });
+    // 發送請求
+    const apiUrl = getApiUrl(endpoint);
+    const response = await axios(apiUrl, options);
+    return response.data;
+  } catch (error) {
+    console.error(`API 請求錯誤 (${endpoint}):`, error);
+    throw error;
+  }
 }
 
 // ==================== 占卜相關功能 ====================
@@ -461,36 +381,19 @@ async function hasPlayedToday() {
   }
 
   try {
-    // 先確保有 CSRF 令牌
-    let csrfToken;
-    try {
-      csrfToken = await securityManager.csrf.generate("check");
-    } catch (csrfError) {
-      console.warn(
-        "無法生成 CSRF 令牌，將繼續檢查但可能存在安全風險",
-        csrfError,
-      );
-      // 如果無法生成令牌，則繼續但不使用 CSRF 保護
-    }
-
+    // 移除對 csrf.generate 的調用
+    // 不再需要生成前端的 CSRF 令牌
+    
     const apiUrl = getApiUrl("checkPlayStatus.php");
-
     console.log("從資料庫檢查占卜狀態...");
 
     // 準備請求數據
     const requestData = { udnmember, um2 };
-    const headers = { "Content-Type": "application/json" };
 
-    // 如果有 CSRF 令牌則添加
-    if (csrfToken) {
-      requestData.csrf_token = csrfToken;
-      headers["X-CSRF-Token"] = csrfToken;
-    }
-
-    // 發送請求
+    // 發送請求 - 不再手動添加 CSRF 令牌，後端會處理
     const response = await axios.post(apiUrl, requestData, {
-      headers,
-      withCredentials: true,
+      headers: { "Content-Type": "application/json" },
+      withCredentials: true, // 重要：確保傳送 cookie
     });
 
     if (
@@ -667,16 +570,17 @@ async function startDivination() {
 // 2. 驗證成功後執行占卜流程
 async function proceedToPerformDivination() {
   try {
+    console.log("=== 開始執行占卜流程 ===");
+
     // 清除登入標記，確保一次性使用
     sessionStorage.removeItem("fate2025_just_logged_in");
 
+    // 步驟1: 檢查流程安全令牌
     console.log("檢查流程安全令牌...");
-    // 獲取令牌
     const flowToken = securityManager.flow.get();
 
-    // 如果沒有令牌，嘗試重新開始占卜流程
     if (!flowToken) {
-      console.error("流程安全令牌不存在或已過期，需要重新開始占卜流程");
+      console.error("流程安全令牌不存在或已過期");
       Swal.fire({
         icon: "warning",
         title: "安全驗證失敗",
@@ -689,16 +593,16 @@ async function proceedToPerformDivination() {
       return;
     }
 
-    // 檢查 Turnstile token 是否存在
+    // 步驟2: 檢查 Turnstile token（非開發環境）
+    console.log("檢查 Turnstile token...");
     if (!turnstileToken.value && !isDevelopment.value) {
       console.error("Turnstile token 不存在，需要重新驗證");
       showPostLoginVerificationDialog();
       return;
     }
 
-    console.log("所有令牌就緒，繼續占卜流程");
-
-    // 顯示處理中訊息
+    // 步驟3: 顯示占卜進行中的提示
+    console.log("開始占卜處理...");
     Swal.fire({
       title: "占卜中...",
       text: "正在解讀您的命運",
@@ -709,204 +613,176 @@ async function proceedToPerformDivination() {
       },
     });
 
-    // 臨時保存 Turnstile token
-    sessionStorage.setItem("temp_turnstile_token", turnstileToken.value || "");
-
-    // 保存用戶資料
+    // 步驟4: 調用 API 保存用戶數據
     console.log("正在發送占卜資料...");
     const result = await saveUserData();
+
+    // 關閉處理中訊息
+    Swal.close();
+
+    console.log("API 回應結果:", result);
+
+    // 步驟5: 處理 API 回應
+    if (result.status === "error") {
+      await handleApiError(result);
+      return;
+    }
+
+    // 步驟6: 處理成功的占卜結果
+    if (result.status === "success") {
+      await handleSuccessfulDivination(result);
+    }
+  } catch (error) {
+    console.error("占卜流程執行錯誤:", error);
+    Swal.close(); // 確保關閉任何開啟的對話框
+
+    Swal.fire({
+      icon: "error",
+      title: "系統錯誤",
+      text: "執行占卜時發生錯誤: " + (error.message || "未知錯誤"),
+      confirmButtonText: "確定",
+      showCancelButton: true,
+      cancelButtonText: "重新嘗試",
+    }).then((result) => {
+      if (result.isDismissed) {
+        showPostLoginVerificationDialog();
+      }
+    });
+  }
+}
+
+// 處理 API 錯誤的輔助函數
+async function handleApiError(result) {
+  console.log("處理 API 錯誤:", result);
+
+  // 只有在明確收到 already_played = true 時才設置為已占卜
+  if (result.already_played === true) {
+    console.log("用戶今天已經占卜過了");
 
     // 清理令牌
     securityManager.flow.clear();
     sessionStorage.removeItem("temp_turnstile_token");
 
-    // 關閉處理中訊息
-    Swal.close();
-
-    console.log("API 回應:", result);
-
-    // 檢查回應
-    if (result.status === "error") {
-      // 檢查是否為驗證失敗錯誤
-      if (result.message && result.message.includes("機器人驗證失敗")) {
-        Swal.fire({
-          icon: "warning",
-          title: "機器人驗證失敗",
-          text: "請重新進行驗證",
-          confirmButtonText: "重新驗證",
-        }).then(() => {
-          // 重新顯示驗證對話框
-          showPostLoginVerificationDialog();
-        });
-        return;
-      }
-
-      // 檢查是否為bot自動化行為相關的錯誤
-      if (result.message && result.message.includes("系統檢測到自動化行為")) {
-        Swal.fire({
-          icon: "error",
-          title: "安全警告",
-          text: "系統檢測到自動化行為，請勿使用機器人或腳本，請使用正常瀏覽器操作。",
-          confirmButtonText: "重新驗證",
-          confirmButtonColor: "#ff4d4f",
-        }).then(() => {
-          // 重新顯示驗證對話框
-          showPostLoginVerificationDialog();
-        });
-        return;
-      }
-
-      // 檢查是否為timeout或重複提交的錯誤
-      if (
-        result.message &&
-        result.message.includes("請勿重複提交或驗證已過期")
-      ) {
-        Swal.fire({
-          icon: "warning",
-          title: "驗證已過期",
-          text: "請勿重複提交或驗證已過期，請重新進行驗證。",
-          confirmButtonText: "重新驗證",
-        }).then(() => {
-          // 重新顯示驗證對話框
-          showPostLoginVerificationDialog();
-        });
-        return;
-      }
-
-      throw new Error(result.message || "伺服器錯誤");
-    }
-
-    // 如果已經占卜過
-    if (result.already_played) {
-      // showAlreadyPlayedMessage();
-      // return;
-    }
-
-    // 從第一次調用的結果中獲取 db_info
+    // 更新占卜次數
     if (result.db_info && result.db_info.play_times_total !== undefined) {
-      const oldCount = totalPlayCount.value;
       totalPlayCount.value = parseInt(result.db_info.play_times_total);
-      console.log("累計占卜次數更新為:", totalPlayCount.value);
-
-      // 判斷是否是首次占卜
-      const isFirstTime =
-        result.message && result.message.includes("首次占卜成功");
-
-      // 傳入 isFirstTime 參數給 checkMilestoneAchievement
-      checkMilestoneAchievement(totalPlayCount.value, oldCount, isFirstTime);
-    } else {
-      // 如果API沒有返回次數，本地增加計數
-      const oldCount = totalPlayCount.value;
-      totalPlayCount.value++;
-      console.log("本地更新累計占卜次數為:", totalPlayCount.value);
-
-      // 這裡假定不是首次占卜
-      checkMilestoneAchievement(totalPlayCount.value, oldCount, false);
-    }
-    // 記錄占卜成功
-    recordPlayToday();
-
-    // 直接在前端生成占卜結果
-    const fortuneData = generateFortuneResult();
-
-    let resultMessage = "";
-    if (totalPlayCount.value === 1) {
-      resultMessage =
-        "<div class='glowing-message'>占卜完成!<br>恭喜獲得 LINE Points 5點抽獎資格！</div>";
-    } else if (totalPlayCount.value >= 2 && totalPlayCount.value <= 4) {
-      resultMessage =
-        "<div class='glowing-message'>占卜完成!<br>明天可以再來占卜</div>";
-    } else if (totalPlayCount.value >= 5) {
-      resultMessage =
-        "<div class='glowing-message'>太棒了，占卜完成！<br>祝您有美好的一天</div>";
-    }
-    console.log("準備顯示結果，當前 totalPlayCount:", totalPlayCount.value);
-    console.log("生成的 resultMessage:", resultMessage);
-    showFortuneResult(fortuneData, resultMessage);
-
-    // 更精確判斷是否是首次占卜
-    if (result.db_info) {
-      const oldCount = totalPlayCount.value;
-      totalPlayCount.value = parseInt(result.db_info.play_times_total || 1);
-
-      // 判斷是否是首次占卜 - 通過創建時間和更新時間判斷
-      const createdDate = result.db_info.created_at
-        ? new Date(result.db_info.created_at).toDateString()
-        : null;
-      const updatedDate = result.db_info.updated_at
-        ? new Date(result.db_info.updated_at).toDateString()
-        : null;
-
-      // 如果創建日期和更新日期在同一天，或者 play_times_total 為 1，認為是首次占卜
-      const isFirstTime =
-        createdDate === updatedDate || totalPlayCount.value === 1;
-
-      console.log("會員占卜資訊:", {
-        createdDate,
-        updatedDate,
-        isFirstTime,
-        totalPlayCount: totalPlayCount.value,
-      });
-
-      checkMilestoneAchievement(totalPlayCount.value, oldCount, isFirstTime);
-    }
-    // 從 result 中獲取創建時間，判斷是否為首次註冊用戶
-    if (result.db_info) {
-      const createdAt = new Date(result.db_info.created_at);
-      const updatedAt = new Date(result.db_info.updated_at);
-
-      // 檢查創建日期和今天是否是同一天
-      const today = new Date();
-      const isCreatedToday =
-        createdAt.getDate() === today.getDate() &&
-        createdAt.getMonth() === today.getMonth() &&
-        createdAt.getFullYear() === today.getFullYear();
-
-      // 如果是今天創建的帳號，標記為新用戶
-      if (isCreatedToday) {
-        const udnmember = getCookieValue("udnmember") || "";
-        if (udnmember) {
-          localStorage.setItem(`fate2025_new_user_${udnmember}`, "true");
-          console.log("已標記為新用戶 (首次註冊當天)");
-
-          // 設置今天結束時自動清除新用戶標記
-          const endOfDay = new Date();
-          endOfDay.setHours(23, 59, 59, 999);
-          const timeUntilEndOfDay = endOfDay.getTime() - Date.now();
-
-          setTimeout(() => {
-            localStorage.removeItem(`fate2025_new_user_${udnmember}`);
-            console.log("已自動清除新用戶標記");
-          }, timeUntilEndOfDay);
-        }
-      }
+      console.log("更新累計占卜次數為:", totalPlayCount.value);
     }
 
-    // 更新狀態
-    await updatePlayedStatus();
-  } catch (error) {
-    console.error("占卜流程執行錯誤:", error);
+    // 只有在確認已占卜時才更新狀態
+    hasPlayed.value = true;
 
-    // 錯誤處理
-    try {
-      const checkAgain = await hasPlayedToday();
-      if (checkAgain) {
-        showAlreadyPlayedMessage();
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "系統錯誤",
-          text: "執行占卜時發生錯誤: " + (error.message || "未知錯誤"),
-        });
-      }
-    } catch (e) {
-      Swal.fire({
-        icon: "error",
-        title: "系統錯誤",
-        text: "執行占卜時發生錯誤，請稍後再試",
-      });
-    }
+    // 顯示已占卜過的訊息
+    showAlreadyPlayedMessage();
+    return;
   }
+
+  // 機器人驗證失敗
+  if (result.message && result.message.includes("機器人驗證失敗")) {
+    console.log("機器人驗證失敗，要求重新驗證");
+    Swal.fire({
+      icon: "warning",
+      title: "機器人驗證失敗",
+      text: "請重新進行驗證",
+      confirmButtonText: "重新驗證",
+    }).then(() => {
+      showPostLoginVerificationDialog();
+    });
+    return;
+  }
+
+  // 自動化行為檢測
+  if (result.message && result.message.includes("系統檢測到自動化行為")) {
+    console.log("檢測到自動化行為");
+    Swal.fire({
+      icon: "error",
+      title: "安全警告",
+      text: "系統檢測到自動化行為，請勿使用機器人或腳本，請使用正常瀏覽器操作。",
+      confirmButtonText: "重新驗證",
+      confirmButtonColor: "#ff4d4f",
+    }).then(() => {
+      showPostLoginVerificationDialog();
+    });
+    return;
+  }
+
+  // 其他錯誤（包括500錯誤）- 不要設置 hasPlayed.value = true
+  console.log("其他 API 錯誤，不更新占卜狀態:", result.message);
+  Swal.fire({
+    icon: "error",
+    title: "占卜失敗",
+    text: result.message || "伺服器錯誤，請稍後再試",
+    confirmButtonText: "確定",
+    showCancelButton: true,
+    cancelButtonText: "重新嘗試",
+  }).then((modalResult) => {
+    if (
+      modalResult.isDismissed ||
+      modalResult.dismiss === Swal.DismissReason.cancel
+    ) {
+      // 使用者點擊了「重新嘗試」或取消按鈕
+      showPostLoginVerificationDialog();
+    }
+  });
+}
+
+// 處理成功占卜的輔助函數
+async function handleSuccessfulDivination(result) {
+  console.log("=== 處理成功的占卜結果 ===");
+
+  // 清理令牌
+  securityManager.flow.clear();
+  sessionStorage.removeItem("temp_turnstile_token");
+
+  // 更新占卜次數
+  const oldCount = totalPlayCount.value;
+  if (result.db_info && result.db_info.play_times_total !== undefined) {
+    totalPlayCount.value = parseInt(result.db_info.play_times_total);
+    console.log("累計占卜次數更新為:", totalPlayCount.value);
+  } else {
+    // 如果 API 沒有返回次數，本地增加計數
+    totalPlayCount.value++;
+    console.log("本地更新累計占卜次數為:", totalPlayCount.value);
+  }
+
+  // 判斷是否是首次占卜
+  const isFirstTime = result.message && result.message.includes("首次占卜成功");
+  console.log("是否首次占卜:", isFirstTime);
+
+  // 檢查里程碑成就
+  checkMilestoneAchievement(totalPlayCount.value, oldCount, isFirstTime);
+
+  // 記錄占卜成功
+  recordPlayToday();
+
+  // 生成占卜結果
+  const fortuneData = generateFortuneResult(); // 使用前端生成，不依賴後端
+  console.log("占卜結果:", fortuneData);
+
+  // 根據占卜次數生成對應訊息
+  let resultMessage = generateResultMessage(totalPlayCount.value);
+  console.log("生成的結果訊息:", resultMessage);
+
+  // 顯示占卜結果
+  console.log("準備顯示占卜結果彈窗");
+  showFortuneResult(fortuneData, resultMessage);
+
+  // 更新狀態
+  await updatePlayedStatus();
+
+  console.log("=== 占卜流程完成 ===");
+}
+
+// 生成結果訊息的輔助函數
+function generateResultMessage(playCount) {
+  if (playCount === 1) {
+    return "<div class='glowing-message'>占卜完成!<br>恭喜獲得 LINE Points 5點抽獎資格！</div>";
+  } else if (playCount >= 2 && playCount <= 4) {
+    return "<div class='glowing-message'>占卜完成!<br>明天可以再來占卜</div>";
+  } else if (playCount >= 5) {
+    return "<div class='glowing-message'>太棒了，占卜完成！<br>祝您有美好的一天</div>";
+  }
+  return "<div class='glowing-message'>占卜完成！</div>";
 }
 
 // 3. 保存用戶數據到資料庫
@@ -933,14 +809,6 @@ async function saveUserData() {
       throw new Error("流程驗證失效，請重新開始占卜");
     }
 
-    // 確保有 CSRF 令牌
-    let csrfToken;
-    try {
-      csrfToken = await securityManager.csrf.generate("save");
-    } catch (csrfError) {
-      console.warn("無法生成 CSRF 令牌，將繼續但可能存在安全風險", csrfError);
-    }
-
     const apiUrl = getApiUrl("saveUserData.php");
     console.log("使用的 API 路徑:", apiUrl);
 
@@ -954,14 +822,9 @@ async function saveUserData() {
       udnmember,
       um2,
       email,
-      flow_token: flowToken, // 這是關鍵點，確保使用 flow_token
+      flow_token: flowToken,
       turnstile_token: turnstileTokenValue || null,
     };
-
-    // 如果有 CSRF 令牌，添加它
-    if (csrfToken) {
-      userData.csrf_token = csrfToken;
-    }
 
     console.log("準備發送的用戶數據:", userData);
 
@@ -971,9 +834,8 @@ async function saveUserData() {
       headers: {
         "Content-Type": "application/json",
         "X-Requested-With": "XMLHttpRequest",
-        ...(csrfToken ? { "X-CSRF-Token": csrfToken } : {}),
       },
-      withCredentials: true,
+      withCredentials: true, // 確保傳送 cookie
       timeout: 60000, // 60秒超時
     });
 
@@ -1047,7 +909,7 @@ function showAlreadyPlayedMessage() {
           <img src="${imgUrl}" alt="今日已參加過囉!" style="max-width: 100%; margin-bottom: 15px;">
         </div>
         ${message ? `<p class="points-message">${message}</p>` : ""}
-        <p>小提醒:天天能占卜，還可抽65錯LED、Dyson、咖啡機等好禮喔!</p>
+        <p>小提醒:天天能占卜，還可抽65吋LED電視、Dyson、咖啡機等好禮喔!</p>
       </div>
     `,
     icon: "info",
@@ -1170,28 +1032,28 @@ function toggleDebugTools() {
 
 // ==================== 調試功能 ====================
 // 清除占卜記錄 (用於測試)
-// async function clearPlayRecord() {
-//   if (typeof window === "undefined") return;
+async function clearPlayRecord() {
+  if (typeof window === "undefined") return;
 
-//   const udnmember = getCookieValue("udnmember") || "";
-//   const storageKey = udnmember
-//     ? `fate2025_last_played_${udnmember}`
-//     : "fate2025_last_played";
+  const udnmember = getCookieValue("udnmember") || "";
+  const storageKey = udnmember
+    ? `fate2025_last_played_${udnmember}`
+    : "fate2025_last_played";
 
-//   localStorage.removeItem(storageKey);
+  localStorage.removeItem(storageKey);
 
-//   // 重要：立即更新占卜狀態
-//   hasPlayed.value = false;
+  // 重要：立即更新占卜狀態
+  hasPlayed.value = false;
 
-//   Swal.fire({
-//     toast: true,
-//     icon: "success",
-//     title: "占卜記錄已清除",
-//     position: "top-end",
-//     showConfirmButton: false,
-//     timer: 1500,
-//   });
-// }
+  Swal.fire({
+    toast: true,
+    icon: "success",
+    title: "占卜記錄已清除",
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 1500,
+  });
+}
 
 // 檢查資料庫狀態
 async function debugCheckDatabase() {
@@ -1276,60 +1138,60 @@ ${JSON.stringify(response.data, null, 2)}
 }
 
 // 重置資料庫 - 刪除所有記錄並重置 ID
-// async function resetDatabase() {
-//   if (typeof window === "undefined") return;
+async function resetDatabase() {
+  if (typeof window === "undefined") return;
 
-//   const result = await Swal.fire({
-//     title: "確定要重置資料庫?",
-//     text: "這將刪除所有記錄並重置 ID！這個操作無法撤銷！",
-//     icon: "warning",
-//     showCancelButton: true,
-//     confirmButtonText: "是，重置！",
-//     cancelButtonText: "取消",
-//     confirmButtonColor: "#d33",
-//     cancelButtonColor: "#3085d6",
-//   });
+  const result = await Swal.fire({
+    title: "確定要重置資料庫?",
+    text: "這將刪除所有記錄並重置 ID！這個操作無法撤銷！",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "是，重置！",
+    cancelButtonText: "取消",
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+  });
 
-//   if (!result.isConfirmed) return;
+  if (!result.isConfirmed) return;
 
-//   try {
-//     const apiUrl = getApiUrl("resetDatabase.php");
+  try {
+    const apiUrl = getApiUrl("resetDatabase.php");
 
-//     // 發送重置請求，包含安全密鑰
-//     const response = await axios.post(
-//       apiUrl,
-//       { security_key: "reset2025fate" },
-//       {
-//         headers: { "Content-Type": "application/json" },
-//       },
-//     );
+    // 發送重置請求，包含安全密鑰
+    const response = await axios.post(
+      apiUrl,
+      { security_key: "reset2025fate" },
+      {
+        headers: { "Content-Type": "application/json" },
+      },
+    );
 
-//     if (response.data.status === "success") {
-//       Swal.fire({
-//         title: "重置成功",
-//         text: "資料庫已成功重置。",
-//         icon: "success",
-//         confirmButtonText: "確定",
-//       });
+    if (response.data.status === "success") {
+      Swal.fire({
+        title: "重置成功",
+        text: "資料庫已成功重置。",
+        icon: "success",
+        confirmButtonText: "確定",
+      });
 
-//       // 同時清除本地存儲
-//       localStorage.clear();
+      // 同時清除本地存儲
+      localStorage.clear();
 
-//       // 重新載入頁面
-//       setTimeout(() => window.location.reload(), 1500);
-//     } else {
-//       throw new Error(response.data.message || "重置失敗");
-//     }
-//   } catch (error) {
-//     console.error("重置資料庫時發生錯誤:", error);
-//     Swal.fire({
-//       title: "重置失敗",
-//       text: `發生錯誤: ${error.message}`,
-//       icon: "error",
-//       confirmButtonText: "確定",
-//     });
-//   }
-// }
+      // 重新載入頁面
+      setTimeout(() => window.location.reload(), 1500);
+    } else {
+      throw new Error(response.data.message || "重置失敗");
+    }
+  } catch (error) {
+    console.error("重置資料庫時發生錯誤:", error);
+    Swal.fire({
+      title: "重置失敗",
+      text: `發生錯誤: ${error.message}`,
+      icon: "error",
+      confirmButtonText: "確定",
+    });
+  }
+}
 
 // 登出功能
 function logout() {
@@ -1469,9 +1331,6 @@ function clearCookiesAfterDivination() {
 onMounted(async () => {
   // 第1部分：基本初始化設置
   // ------------------------------------------
-  // 初始化全局 CSRF 保護機制
-  setupCSRFProtection();
-
   // 註冊開發工具鍵盤快捷鍵
   const handleKeyDown = (event) => {
     if (event.shiftKey && event.key === "D") {
@@ -1708,8 +1567,8 @@ function restoreTokenIfNeeded() {
       sessionStorage.getItem("fate2025_auth_token"),
     );
 
-    // 設置過期時間（10分鐘）
-    const expiryTime = Date.now() + 10 * 60 * 1000;
+    // 設置過期時間（5分鐘）
+    const expiryTime = Date.now() + 5 * 60 * 1000;
     sessionStorage.setItem("fate2025_flow_token_expiry", String(expiryTime));
   }
 }

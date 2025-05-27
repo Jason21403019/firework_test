@@ -1,12 +1,7 @@
 <?php
-// auth_token.php - 生成並存儲流程令牌
-
 // 設置允許的請求來源
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: https://lab-event.udn.com'); 
-header('Access-Control-Allow-Methods: GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-header('Access-Control-Allow-Credentials: true');
+require_once('./basic/base.php');
+setCorsHeaders('GET, OPTIONS', 'Content-Type');
 
 // 啟用 session
 session_start();

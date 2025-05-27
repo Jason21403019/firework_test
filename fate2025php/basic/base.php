@@ -194,3 +194,12 @@ function checkEmail($email)
     curl_close($ch);
     return $arrResponse['status'];
 }
+
+// 設定 CORS 標頭
+function setCorsHeaders($methods = 'GET, OPTIONS', $headers = 'Content-Type') {
+    header('Content-Type: application/json');
+    header('Access-Control-Allow-Origin: ' . CORS_ALLOWED_ORIGIN);
+    header('Access-Control-Allow-Methods: ' . $methods);
+    header('Access-Control-Allow-Headers: ' . $headers);
+    header('Access-Control-Allow-Credentials: true');
+}

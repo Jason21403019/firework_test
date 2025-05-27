@@ -1,7 +1,11 @@
 <?php
 require_once('./basic/base.php');
 require_once('./basic/connetDB.php');
-session_start(); // 啟用 session
+require_once('./basic/csrf_handler.php');
+session_start();
+
+// 設定台灣時區
+date_default_timezone_set('Asia/Taipei');
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: https://lab-event.udn.com'); 
@@ -11,7 +15,6 @@ header('Access-Control-Allow-Credentials: true');
 
 // 記錄所有請求以方便調試
 error_log("saveUserData.php 收到請求 - Method: " . $_SERVER['REQUEST_METHOD']);
-error_log("Headers: " . json_encode(getallheaders()));
 
 // 處理 OPTIONS 請求
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -24,29 +27,16 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// 檢查來源網址 (Referer)
-$allowedReferers = ['lab-event.udn.com', 'event.udn.com'];
-$refererValid = false;
-
-if (isset($_SERVER['HTTP_REFERER'])) {
-    foreach ($allowedReferers as $domain) {
-        if (strpos($_SERVER['HTTP_REFERER'], $domain) !== false) {
-            $refererValid = true;
-            break;
-        }
-    }
-}
-
-// 開發環境可略過 referer 檢查
-if (!$refererValid && !preg_match('/localhost|127\.0\.0\.1|192\.168\.|dev/i', $_SERVER['HTTP_HOST'])) {
-    error_log("非法的請求來源: " . ($_SERVER['HTTP_REFERER'] ?? '未知'));
-    echo json_encode(['status' => 'error', 'message' => '非法請求來源']);
-    exit;
-}
-
 // 獲取 POST 數據
 $json = file_get_contents('php://input');
 $data = json_decode($json, true);
+
+// 檢查 JSON 解析是否成功
+if (json_last_error() !== JSON_ERROR_NONE) {
+    error_log("JSON 解析錯誤: " . json_last_error_msg());
+    echo json_encode(['status' => 'error', 'message' => 'JSON 格式錯誤']);
+    exit;
+}
 
 // 記錄收到的數據
 error_log("收到的請求數據: " . $json);
@@ -55,45 +45,57 @@ error_log("收到的請求數據: " . $json);
 $udnmember = isset($data['udnmember']) ? $data['udnmember'] : null;
 $um2 = isset($data['um2']) ? $data['um2'] : null;
 $turnstileToken = isset($data['turnstile_token']) ? $data['turnstile_token'] : null;
-$session_token = isset($data['flow_token']) ? $data['flow_token'] : null; // 修改使用 flow_token 作為 session_token
-$csrf_token = isset($data['csrf_token']) ? $data['csrf_token'] : null;
+$session_token = isset($data['flow_token']) ? $data['flow_token'] : null;
 
-// 添加 CSRF 檢查 (如果存在)
-if (!empty($csrf_token)) {
-    $csrf_header = isset($_SERVER['HTTP_X_CSRF_TOKEN']) ? $_SERVER['HTTP_X_CSRF_TOKEN'] : '';
-    $csrf_to_check = !empty($csrf_header) ? $csrf_header : $csrf_token;
-    
-    // 檢查 CSRF 令牌 - 僅記錄不拒絕請求
-    if (isset($_SESSION['fate2025_csrf_save']) && $_SESSION['fate2025_csrf_save'] !== $csrf_to_check) {
-        error_log("CSRF 令牌不匹配: 預期 " . $_SESSION['fate2025_csrf_save'] . ", 收到 " . $csrf_to_check);
-        // 不阻止請求繼續，但記錄此情況
-    } else {
-        error_log("CSRF 令牌驗證成功");
-    }
-    
-    // 使用後清除令牌
-    if (isset($_SESSION['fate2025_csrf_save'])) {
-        unset($_SESSION['fate2025_csrf_save']);
-    }
+// 從 header 或請求數據或 cookie 中獲取 CSRF 令牌
+$csrf_token = null;
+$action = 'save'; // 當前操作類型
+
+// 1. 從 header 中獲取
+$csrf_header = isset($_SERVER['HTTP_X_CSRF_TOKEN']) ? $_SERVER['HTTP_X_CSRF_TOKEN'] : null;
+if ($csrf_header) {
+    $csrf_token = $csrf_header;
 }
 
-// 更改為檢查 flow_token 而非 auth_token
-// [步驟 6] 驗證 session token - 更靈活的檢查
+// 2. 從請求數據中獲取
+if (!$csrf_token && isset($data['csrf_token'])) {
+    $csrf_token = $data['csrf_token'];
+}
+
+// 3. 從 cookie 中獲取(此為備用方法，不推薦使用)
+if (!$csrf_token && isset($_COOKIE["fate2025_csrf_{$action}"])) {
+    $csrf_token = $_COOKIE["fate2025_csrf_{$action}"];
+}
+
+// 驗證 CSRF 令牌
+if ($csrf_token) {
+    if (!CSRFHandler::verify($csrf_token, $action)) {
+        error_log("CSRF 驗證失敗");
+        echo json_encode(['status' => 'error', 'message' => '安全驗證失敗，請重新嘗試']);
+        exit;
+    } else {
+        error_log("CSRF 驗證成功");
+    }
+} else {
+    // 可選：根據安全需求決定是否強制要求 CSRF 令牌
+    error_log("請求中未找到 CSRF 令牌");
+    // echo json_encode(['status' => 'error', 'message' => '安全驗證失敗，請重新嘗試 (缺少令牌)']);
+    // exit;
+}
+
+// 驗證 session token
 if (empty($session_token)) {
     error_log("缺少 flow_token");
     echo json_encode(['status' => 'error', 'message' => '安全驗證失敗，請重新開始占卜流程 (缺少令牌)']);
     exit;
 }
 
-// 檢查 session 中是否有 fate2025_flow_token - 更改檢查的 session 鍵名
 if (!isset($_SESSION['fate2025_flow_token'])) {
-    // 如果沒有 flow_token，檢查 auth_token 作為備用
     if (!isset($_SESSION['auth_token'])) {
         error_log("Session 中沒有 fate2025_flow_token 或 auth_token");
         echo json_encode(['status' => 'error', 'message' => '安全驗證失敗，請重新開始占卜流程 (會話令牌無效)']);
         exit;
     } else {
-        // 使用 auth_token
         if ($_SESSION['auth_token'] !== $session_token) {
             error_log("auth_token 不匹配: " . $_SESSION['auth_token'] . " vs " . $session_token);
             echo json_encode(['status' => 'error', 'message' => '安全驗證失敗，請重新開始占卜流程 (令牌不匹配)']);
@@ -101,7 +103,6 @@ if (!isset($_SESSION['fate2025_flow_token'])) {
         }
     }
 } else {
-    // 優先使用 fate2025_flow_token
     if ($_SESSION['fate2025_flow_token'] !== $session_token) {
         error_log("flow_token 不匹配: " . $_SESSION['fate2025_flow_token'] . " vs " . $session_token);
         echo json_encode(['status' => 'error', 'message' => '安全驗證失敗，請重新開始占卜流程 (令牌不匹配)']);
@@ -109,19 +110,17 @@ if (!isset($_SESSION['fate2025_flow_token'])) {
     }
 }
 
-// [步驟 7] 驗證 Turnstile token 
+// 驗證 Turnstile token 
 if (!empty($turnstileToken)) {
     $verificationResult = verifyTurnstileToken($turnstileToken);
     
     if (!is_array($verificationResult) || !isset($verificationResult['success']) || !$verificationResult['success']) {
         $errorMessage = '機器人驗證失敗';
         
-        // 如果是數組且包含錯誤代碼，提供更具體的錯誤訊息
         if (is_array($verificationResult) && isset($verificationResult['error_codes'])) {
             $errorCodes = implode(', ', $verificationResult['error_codes']);
             $errorMessage .= "：{$errorCodes}";
             
-            // 特定錯誤的處理
             if (in_array('timeout-or-duplicate', $verificationResult['error_codes'])) {
                 $errorMessage = '請勿重複提交或驗證已過期，請刷新頁面重試';
             } else if (in_array('invalid-input-response', $verificationResult['error_codes'])) {
@@ -129,7 +128,6 @@ if (!empty($turnstileToken)) {
             }
         }
         
-        // 對於機器人，給出特定警告
         if (is_array($verificationResult) && isset($verificationResult['is_bot']) && $verificationResult['is_bot']) {
             $errorMessage = '系統檢測到自動化行為，請勿使用機器人或腳本';
         }
@@ -139,7 +137,7 @@ if (!empty($turnstileToken)) {
     }
 }
 
-// [步驟 8 & 9] 檢查是否取得必要的 cookie
+// 檢查是否取得必要的 cookie
 if (empty($udnmember) || empty($um2)) {
     echo json_encode(['status' => 'error', 'message' => '未取得會員資訊，請重新登入']);
     exit;
@@ -156,23 +154,25 @@ try {
     if (!empty($udnmember)) {
         // 嘗試獲取 email
         $memberData = getMemberMail($udnmember);
-        $isVerified = $memberData['verified'];
-        
-        if ($isVerified && !empty($memberData['email'])) {
-            $email = $memberData['email'];
-        } else {
-            // 備用方法
-            if (!empty($um2)) {
-                try {
-                    $userLogin = getUdnMember($udnmember, $um2);
-                    if (isset($userLogin['response']['status']) && 
-                        $userLogin['response']['status'] === 'success' &&
-                        isset($userLogin['response']['email'])) {
-                        $email = filter_var($userLogin['response']['email'], FILTER_SANITIZE_EMAIL);
-                        $isVerified = true;
+        if (is_array($memberData)) {
+            $isVerified = $memberData['verified'] ?? false;
+            
+            if ($isVerified && !empty($memberData['email'])) {
+                $email = $memberData['email'];
+            } else {
+                // 備用方法
+                if (!empty($um2)) {
+                    try {
+                        $userLogin = getUdnMember($udnmember, $um2);
+                        if (isset($userLogin['response']['status']) && 
+                            $userLogin['response']['status'] === 'success' &&
+                            isset($userLogin['response']['email'])) {
+                            $email = filter_var($userLogin['response']['email'], FILTER_SANITIZE_EMAIL);
+                            $isVerified = true;
+                        }
+                    } catch (Exception $e) {
+                        error_log("getUdnMember 失敗: " . $e->getMessage());
                     }
-                } catch (Exception $e) {
-                    error_log("getUdnMember 失敗: " . $e->getMessage());
                 }
             }
         }
@@ -183,14 +183,17 @@ try {
         $email = $udnmember . '@example.com';
     }
     
+    error_log("最終使用的 email: " . $email);
+    
     // 獲取用戶 IP
     $ip = getIP();
     
-    // [步驟 10] 檢查 IP 是否在短時間內重複嘗試
+    // 檢查 IP 是否在短時間內重複嘗試
     $ipCheckStmt = $pdo->prepare("SELECT MAX(updated_at) AS last_attempt FROM test_fate_event WHERE ip = :ip");
     $ipCheckStmt->bindParam(':ip', $ip);
     $ipCheckStmt->execute();
-    $lastAttempt = $ipCheckStmt->fetch(PDO::FETCH_ASSOC)['last_attempt'];
+    $ipResult = $ipCheckStmt->fetch(PDO::FETCH_ASSOC);
+    $lastAttempt = $ipResult ? $ipResult['last_attempt'] : null;
     
     if ($lastAttempt) {
         $timeSinceLastAttempt = time() - strtotime($lastAttempt);
@@ -204,28 +207,35 @@ try {
         }
     }
     
+    // 獲取當前日期（台灣時區）
+    $today = date('Y-m-d');
+    error_log("今天日期 (台灣時區): " . $today);
+    
     // 檢查用戶是否已存在
     $stmt = $pdo->prepare("SELECT * FROM test_fate_event WHERE email = :email");
     $stmt->bindParam(':email', $email);
     $stmt->execute();
-    
-    // 獲取當前日期（台灣時區）
-    $today = date('Y-m-d', strtotime('+8 hours'));
     
     if ($stmt->rowCount() > 0) {
         // 用戶已存在
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         
         // 從 updated_at 欄位提取上次更新日期
-        $lastUpdatedDate = date('Y-m-d', strtotime($row['updated_at']));
+        $lastUpdatedTimestamp = strtotime($row['updated_at']);
+        $lastUpdatedDate = date('Y-m-d', $lastUpdatedTimestamp);
         
-        // [步驟 10] 檢查是否在今天已經占卜過
+        error_log("用戶 {$email} 上次占卜日期: " . $lastUpdatedDate . " (完整時間: " . $row['updated_at'] . ")");
+        error_log("今天日期: " . $today);
+        error_log("日期比較結果: " . ($lastUpdatedDate === $today ? '相同 - 今天已占卜' : '不同 - 可以占卜'));
+        
+        // 檢查是否在今天已經占卜過
         if ($lastUpdatedDate === $today) {
             echo json_encode([
                 'status' => 'error',
                 'message' => '您今天已經占卜過了，請明天再來',
                 'already_played' => true,
                 'last_play_date' => $lastUpdatedDate,
+                'today' => $today,
                 'db_info' => [
                     'email' => $row['email'],
                     'username' => $row['username'],
@@ -239,7 +249,9 @@ try {
         }
         
         // 如果今天尚未占卜，則更新記錄
-        $play_times_total = $row['play_times_total'] + 1;
+        $play_times_total = intval($row['play_times_total']) + 1;
+        
+        error_log("用戶 {$email} 今天尚未占卜，準備更新記錄 (第 {$play_times_total} 次)");
         
         $updateStmt = $pdo->prepare("UPDATE test_fate_event SET 
             username = :username,
@@ -260,6 +272,8 @@ try {
         $fetchStmt->execute();
         $userData = $fetchStmt->fetch(PDO::FETCH_ASSOC);
         
+        error_log("用戶 {$email} 占卜成功，記錄已更新");
+        
         echo json_encode([
             'status' => 'success', 
             'message' => '占卜成功！', 
@@ -272,10 +286,11 @@ try {
                 'updated_at' => $userData['updated_at'],
                 'play_times_total' => $userData['play_times_total']
             ],
-            'fortune_data' => generateFortuneData() // 產生占卜結果
         ]);
     } else {
         // 創建新用戶
+        error_log("新用戶 {$email} 首次占卜，創建記錄");
+        
         $stmt = $pdo->prepare("INSERT INTO test_fate_event 
             (email, username, ip, play_times_total, created_at, updated_at) 
             VALUES (:email, :username, :ip, 1, NOW(), NOW())");
@@ -292,6 +307,8 @@ try {
         $fetchStmt->execute();
         $userData = $fetchStmt->fetch(PDO::FETCH_ASSOC);
         
+        error_log("新用戶 {$email} 記錄創建成功");
+        
         echo json_encode([
             'status' => 'success', 
             'message' => '首次占卜成功！', 
@@ -304,7 +321,6 @@ try {
                 'updated_at' => $userData['updated_at'],
                 'play_times_total' => $userData['play_times_total']
             ],
-            'fortune_data' => generateFortuneData() // 產生占卜結果
         ]);
     }
 } catch(PDOException $e) {
@@ -319,7 +335,7 @@ try {
  * Turnstile token 驗證函數
  */
 function verifyTurnstileToken($token) {
-    $secret = TURNSTILE_SECRET_KEY; // 應該配置在安全的環境變數中
+    $secret = TURNSTILE_SECRET_KEY;
     $ip = getIP();
     
     $url = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
@@ -341,15 +357,12 @@ function verifyTurnstileToken($token) {
     $result = file_get_contents($url, false, $context);
     $response = json_decode($result, true);
     
-    // 記錄完整回應以供調試
     error_log("Turnstile API response: " . print_r($response, true));
     
     if (!isset($response['success']) || $response['success'] !== true) {
-        // 獲取錯誤代碼並記錄
         $errorCodes = $response['error-codes'] ?? ['unknown_error'];
         error_log("Turnstile validation failed: " . implode(', ', $errorCodes));
         
-        // 返回更詳細的錯誤信息
         return [
             'success' => false,
             'error_codes' => $errorCodes,
@@ -359,93 +372,35 @@ function verifyTurnstileToken($token) {
     
     return [
         'success' => true,
-        'cdata' => $response['cdata'] ?? null,  // 客戶數據
-        'hostname' => $response['hostname'] ?? null,  // 主機名稱
-        'challenge_ts' => $response['challenge_ts'] ?? null  // 挑戰時間戳
+        'cdata' => $response['cdata'] ?? null,
+        'hostname' => $response['hostname'] ?? null,
+        'challenge_ts' => $response['challenge_ts'] ?? null
     ];
 }
 
 /**
- * 產生占卜結果（模擬）
- */
-function generateFortuneData() {
-    // 定義占卜結果及其權重（機率百分比）
-    $fortunes = [
-        [
-            'id' => 'fortune_1',
-            'title' => '財運亨通',
-            'description' => '今年財運亨通，可能會有意外之財。投資謹慎，避免衝動決策。',
-            'weight' => 40  // 40% 機率
-        ],
-        [
-            'id' => 'fortune_2',
-            'title' => '事業有成',
-            'description' => '工作上將遇到貴人相助，把握機會表現自己，升職加薪指日可待。',
-            'weight' => 30  // 30% 機率
-        ],
-        [
-            'id' => 'fortune_3',
-            'title' => '桃花朵朵',
-            'description' => '感情生活甜蜜，單身者有機會遇到心儀對象，已有伴侶者關係更加穩固。',
-            'weight' => 20  // 20% 機率
-        ],
-        [
-            'id' => 'fortune_4',
-            'title' => '健康平安',
-            'description' => '身體健康狀況良好，注意作息規律，適度運動。心情愉悅，遠離煩惱。',
-            'weight' => 10  // 10% 機率
-        ]
-    ];
-    
-    // 計算權重總和
-    $totalWeight = array_sum(array_column($fortunes, 'weight'));
-    
-    // 產生隨機數
-    $randomValue = mt_rand(1, $totalWeight);
-    
-    // 根據權重選擇結果
-    $currentWeight = 0;
-    foreach ($fortunes as $fortune) {
-        $currentWeight += $fortune['weight'];
-        if ($randomValue <= $currentWeight) {
-            // 移除 weight 欄位，不需要返回給前端
-            unset($fortune['weight']);
-            return $fortune;
-        }
-    }
-    
-    // 預設情況下返回第一個結果（理論上不會執行到這裡）
-    unset($fortunes[0]['weight']);
-    return $fortunes[0];
-}
-
-/**
- * 添加會員數據同步函數 - 用於獲取真實 email
+ * 獲取會員信箱函數
  */
 function getMemberMail($memberId)
 {
-    // 檢查 Cookie 取得會員信箱
     $email = null;
+    $verified = false;
     $apiUrl = "https://umapi.udn.com/member/wbs/MemberUm2Check";
 
-    // 優先使用 udnmember，如果不存在則嘗試使用 udnland
-    $udnmember = !empty($_COOKIE['udnmember']) ? $_COOKIE['udnmember'] : $_COOKIE['udnland'] ?? '';
+    $udnmember = !empty($_COOKIE['udnmember']) ? $_COOKIE['udnmember'] : ($_COOKIE['udnland'] ?? '');
     $um2 = $_COOKIE['um2'] ?? '';
 
-    // 如果有必要的 cookie 值
     if (!empty($udnmember) && !empty($um2)) {
         $um2Encoded = urlencode($um2);
 
-        // 準備 API 請求數據 - 更新配置
         $data = [
             'account' => $udnmember,
             'um2' => $um2Encoded,
             'json' => 'Y',
-            'site' => 'fate_event',  // 網站代碼，限制20字元
-            'check_ts' => 'S'        // 檢查cookie時效是否超過30分鐘
+            'site' => 'fate_event',
+            'check_ts' => 'S'
         ];
 
-        // 從會員系統 API 獲取資料
         $ch = curl_init();
 
         curl_setopt_array($ch, [
@@ -456,69 +411,43 @@ function getMemberMail($memberId)
         ]);
 
         $response = curl_exec($ch);
+        
+        if (curl_error($ch)) {
+            error_log("cURL 錯誤: " . curl_error($ch));
+        }
+        
         curl_close($ch);
 
-        // 解析 API 回應
-        $data = json_decode($response, true);
-        if (json_last_error() === JSON_ERROR_NONE) {
-            // 檢查 API 響應狀態
-            if (isset($data['response']) && isset($data['response']['status']) && $data['response']['status'] === 'success') {
-                if (isset($data['response']['email'])) {
-                    $email = filter_var($data['response']['email'], FILTER_SANITIZE_EMAIL);
+        if ($response) {
+            $data = json_decode($response, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                if (isset($data['response']) && isset($data['response']['status']) && $data['response']['status'] === 'success') {
+                    if (isset($data['response']['email'])) {
+                        $email = filter_var($data['response']['email'], FILTER_SANITIZE_EMAIL);
+                    }
+                    $verified = true;
+                } else {
+                    $verified = false;
+                    error_log("Member verification failed: " . json_encode($data));
                 }
-                // 驗證成功的狀態
-                $verified = true;
             } else {
-                // 驗證失敗
                 $verified = false;
-                error_log("Member verification failed: " . json_encode($data));
+                error_log("Failed to parse member API response: " . $response);
             }
-        } else {
-            $verified = false;
-            error_log("Failed to parse member API response: " . $response);
         }
     } else {
         $verified = false;
     }
 
-    // 如果API請求失敗，嘗試從 fg_mail cookie 獲取
     if (empty($email) && isset($_COOKIE['fg_mail'])) {
         $email = filter_var(urldecode($_COOKIE['fg_mail']), FILTER_SANITIZE_EMAIL);
     }
 
-    // 記錄會員信箱到日誌
     error_log("Member email fetched: " . ($email ?: 'NULL') . " for ID: " . $memberId);
 
     return [
         'member_id' => $memberId,
         'email' => $email,
-        'verified' => $verified ?? false
+        'verified' => $verified
     ];
 }
-
-/**
- * 驗證安全令牌
- */
-function validateSecurityToken($userId, $um2, $token) {
-    if (empty($userId) || empty($um2) || empty($token)) {
-        return false;
-    }
-    
-    // 在開發環境中可以註解這一行來略過安全檢查
-    // return true;  
-    
-    // 產生預期的令牌
-    $today = date('Y-m-d', strtotime('+8 hours'));  // 台灣時區 UTC+8
-    $baseString = "{$userId}-{$um2}-{$today}-fate2025";
-    
-    // 產生安全雜湊
-    $expectedHash = hash('md5', $baseString);
-    
-    // 由於前端使用的是簡單雜湊，這裡我們允許使用多種方式驗證
-    // 這種方式可以讓我們在不中斷服務的情況下升級安全驗證方法
-    $simpleHash = sprintf('%x', abs(hashString($baseString)));
-    
-    return ($token === $expectedHash || $token === $simpleHash);
-}
-
-?>

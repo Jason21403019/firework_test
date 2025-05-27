@@ -87,15 +87,6 @@ try {
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$email, $today]);
     
-    // if ($stmt->rowCount() > 0) {
-    //     // 用戶今天已經占卜過
-    //     error_log("用戶今天已占卜過");
-    //     echo json_encode(['status' => 'success', 'played_today' => true]);
-    // } else {
-    //     // 用戶今天還沒有占卜過
-    //     error_log("用戶今天尚未占卜");
-    //     echo json_encode(['status' => 'success', 'played_today' => false]);
-    // }
     if ($stmt->rowCount() > 0) {
         // 用戶存在，返回累計次數和是否今天已占卜
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
