@@ -1,4 +1,5 @@
 <template>
+  <Banner @startDivination="startDivination" />
   <div class="divination-container">
     <h1 class="title">2025蛇年運勢占卜</h1>
     <div class="description">
@@ -68,6 +69,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import Swal from "sweetalert2";
 import axios from "axios";
+import Banner from "../components/Banner.vue";
 
 // ==================== 基本狀態管理 ====================
 const config = useRuntimeConfig();
@@ -383,7 +385,7 @@ async function hasPlayedToday() {
   try {
     // 移除對 csrf.generate 的調用
     // 不再需要生成前端的 CSRF 令牌
-    
+
     const apiUrl = getApiUrl("checkPlayStatus.php");
     console.log("從資料庫檢查占卜狀態...");
 

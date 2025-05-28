@@ -1,6 +1,7 @@
 export default defineNuxtConfig({
-  compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
+  plugins: ["~/plugins/global-components.js"],
+  css: ["~/assets/css/reset.css"],
   app: {
     baseURL: process.env.NUXT_PUBLIC_BASE || "/",
     buildAssetsDir: "/_nuxt/",
