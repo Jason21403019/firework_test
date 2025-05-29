@@ -1,34 +1,14 @@
 <template>
   <Banner @startDivination="startDivination" />
   <div class="divination-container">
-    <h1 class="title">2025蛇年運勢占卜</h1>
-    <div class="description">
-      <p>探索您在蛇年的財運、事業與人際關係</p>
-    </div>
-
     <!-- 主要占卜按鈕 -->
-    <button @click="startDivination" class="fortune-btn">立即占卜</button>
+    <!-- <button @click="startDivination" class="fortune-btn">立即占卜</button> -->
 
     <!-- 占卜次數顯示 -->
-    <div class="play-count-info">
-      <p>
-        您已累計占卜 <span class="count-number">{{ totalPlayCount }}</span> 次
-      </p>
-    </div>
-
-    <!-- 里程碑數字顯示 -->
-    <div class="play-count-info">
-      <div class="milestones-container">
-        <div
-          v-for="milestone in milestones"
-          :key="milestone"
-          class="milestone-item"
-          :class="{ achieved: totalPlayCount >= milestone }"
-        >
-          {{ milestone }}
-        </div>
-      </div>
-    </div>
+    <PlayCount
+      :count="totalPlayCount"
+      @milestone-achieved="handleMilestoneAchieved"
+    />
 
     <!-- 開發工具區域 - 按 Shift+D 顯示 -->
     <div v-if="showDebugTools" class="debug-tools">
@@ -70,6 +50,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import Swal from "sweetalert2";
 import axios from "axios";
 import Banner from "../components/Banner.vue";
+import PlayCount from "../components/PlayCount.vue";
 
 // ==================== 基本狀態管理 ====================
 const config = useRuntimeConfig();
@@ -464,6 +445,21 @@ function showMilestoneMessage() {
     confirmButtonText: "太棒了!",
     confirmButtonColor: "#fa541c",
   });
+}
+
+// 處理里程碑達成
+function handleMilestoneAchieved(milestone) {
+  console.log(`達成里程碑: ${milestone.count} - ${milestone.prize}`);
+
+  // 如果是首次達到此里程碑，顯示相關訊息
+  if (milestone.count > lastAchievedMilestone.value) {
+    lastAchievedMilestone.value = milestone.count;
+
+    // 只有在首次占卜時才顯示里程碑成就訊息
+    if (milestone.count === 1 && totalPlayCount.value === 1) {
+      showMilestoneMessage();
+    }
+  }
 }
 
 // 產生占卜結果
@@ -1610,25 +1606,6 @@ function handleInvalidFlow() {
 </script>
 
 <style lang="scss" scoped>
-.divination-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  text-align: center;
-}
-
-.title {
-  font-size: 32px;
-  color: #d4380d;
-  margin-bottom: 20px;
-}
-
-.description {
-  font-size: 18px;
-  margin-bottom: 30px;
-  color: #666;
-}
-
 .fortune-btn {
   display: inline-block;
   padding: 15px 30px;

@@ -2,6 +2,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   plugins: ["~/plugins/global-components.js"],
   css: ["~/assets/css/reset.css"],
+
   app: {
     baseURL: process.env.NUXT_PUBLIC_BASE || "/",
     buildAssetsDir: "/_nuxt/",
@@ -14,11 +15,12 @@ export default defineNuxtConfig({
         { name: "theme-color", content: "#ffffff" },
       ],
       link: [
-        { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
+        { rel: "icon", type: "image/x-icon" },
         { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       ],
     },
   },
+
   runtimeConfig: {
     public: {
       baseUrl: process.env.NUXT_PUBLIC_BASE_URL,
@@ -26,4 +28,6 @@ export default defineNuxtConfig({
       base: process.env.NUXT_PUBLIC_BASE,
     },
   },
+
+  compatibilityDate: "2025-05-29",
 });

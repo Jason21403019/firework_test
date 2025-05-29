@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar">
+  <nav class="navbar" :class="{ 'navbar--scrolled': isScrolled }">
     <Nav_container>
       <div class="navbar__content">
         <div class="navbar__logo">
@@ -76,14 +76,32 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import Nav_container from "./Nav_container.vue";
 
 const isMobileMenuOpen = ref(false);
+const isScrolled = ref(false);
+const scrollThreshold = 90;
 
 function toggleMobileMenu() {
   isMobileMenuOpen.value = !isMobileMenuOpen.value;
 }
+
+function handleScroll() {
+  isScrolled.value = window.scrollY > scrollThreshold;
+}
+
+onMounted(() => {
+  if (window.scrollY > scrollThreshold) {
+    isScrolled.value = true;
+  }
+
+  window.addEventListener("scroll", handleScroll);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("scroll", handleScroll);
+});
 </script>
 
 <style lang="scss" scoped>
@@ -110,6 +128,12 @@ function toggleMobileMenu() {
     align-items: center;
     justify-content: center;
     width: 160px;
+    border-radius: 8px;
+    padding: 0px 16px;
+    transition: all 0.3s ease;
+    background-color: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 
     &-image {
       margin-bottom: 11px;
@@ -122,6 +146,28 @@ function toggleMobileMenu() {
     display: flex;
     align-items: center;
     gap: 1.5rem;
+    border-radius: 8px;
+    padding: 8px 16px;
+    transition: all 0.3s ease;
+    background-color: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  &--scrolled {
+    .navbar__logo {
+      background-color: rgba(109, 39, 234, 0.15);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 4px 12px rgba(109, 39, 234, 0.2);
+    }
+
+    .navbar__right {
+      background-color: rgba(109, 39, 234, 0.15);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 4px 12px rgba(109, 39, 234, 0.2);
+    }
   }
 
   &__links {
