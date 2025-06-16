@@ -9,6 +9,7 @@
       :count="totalPlayCount"
       @milestone-achieved="handleMilestoneAchieved"
     />
+    <Act_area />
 
     <!-- 開發工具區域 - 按 Shift+D 顯示 -->
     <div v-if="showDebugTools" class="debug-tools">
@@ -51,6 +52,7 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import Banner from "../components/Banner.vue";
 import PlayCount from "../components/PlayCount.vue";
+import Act_area from "../components/Act_area.vue";
 
 // ==================== 基本狀態管理 ====================
 const config = useRuntimeConfig();
