@@ -20,13 +20,51 @@
             </li>
           </ul>
         </div>
+        <Act_title type="info" />
+        <div class="act-area__info">
+          <ul class="act-area__info-list">
+            <li class="act-area__info-list-items">
+              若發現刻意進行
+              人為操作、使用網頁機器人程式或以一次性信箱等參與活動，聯合線上得直接取消其參加或得獎資格。
+            </li>
+            <li class="act-area__info-list-items">
+              各獎項 (圖示僅供參考) 於活動結束後，由主辦單位以系統隨機抽出，並以
+              e-mail
+              或簡訊方式通知領取，請務必確認填寫資訊的真實性與正確性皆無誤。
+            </li>
+            <li class="act-area__info-list-items">
+              LINE POINTS 於 2025/07/21
+              起將以隨機方式，陸續派發兌換序號至「會員中心」，請再次登入會員帳號進行領取
+              (派發前封鎖 udn LINE
+              官方帳號則取消獲獎資格)，並請妥善保管兌換序號，領取期限至
+              2025/08/05，逾期未領，聯合線上不再重新發送序號。
+            </li>
+            <li class="act-area__info-list-items">
+              獲獎資格不得重複，每人一次領獎機會
+              (依個人資料為準)，均不得重複得獎。獲經查詢若得獎者於活動開獎日前一年內，參與聯合線上活動累計中獎獎項價值超過新台幣
+              1,000 元 (含) 以上，將取消得獎資格。
+            </li>
+            <li class="act-area__info-list-items">
+              若使用 Gmail
+              帳號參加活動，於帳號任意字元間加入小數點，均視為同一個信箱，僅有一次獲
+              (抽)獎資格。例如，已有123@gmail.com參加活動，將主動排除1.23@gmail.com、12.3@gmail.com
+              等變體信箱。
+            </li>
+            <li class="act-area__info-list-items">
+              參與本次活動即代表您已充分了解並同意接受個資聲明與注意事項。
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
+    <Act_title type="prize" />
+    <Prize />
   </section>
 </template>
 
 <script setup>
 import Act_title from "./Act_title.vue";
+import Prize from "./Prize.vue";
 defineProps({
   name: "ActArea",
 });
@@ -34,7 +72,7 @@ defineProps({
 
 <style lang="scss" scoped>
 .act-area {
-  border: 1px solid #ccc;
+  // border: 1px solid #ccc;
 
   .act-area__container {
     border: 3px solid #d8ceff;
@@ -44,27 +82,15 @@ defineProps({
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 12px;
-    position: relative;
-    &::before {
-      content: "";
-      background-image: url("./imgs/blue_light.png");
-      background-size: 100% 100%;
-      position: absolute;
-      display: block;
-      top: -50%;
-      left: -50%;
-      width: 120%;
-      height: 200%;
-      z-index: -1;
-    }
+    margin-bottom: 140px;
   }
   .act-area__content {
-    border: 1px solid green;
+    // border: 1px solid green;
     max-width: 800px;
     margin: 0 auto;
   }
   .act-area__rules {
-    border: 1px solid yellow;
+    // border: 1px solid yellow;
     width: 100%;
     margin-bottom: 140px;
     h3,
@@ -89,6 +115,21 @@ defineProps({
     ul {
       list-style-type: disc;
       padding-left: 50px;
+      li {
+        color: #fff;
+        font-size: 18px;
+        margin-bottom: 10px;
+        line-height: 1.5;
+      }
+    }
+  }
+  .act-area__info {
+    // border: 1px solid blue;
+    width: 100%;
+    margin-bottom: 140px;
+    ul {
+      list-style-type: number;
+      padding-left: 20px;
       li {
         color: #fff;
         font-size: 18px;

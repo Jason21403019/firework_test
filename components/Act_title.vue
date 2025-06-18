@@ -30,10 +30,10 @@ const getImagePath = (type) => {
   switch (type) {
     case "rules":
       return basePath + "act_rules.png";
-    case "prizes":
-      return basePath + "act_prizes.png";
+    case "prize":
+      return basePath + "act_prize.png";
     case "info":
-      return basePath + "act_info.png";
+      return basePath + "act_remind.png";
     default:
       return basePath + "act_rules.png";
   }
@@ -56,8 +56,9 @@ const getAltText = (type) => {
 
 <style scoped>
 .title-image-container {
-  border: 1px solid red;
-  margin: 0;
+  /* border: 1px solid red; */
+  max-width: 800px;
+  margin: 0 auto;
   width: 100%;
   margin-bottom: 40px;
 }
