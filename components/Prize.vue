@@ -12,55 +12,57 @@
       </div>
     </div>
   </div>
+  <Notice_popup />
 </template>
 
 <script setup>
 import { ref } from "vue";
+import Notice_popup from "./Notice_popup.vue";
 
 // 獎品數據
 const prizes = ref([
   {
     id: 1,
-    image: "/imgs/prizes/tv.png",
-    title: "65吋LED電視",
-    subtitle: "1名",
+    image: "./imgs/tv.png",
+    title: "星光劇院獎",
+    subtitle: "小米 65 吋LED 電視 | 1名",
   },
   {
     id: 2,
-    image: "/imgs/prizes/dyson.png",
-    title: "Dyson吸塵器",
-    subtitle: "2名",
+    image: "./imgs/dyson.png",
+    title: "閃耀風光獎",
+    subtitle: "Dyson二合一涼風空氣清淨機 | 2 名",
   },
   {
     id: 3,
-    image: "/imgs/prizes/coffee.png",
-    title: "咖啡機",
-    subtitle: "3名",
+    image: "./imgs/barista.png",
+    title: "啡常幸運獎",
+    subtitle: "Barista C2+ 全自動義式咖啡機 | 1 名",
   },
   {
     id: 4,
-    image: "/imgs/prizes/airpods.png",
-    title: "AirPods",
-    subtitle: "5名",
+    image: "./imgs/wang1000.png",
+    title: "煙火食光獎",
+    subtitle: "王品集團 $ 1,000 即享券雙 人 | 5 名",
   },
   {
     id: 5,
-    image: "/imgs/prizes/voucher.png",
-    title: "購物金",
-    subtitle: "10名",
+    image: "./imgs/linepoints5.png",
+    title: "轉運流星獎",
+    subtitle: "LINE POINTS 5點 | 1 萬組送完為止  ",
   },
   {
     id: 6,
-    image: "/imgs/prizes/gift.png",
-    title: "精美禮品",
-    subtitle: "20名",
+    image: "./imgs/citycoffee.png",
+    title: "Line 好運加碼禮",
+    subtitle: "CITY CAFÉ 提貨券 | 50 名",
   },
 ]);
 </script>
 
 <style lang="scss" scoped>
 .prize-container {
-  padding: 20px;
+  padding: 0px 20px 120px 20px;
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -78,7 +80,7 @@ const prizes = ref([
   box-shadow: inset 0 0 50px 20px rgba(#8d46d6, 0.3);
   background-color: rgba(#8d46d6, 0.2);
   border-radius: 10px;
-  padding: 25px 20px;
+  padding: 10px 10px 20px 10px;
   text-align: center;
   transition: all 0.3s ease;
   position: relative;
@@ -122,47 +124,37 @@ const prizes = ref([
 }
 
 .prize-image {
-  margin-bottom: 20px;
-  height: 120px;
+  max-width: 100%;
+  margin-bottom: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(5px);
+  border-radius: 10px;
 
   img {
-    max-width: 100%;
-    max-height: 100%;
+    width: 100%;
     object-fit: contain;
     transition: transform 0.3s ease;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
   }
 }
 
 .prize-content {
   .prize-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: #ffffff;
+    font-size: 40px;
+    font-weight: 400;
+    color: #fbcf47;
     margin: 0 0 10px 0;
     line-height: 1.3;
+    letter-spacing: 4px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
   }
 
   .prize-subtitle {
-    font-size: 14px;
-    color: #f0f0f0;
-    margin: 0;
-    padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 20px;
+    font-size: 18px;
+    color: #fff;
+    margin: 0 auto;
     display: inline-block;
-    font-weight: 600;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
   }
 }
 
@@ -175,58 +167,9 @@ const prizes = ref([
     transform: translateX(100%) translateY(100%) rotate(45deg);
   }
 }
-
-// 響應式設計
-@media (max-width: 992px) {
-  .prize-grid {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    gap: 20px;
-  }
-
-  .prize-card {
-    padding: 20px 15px;
-  }
-
-  .prize-image {
-    height: 100px;
-  }
-}
-
-@media (max-width: 576px) {
-  .prize-container {
-    padding: 15px;
-  }
-
-  .prize-grid {
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(6, 1fr);
-    gap: 15px;
-  }
-
-  .prize-card {
-    padding: 18px 12px;
-  }
-
-  .prize-image {
-    height: 80px;
-  }
-
-  .prize-content .prize-title {
-    font-size: 16px;
-  }
-
-  .prize-content .prize-subtitle {
-    font-size: 13px;
-    padding: 6px 12px;
-  }
-}
-
-// 平板橫向模式
-@media (max-width: 768px) and (orientation: landscape) {
-  .prize-grid {
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-  }
+.footer {
+  width: 100%;
+  background: url("./imgs/footer_bg.png") no-repeat center center;
+  height: 772px;
 }
 </style>

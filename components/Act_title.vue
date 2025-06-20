@@ -9,13 +9,11 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-
 const props = defineProps({
   type: {
     type: String,
     default: "rules",
-    validator: (value) => ["rules", "prizes", "info"].includes(value),
+    validator: (value) => ["rules", "prize", "info"].includes(value),
   },
   centered: {
     type: Boolean,
@@ -25,7 +23,7 @@ const props = defineProps({
 
 // 根據類型獲取圖片路徑
 const getImagePath = (type) => {
-  const basePath = "/imgs/";
+  const basePath = "./imgs/";
 
   switch (type) {
     case "rules":
@@ -71,15 +69,5 @@ const getAltText = (type) => {
   max-width: 100%;
   height: auto;
   display: inline-block;
-}
-
-@media (max-width: 768px) {
-  .title-image-container {
-    margin: 20px 0;
-  }
-
-  .title-image {
-    max-width: 90%;
-  }
 }
 </style>

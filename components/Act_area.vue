@@ -83,6 +83,7 @@ defineProps({
     margin: 0 auto;
     padding: 0 12px;
     margin-bottom: 140px;
+    padding-top: 120px;
   }
   .act-area__content {
     // border: 1px solid green;

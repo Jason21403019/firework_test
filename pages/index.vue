@@ -10,6 +10,7 @@
       @milestone-achieved="handleMilestoneAchieved"
     />
     <Act_area />
+    <ToTop />
 
     <!-- 開發工具區域 - 按 Shift+D 顯示 -->
     <div v-if="showDebugTools" class="debug-tools">
@@ -53,7 +54,7 @@ import axios from "axios";
 import Banner from "../components/Banner.vue";
 import PlayCount from "../components/PlayCount.vue";
 import Act_area from "../components/Act_area.vue";
-
+import ToTop from "../components/ToTop.vue";
 // ==================== 基本狀態管理 ====================
 const config = useRuntimeConfig();
 const showDebugTools = ref(false);
@@ -72,7 +73,7 @@ const fortuneResults = ref([
     title: "心型煙火 | 幸運指數:91%",
     description:
       "今日你愛情能量報表!特別適合告白、約會，\n你的魅力讓你閃閃發光。",
-    image_url: "./imgs/heart.png",
+    image_url: "../imgs/heart.png",
     weight: 20,
   },
   {
@@ -80,7 +81,7 @@ const fortuneResults = ref([
     title: "金浪煙火 | 幸運指數:88%",
     description:
       "財務上有不錯的直覺和機會，適合投資、\n做小額理財規劃。也有機會獲得意外之財或小獎喔!",
-    image_url: "./imgs/goldwave.png",
+    image_url: "../imgs/goldwave.png",
     weight: 20,
   },
   {
@@ -88,7 +89,7 @@ const fortuneResults = ref([
     title: "療癒煙火 | 幸運指數:75%",
     description:
       "今天適合慢下腳步，讓身心放鬆，\n多親近自然或早點休息，補充滿滿能量!",
-    image_url: "./imgs/healing.png",
+    image_url: "../imgs/healing.png",
     weight: 40,
   },
   {
@@ -96,7 +97,7 @@ const fortuneResults = ref([
     title: "金光煙火 | 幸運指數:80%",
     description:
       "你的工作運極佳，有重要會議或報告時表現亮眼，\n適合發展實力的好日子。",
-    image_url: "./imgs/goldlight.png",
+    image_url: "../imgs/goldlight.png",
     weight: 20,
   },
 ]);
@@ -891,9 +892,9 @@ function showAlreadyPlayedMessage() {
   let imgUrl = "";
 
   if (totalPlayCount.value < 5) {
-    imgUrl = "./imgs/one_four.png";
+    imgUrl = "../imgs/one_four.png";
   } else {
-    imgUrl = "./imgs/five.png";
+    imgUrl = "../imgs/five.png";
   }
   // 根據占卜次數決定顯示不同的訊息內容
   if (totalPlayCount.value === 1) {
