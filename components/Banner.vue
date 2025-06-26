@@ -250,35 +250,89 @@ function handleDivination() {
     border-radius: 50%;
     aspect-ratio: 1 / 1;
     cursor: pointer;
-    // border: 2px solid rgb(255, 255, 255);
+    border: 2px solid rgb(255, 255, 255);
+    @media (max-width: 1535px) {
+      right: 17.7%;
+      top: 36%;
+      width: 15%;
+      min-width: 80px;
+    }
+    @media (max-width: 768px) {
+      top: 56.6%;
+      right: 35.4%;
+      width: 28%;
+      min-width: 60px;
+    }
   }
 }
 
 @media (max-width: 768px) {
   .banner {
-    height: auto;
-    aspect-ratio: 16 / 9;
-
-    .firework {
-      width: 60px;
-      height: 60px;
-    }
-
+    background-image: url("/imgs/m_banner.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center top;
+    position: relative;
+    aspect-ratio: 640 / 1076;
     .firework-1 {
-      width: 90px;
-      height: 90px;
+      width: 400px;
+      height: 300px;
+      top: -8%;
+      left: -17%;
+      @media (max-width: 430px) {
+        width: 300px;
+        height: 200px;
+        top: -10%;
+        left: -20%;
+      }
     }
 
-    .firework-2,
+    .firework-2 {
+      width: 300px;
+      height: 200px;
+      top: -8%;
+      right: -4%;
+      left: unset;
+      @media (max-width: 430px) {
+        width: 200px;
+        height: 100px;
+        top: -8%;
+        right: -4%;
+        left: unset;
+      }
+    }
+
+    .firework-3 {
+      width: 200px;
+      height: 300px;
+      top: 30%;
+      right: unset;
+      left: -9%;
+    }
     .firework-4 {
-      width: 70px;
-      height: 70px;
-    }
-
-    &__trigger-area {
-      width: 15%;
-      min-width: 60px;
+      width: 300px;
+      height: 200px;
+      top: 8%;
+      right: -15%;
+      left: unset;
+      @media (max-width: 430px) {
+        width: 300px;
+        height: 100px;
+        top: 8%;
+        right: -15%;
+        left: unset;
+      }
     }
   }
 }
+// @media (max-width: 640px) {
+//   .banner {
+//     background-image: url("/imgs/m_banner.png");
+//     background-size: cover;
+//     background-repeat: no-repeat;
+//     background-position: center top;
+//     position: relative;
+//     aspect-ratio: 640 / 1076;
+//   }
+// }
 </style>

@@ -13,9 +13,8 @@
   margin: 0 auto;
   padding: 0 20px;
   box-sizing: border-box;
-
-  @media (max-width: 768px) {
-    padding: 0 16px;
+  @media (max-width: 480px) {
+    padding: 0 4px;
   }
 }
 </style>

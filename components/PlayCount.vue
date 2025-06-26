@@ -100,6 +100,17 @@ watch(
   background-position: center;
   padding-top: 150px;
   margin-top: -8%;
+  @media (max-width: 1024px) {
+    padding-top: 100px;
+  }
+  @media (max-width: 768px) {
+    padding: 100px 12px 0 12px;
+    background-position: center -250px;
+  }
+  @media (max-width: 480px) {
+    padding: 50px 12px 0 12px;
+    background-position: center -200px;
+  }
 
   // 旗幟容器
   &__banner {
@@ -116,12 +127,29 @@ watch(
     display: flex;
     align-items: center;
     justify-content: center;
+    @media (max-width: 1024px) {
+      width: 80%;
+      height: 100px;
+      margin-bottom: 25px;
+    }
+    @media (max-width: 768px) {
+      background-image: url("/imgs/m_flag.png");
+      background-size: contain;
+      width: 100%;
+      height: 200px;
+    }
+    @media (max-width: 480px) {
+      height: 150px;
+    }
 
     &-content {
       width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
+      @media (max-width: 768px) {
+        flex-direction: column;
+      }
     }
 
     &-left {
@@ -138,6 +166,19 @@ watch(
     width: 100%;
     max-width: 290px;
     height: auto;
+    @media (max-width: 1024px) {
+      max-width: 200px;
+    }
+    @media (max-width: 768px) {
+      max-width: 300px;
+      margin-bottom: 10px;
+    }
+    @media (max-width: 480px) {
+      max-width: 200px;
+    }
+    @media (max-width: 360px) {
+      max-width: 140px;
+    }
   }
 
   &__text {
@@ -151,6 +192,19 @@ watch(
     padding: 10px 60px;
     border-radius: 100px;
     box-sizing: border-box;
+    @media (max-width: 1024px) {
+      font-size: 24px;
+    }
+    @media (max-width: 768px) {
+      font-size: 36px;
+      margin-left: 0;
+    }
+    @media (max-width: 480px) {
+      font-size: 20px;
+    }
+    @media (max-width: 360px) {
+      font-size: 18px;
+    }
   }
 
   // 計數數字樣式
@@ -160,6 +214,15 @@ watch(
     font-size: 40px;
     backdrop-filter: blur(4px);
     border-radius: 4px;
+    @media (max-width: 1024px) {
+      font-size: 24px;
+    }
+    @media (max-width: 768px) {
+      font-size: 36px;
+    }
+    @media (max-width: 480px) {
+      font-size: 20px;
+    }
   }
 
   // 說明文字
@@ -173,6 +236,19 @@ watch(
     line-height: 1.5;
     margin-bottom: 50px;
     text-shadow: 0 3px 5px rgba(0, 0, 0, 0.5);
+    @media (max-width: 1024px) {
+      font-size: 24px;
+      margin-bottom: 0px;
+    }
+    @media (max-width: 768px) {
+      font-size: 28px;
+    }
+    @media (max-width: 480px) {
+      font-size: 20px;
+    }
+    @media (max-width: 360px) {
+      font-size: 16px;
+    }
   }
 
   // 里程碑容器
@@ -183,6 +259,10 @@ watch(
     margin-top: 25px;
     gap: 50px;
     flex-wrap: wrap;
+    @media (max-width: 768px) {
+      gap: 0px;
+      flex-direction: column;
+    }
   }
 
   // 單個里程碑項目
@@ -193,6 +273,9 @@ watch(
     justify-content: center;
     max-width: 100%;
     transition: all 0.4s ease;
+    @media (max-width: 768px) {
+      flex-direction: row;
+    }
 
     &--achieved {
       .play-count__milestone-number {
@@ -218,6 +301,21 @@ watch(
       color: #fff;
       transition: all 0.3s ease;
       position: relative;
+      @media (max-width: 1024px) {
+        width: 90px;
+        height: 130px;
+        font-size: 40px;
+      }
+      @media (max-width: 480px) {
+        width: 80px;
+        height: 120px;
+        font-size: 28px;
+      }
+      @media (max-width: 360px) {
+        width: 60px;
+        height: 100px;
+        font-size: 24px;
+      }
 
       // 調整數字在背景圖中的位置
       & > span {
@@ -237,52 +335,21 @@ watch(
       text-align: center;
       transition: all 0.3s ease;
       white-space: pre-line;
-    }
-  }
-}
-
-// 響應式調整
-@media (max-width: 768px) {
-  .play-count {
-    &__banner {
-      padding: 15px 5px;
-
-      &-content {
-        padding: 0 10px;
-      }
-    }
-
-    &__title-img {
-      max-width: 140px;
-    }
-
-    &__text {
-      font-size: 16px;
-    }
-
-    &__number {
-      font-size: 18px;
-    }
-
-    &__description {
-      font-size: 14px;
-    }
-
-    &__milestones {
-      gap: 10px;
-    }
-
-    &__milestone {
-      width: 70px;
-
-      &-number {
-        width: 50px;
-        height: 50px;
+      @media (max-width: 1024px) {
         font-size: 18px;
       }
-
-      &-prize {
-        font-size: 12px;
+      @media (max-width: 768px) {
+        font-size: 36px;
+        margin-top: 30px;
+        margin-left: 10px;
+        text-align: left;
+        white-space: nowrap;
+      }
+      @media (max-width: 480px) {
+        font-size: 24px;
+      }
+      @media (max-width: 360px) {
+        font-size: 20px;
       }
     }
   }

@@ -1,11 +1,14 @@
 <template>
-  <nav class="navbar" :class="{ 'navbar--scrolled': isScrolled }">
+  <nav class="navbar">
     <Nav_container>
-      <div class="navbar__content">
+      <div
+        class="navbar__content"
+        :class="{ 'navbar__content--scrolled': isScrolled }"
+      >
         <div class="navbar__logo">
           <NuxtLink to="/">
             <img
-              src="/imgs/logo_udn.svg"
+              src="/imgs/logo.png"
               alt="logo_udn_Logo"
               class="navbar__logo-image"
             />
@@ -64,14 +67,24 @@
             </a>
           </div>
 
-          <div class="navbar__hamburger" @click="toggleMobileMenu">
-            <span></span>
-            <span></span>
-            <span></span>
+          <div
+            class="navbar__hamburger"
+            :class="{ 'navbar__hamburger--active': isMobileMenuOpen }"
+            @click="toggleMobileMenu"
+          >
+            <span class="navbar__hamburger-line"></span>
+            <span class="navbar__hamburger-line"></span>
+            <span class="navbar__hamburger-line"></span>
           </div>
         </div>
       </div>
     </Nav_container>
+
+    <div
+      v-if="isMobileMenuOpen"
+      class="navbar__backdrop"
+      @click="isMobileMenuOpen = false"
+    ></div>
   </nav>
 </template>
 
@@ -81,7 +94,7 @@ import Nav_container from "./Nav_container.vue";
 
 const isMobileMenuOpen = ref(false);
 const isScrolled = ref(false);
-const scrollThreshold = 90;
+const scrollThreshold = 100;
 
 function toggleMobileMenu() {
   isMobileMenuOpen.value = !isMobileMenuOpen.value;
@@ -115,12 +128,26 @@ onBeforeUnmount(() => {
   top: 0;
   left: 0;
   z-index: 100;
+  @media (max-width: 640px) {
+    padding: 12px 0 1rem 0;
+  }
+  @media (max-width: 410px) {
+    padding: 4px 0 1rem 0;
+  }
 
   &__content {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    border-radius: 8px;
+
+    &--scrolled {
+      background-color: rgba(109, 39, 234, 0.25);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 4px 12px rgba(109, 39, 234, 1);
+    }
   }
 
   &__logo {
@@ -128,15 +155,15 @@ onBeforeUnmount(() => {
     align-items: center;
     justify-content: center;
     width: 160px;
-    border-radius: 8px;
-    padding: 0px 16px;
+    padding: 8px 16px;
     transition: all 0.3s ease;
     background-color: transparent;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-
+    @media (max-width: 410px) {
+      padding: 4px 8px;
+    }
     &-image {
-      margin-bottom: 11px;
       display: block;
       width: 100%;
     }
@@ -146,27 +173,13 @@ onBeforeUnmount(() => {
     display: flex;
     align-items: center;
     gap: 1.5rem;
-    border-radius: 8px;
     padding: 8px 16px;
     transition: all 0.3s ease;
     background-color: transparent;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-  }
-
-  &--scrolled {
-    .navbar__logo {
-      background-color: rgba(109, 39, 234, 0.15);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0 4px 12px rgba(109, 39, 234, 0.2);
-    }
-
-    .navbar__right {
-      background-color: rgba(109, 39, 234, 0.15);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0 4px 12px rgba(109, 39, 234, 0.2);
+    @media (max-width: 410px) {
+      padding: 4px 8px;
     }
   }
 
@@ -178,12 +191,19 @@ onBeforeUnmount(() => {
   &__link {
     color: #fff;
     text-decoration: none;
-    font-size: 28px;
+    font-size: 24px;
     font-weight: 300;
     transition: color 0.3s ease;
-    padding: 0.5rem 0;
     position: relative;
-    padding: 0.5rem 0.8rem;
+    &:first-child {
+      padding-right: 12px;
+    }
+    &:last-child {
+      padding-left: 12px;
+    }
+    &:nth-child(2) {
+      padding: 0 12px;
+    }
 
     &:not(:last-child)::after {
       content: "|";
@@ -203,7 +223,6 @@ onBeforeUnmount(() => {
       display: flex;
       justify-content: center;
       align-items: center;
-
       width: 40px;
       height: 40px;
       border-radius: 50%;
@@ -223,76 +242,161 @@ onBeforeUnmount(() => {
   &__hamburger {
     display: none;
     flex-direction: column;
-    justify-content: space-between;
-    width: 25px;
-    height: 20px;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 30px;
     cursor: pointer;
     z-index: 110;
+    position: relative;
 
-    span {
+    &-line {
       display: block;
       height: 3px;
-      width: 100%;
-      background-color: #fa541c;
-      border-radius: 3px;
-      transition: all 0.3s ease;
+      width: 25px;
+      background-color: #fff;
+      border-radius: 2px;
+      margin: 3px 0;
+      transition: all 0.4s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+      transform-origin: center;
     }
+
+    &--active {
+      .navbar__hamburger-line {
+        &:nth-child(1) {
+          transform: rotate(45deg) translate(6px, 6px);
+        }
+
+        &:nth-child(2) {
+          opacity: 0;
+          transform: scale(0);
+        }
+
+        &:nth-child(3) {
+          transform: rotate(-45deg) translate(6px, -6px);
+        }
+      }
+    }
+  }
+
+  &__backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(
+      135deg,
+      rgba(27, 3, 62, 0.6),
+      rgba(109, 39, 234, 0.4)
+    );
+    backdrop-filter: blur(5px) saturate(150%);
+    -webkit-backdrop-filter: blur(5px) saturate(150%);
+    z-index: 98;
+    opacity: 0;
+    animation: backdropFadeIn 0.3s ease-out forwards;
+  }
+}
+
+@keyframes backdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 }
 
 @media (max-width: 768px) {
   .navbar {
     &__content {
-      padding: 0.8rem 0;
+      position: relative;
+      z-index: 102;
+    }
+
+    &__logo {
+      position: relative;
+      z-index: 1000;
     }
 
     &__right {
       gap: 1rem;
+      position: relative;
+      z-index: 102;
     }
 
     &__hamburger {
       display: flex;
+      position: relative;
+      z-index: 103;
     }
 
     &__links {
       position: fixed;
       top: 0;
-      right: -100%;
-      width: 70%;
-      height: 100vh;
-      background-color: white;
-      padding: 80px 20px 20px;
+      left: 0;
+      width: 100%;
+      height: auto;
+      min-height: 50vh;
+
+      background: linear-gradient(
+        135deg,
+        rgba(27, 3, 62, 0.85),
+        rgba(109, 39, 234, 0.75)
+      );
+      backdrop-filter: blur(15px) saturate(100%);
+      -webkit-backdrop-filter: blur(15px) saturate(100%);
+      border-bottom-left-radius: 20px;
+      border-bottom-right-radius: 20px;
+      padding: 120px 20px 40px;
       flex-direction: column;
-      align-items: flex-start;
-      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
-      transition: right 0.3s ease;
-      z-index: 100;
-      margin-right: 0;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 2rem;
+      box-shadow: 0 8px 32px rgba(27, 3, 62, 0.4);
+      z-index: 101;
+      box-sizing: border-box;
+      margin: 0;
+      transform: translateY(-100%);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
       &--active {
-        right: 0;
+        transform: translateY(0);
+        opacity: 1;
+        animation: slideDown 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       }
     }
 
     &__link {
-      width: 100%;
-      padding: 12px 0;
-      border-bottom: 1px solid #eee;
+      color: rgba(255, 255, 255, 0.95);
+      font-size: 28px;
+      font-weight: 400;
+      padding: 16px 20px;
+      text-align: center;
+      width: auto;
+      border: none;
 
-      &:last-child {
-        border-bottom: none;
+      &:hover {
+        color: #fff;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+      }
+
+      &:not(:last-child)::after {
+        display: none;
       }
     }
-  }
-
-  .navbar__links--active ~ .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 90;
   }
 }
 </style>

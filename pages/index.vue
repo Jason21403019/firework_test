@@ -1,16 +1,14 @@
 <template>
   <Banner @startDivination="startDivination" />
   <div class="divination-container">
-    <!-- 主要占卜按鈕 -->
     <!-- <button @click="startDivination" class="fortune-btn">立即占卜</button> -->
 
-    <!-- 占卜次數顯示 -->
     <PlayCount
       :count="totalPlayCount"
       @milestone-achieved="handleMilestoneAchieved"
     />
-    <Act_area />
-    <ToTop />
+    <!--  <Act_area />
+    <ToTop /> -->
 
     <!-- 開發工具區域 - 按 Shift+D 顯示 -->
     <div v-if="showDebugTools" class="debug-tools">
