@@ -271,33 +271,58 @@ const closeModal = () => {
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    padding: 20px;
+    padding: 12px;
   }
 
   &__popup {
-    background-image: url("/imgs/notice_bg.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background: linear-gradient(to bottom, #05026a, #4a46fc);
     border: 3px solid #d8ceff;
     border-radius: 25px;
     max-width: 1060px;
-    max-height: 660px;
+    max-height: 700px;
     position: relative;
-    overflow: hidden;
+    // overflow: hidden;
     animation: modalAppear 0.3s ease-out;
+    padding: 20px;
+    @media (max-width: 480px) {
+      border: none;
+    }
+    @media (max-width: 360px) {
+      padding: 10px;
+    }
+    &::before {
+      content: "";
+      position: absolute;
+      width: 80%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background: rgba($color: #fff, $alpha: 0.05);
+    }
   }
 
   &__popup-inner {
-    padding: 20px;
     position: relative;
     padding: 60px 50px;
+    border-radius: 20px;
+    border: 2px solid #577cff;
+    z-index: 0;
+    @media (max-width: 768px) {
+      padding: 40px 30px;
+    }
+    @media (max-width: 480px) {
+      padding: 30px 20px;
+      border: 2px solid #06056a;
+    }
+    @media (max-width: 360px) {
+      padding: 20px 10px;
+    }
   }
 
   &__close-btn {
     position: absolute;
-    top: 15px;
-    right: 15px;
+    top: -12px;
+    right: -12px;
     width: 40px;
     height: 40px;
     border: none;
@@ -310,6 +335,14 @@ const closeModal = () => {
     transition: all 0.2s ease;
     color: white;
     z-index: 10;
+    @media (max-width: 480px) {
+      top: -32px;
+      right: -32px;
+    }
+    @media (max-width: 360px) {
+      top: -24px;
+      right: -24px;
+    }
 
     &:hover {
       transform: scale(1.1);
@@ -326,11 +359,20 @@ const closeModal = () => {
   }
 
   &__content {
-    padding: 2px;
+    padding: 2px 50px 2px 2px;
     height: 500px;
     color: #fff;
     font-size: 18px;
     overflow-y: scroll;
+    @media (max-width: 768px) {
+      padding: 2px 30px 2px 2px;
+    }
+    @media (max-width: 480px) {
+      padding: 2px 20px 2px 2px;
+    }
+    @media (max-width: 360px) {
+      padding: 2px 10px 2px 2px;
+    }
 
     p {
       margin-bottom: 10px;

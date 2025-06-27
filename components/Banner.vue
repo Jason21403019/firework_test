@@ -250,7 +250,7 @@ function handleDivination() {
     border-radius: 50%;
     aspect-ratio: 1 / 1;
     cursor: pointer;
-    border: 2px solid rgb(255, 255, 255);
+    // border: 2px solid rgb(255, 255, 255);
     @media (max-width: 1535px) {
       right: 17.7%;
       top: 36%;
