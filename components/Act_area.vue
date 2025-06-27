@@ -2,7 +2,7 @@
   <section class="act-area">
     <div class="act-area__container">
       <div class="act-area__content">
-        <Act_title type="rules" />
+        <Act_title type="rules" id="activity" />
         <div class="act-area__rules">
           <h3>活動時間：</h3>
           <h4>2025 / 06 / 17 ( 二 ) 10:00 ~ 2025 / 07 / 11 ( 一 ) 10:00為止</h4>
@@ -57,7 +57,7 @@
         </div>
       </div>
     </div>
-    <Act_title type="prize" />
+    <Act_title type="prize" id="prizes" />
     <Prize />
   </section>
 </template>
@@ -67,6 +67,27 @@ import Act_title from "./Act_title.vue";
 import Prize from "./Prize.vue";
 defineProps({
   name: "ActArea",
+});
+onMounted(() => {
+  const handleAnchorClick = (e) => {
+    const href = e.target.getAttribute("href");
+    if (href && href.startsWith("#")) {
+      e.preventDefault();
+      const targetId = href.substring(1);
+      const targetElement = document.getElementById(targetId);
+
+      if (targetElement) {
+        const navbarHeight = 80;
+        const targetPosition = targetElement.offsetTop - navbarHeight;
+
+        window.scrollTo({
+          top: targetPosition,
+          behavior: "smooth",
+        });
+      }
+    }
+  };
+  document.addEventListener("click", handleAnchorClick);
 });
 </script>
 

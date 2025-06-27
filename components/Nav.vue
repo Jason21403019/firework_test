@@ -21,13 +21,13 @@
             :class="{ 'navbar__links--active': isMobileMenuOpen }"
           >
             <NuxtLink
-              to="/"
+              to="#activity"
               class="navbar__link"
               @click="isMobileMenuOpen = false"
               >活動辦法</NuxtLink
             >
             <NuxtLink
-              to="/"
+              to="#prizes"
               class="navbar__link"
               @click="isMobileMenuOpen = false"
               >獎品一覽</NuxtLink

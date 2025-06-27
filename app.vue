@@ -6,6 +6,9 @@
 <style lang="scss">
 @import "~/assets/css/reset.css";
 
+html {
+  scroll-behavior: smooth;
+}
 body {
   background: url("/imgs/bg.jpg") top center;
   background-repeat: no-repeat;
