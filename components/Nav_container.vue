@@ -11,7 +11,7 @@
   max-width: 1440px;
   width: 100%;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 12px;
   box-sizing: border-box;
   @media (max-width: 480px) {
     padding: 0 4px;

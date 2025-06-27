@@ -12,12 +12,10 @@
       </div>
     </div>
   </div>
-  <Notice_popup />
 </template>
 
 <script setup>
 import { ref } from "vue";
-import Notice_popup from "./Notice_popup.vue";
 
 // 獎品數據
 const prizes = ref([
@@ -31,7 +29,7 @@ const prizes = ref([
     id: 2,
     image: "./imgs/dyson.png",
     title: "閃耀風光獎",
-    subtitle: "Dyson二合一涼風空氣清淨機 | 2 名",
+    subtitle: "Dyson 二合一涼風空氣清淨機 | 2 名",
   },
   {
     id: 3,
@@ -43,7 +41,7 @@ const prizes = ref([
     id: 4,
     image: "./imgs/wang1000.png",
     title: "煙火食光獎",
-    subtitle: "王品集團 $ 1,000 即享券雙 人 | 5 名",
+    subtitle: "王品集團 $1,000 即享券雙人 | 5 名",
   },
   {
     id: 5,
@@ -62,9 +60,15 @@ const prizes = ref([
 
 <style lang="scss" scoped>
 .prize-container {
-  padding: 0px 20px 120px 20px;
+  padding: 0px 0px 120px 0px;
   max-width: 1200px;
   margin: 0 auto;
+  @media (max-width: 1024px) {
+    padding-bottom: 80px;
+  }
+  @media (max-width: 480px) {
+    padding-bottom: 40px;
+  }
 }
 
 .prize-grid {
@@ -72,10 +76,19 @@ const prizes = ref([
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(2, 1fr);
   gap: 25px;
-  padding: 20px 0;
+  @media (max-width: 1180px) {
+    gap: 20px;
+  }
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 360px) {
+    gap: 12px;
+  }
 }
 
 .prize-card {
+  max-width: 100%;
   border: 3px solid #d8ceff;
   box-shadow: inset 0 0 50px 20px rgba(#8d46d6, 0.3);
   background-color: rgba(#8d46d6, 0.2);
@@ -98,7 +111,6 @@ const prizes = ref([
     }
   }
 
-  // 添加微妙的光澤效果
   &::before {
     content: "";
     position: absolute;
@@ -145,16 +157,42 @@ const prizes = ref([
     font-weight: 400;
     color: #fbcf47;
     margin: 0 0 10px 0;
-    line-height: 1.3;
+    line-height: 1.2;
     letter-spacing: 4px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    @media (max-width: 1180px) {
+      font-size: 32px;
+    }
+    @media (max-width: 992px) {
+      font-size: 28px;
+    }
+    @media (max-width: 870px) {
+      font-size: 24px;
+    }
+    @media (max-width: 640px) {
+      font-size: 20px;
+    }
+    @media (max-width: 480px) {
+      font-size: 18px;
+      letter-spacing: normal;
+    }
+    @media (max-width: 360px) {
+      font-size: 16px;
+    }
   }
 
   .prize-subtitle {
     font-size: 18px;
     color: #fff;
     margin: 0 auto;
+    line-height: 1.5;
     display: inline-block;
+    @media (max-width: 480px) {
+      font-size: 14px;
+    }
+    @media (max-width: 360px) {
+      font-size: 12px;
+    }
   }
 }
 

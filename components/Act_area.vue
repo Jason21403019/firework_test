@@ -73,6 +73,7 @@ defineProps({
 <style lang="scss" scoped>
 .act-area {
   // border: 1px solid #ccc;
+  padding: 0 12px;
 
   .act-area__container {
     border: 3px solid #d8ceff;
@@ -84,6 +85,14 @@ defineProps({
     padding: 0 12px;
     margin-bottom: 140px;
     padding-top: 120px;
+    @media (max-width: 1024px) {
+      padding-top: 80px;
+      margin-bottom: 80px;
+    }
+    @media (max-width: 480px) {
+      padding-top: 40px;
+      margin-bottom: 40px;
+    }
   }
   .act-area__content {
     // border: 1px solid green;
@@ -94,6 +103,12 @@ defineProps({
     // border: 1px solid yellow;
     width: 100%;
     margin-bottom: 140px;
+    @media (max-width: 1024px) {
+      margin-bottom: 80px;
+    }
+    @media (max-width: 480px) {
+      margin-bottom: 40px;
+    }
     h3,
     h4,
     p {
@@ -103,24 +118,42 @@ defineProps({
       font-size: 24px;
       font-weight: bold;
       margin-bottom: 8px;
+      @media (max-width: 480px) {
+        font-size: 20px;
+      }
     }
     h4 {
       font-size: 18px;
       font-weight: normal;
       margin-bottom: 30px;
+      text-align: justify;
+      line-height: 1.5;
+      @media (max-width: 480px) {
+        font-size: 16px;
+      }
     }
     p {
       font-size: 24px;
       margin-bottom: 20px;
+      @media (max-width: 480px) {
+        font-size: 20px;
+      }
     }
     ul {
       list-style-type: disc;
       padding-left: 50px;
+      @media (max-width: 480px) {
+        padding-left: 20px;
+      }
       li {
         color: #fff;
         font-size: 18px;
         margin-bottom: 10px;
+        text-align: justify;
         line-height: 1.5;
+        @media (max-width: 480px) {
+          font-size: 16px;
+        }
       }
     }
   }
@@ -128,6 +161,12 @@ defineProps({
     // border: 1px solid blue;
     width: 100%;
     margin-bottom: 140px;
+    @media (max-width: 1024px) {
+      margin-bottom: 80px;
+    }
+    @media (max-width: 480px) {
+      margin-bottom: 40px;
+    }
     ul {
       list-style-type: number;
       padding-left: 20px;
@@ -136,6 +175,10 @@ defineProps({
         font-size: 18px;
         margin-bottom: 10px;
         line-height: 1.5;
+        text-align: justify;
+        @media (max-width: 480px) {
+          font-size: 16px;
+        }
       }
     }
   }

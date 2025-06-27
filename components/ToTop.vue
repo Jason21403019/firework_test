@@ -1,10 +1,6 @@
 <template>
   <transition name="fade">
-    <button
-      v-if="isVisible"
-      @click="scrollToTop"
-      class="totop"
-    >
+    <button v-if="isVisible" @click="scrollToTop" class="totop">
       <svg
         width="24"
         height="24"
@@ -25,7 +21,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted } from "vue";
 
 // 狀態管理
 const isVisible = ref(false);
@@ -39,17 +35,17 @@ const handleScroll = () => {
 const scrollToTop = () => {
   window.scrollTo({
     top: 0,
-    behavior: 'smooth'
+    behavior: "smooth",
   });
 };
 
 // 生命週期
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll, { passive: true });
+  window.addEventListener("scroll", handleScroll, { passive: true });
 });
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll);
+  window.removeEventListener("scroll", handleScroll);
 });
 </script>
 
@@ -71,6 +67,26 @@ onUnmounted(() => {
   box-shadow: 0 4px 12px rgba(141, 70, 214, 0.3);
   z-index: 999;
 
+  @media (max-width: 1180px) {
+    bottom: 300px;
+  }
+  @media (max-width: 992px) {
+    bottom: 230px;
+  }
+  @media (max-width: 768px) {
+    bottom: 320px;
+  }
+  @media (max-width: 480px) {
+    bottom: 230px;
+  }
+  @media (max-width: 410px) {
+    right: 12px;
+    bottom: 190px;
+  }
+  @media (max-width: 360px) {
+    right: 12px;
+    bottom: 170px;
+  }
   &:hover {
     background: #a066e6;
     transform: translateY(-2px);
@@ -96,20 +112,5 @@ onUnmounted(() => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
-}
-
-// 響應式設計
-@media (max-width: 768px) {
-  .totop {
-    width: 45px;
-    height: 45px;
-    bottom: 20px;
-    right: 20px;
-    
-    svg {
-      width: 20px;
-      height: 20px;
-    }
-  }
 }
 </style>

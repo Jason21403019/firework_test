@@ -7,8 +7,9 @@
       :count="totalPlayCount"
       @milestone-achieved="handleMilestoneAchieved"
     />
-    <!--  <Act_area />
-    <ToTop /> -->
+    <Act_area />
+    <Notice_popup />
+    <ToTop />
 
     <!-- 開發工具區域 - 按 Shift+D 顯示 -->
     <div v-if="showDebugTools" class="debug-tools">
@@ -53,6 +54,7 @@ import Banner from "../components/Banner.vue";
 import PlayCount from "../components/PlayCount.vue";
 import Act_area from "../components/Act_area.vue";
 import ToTop from "../components/ToTop.vue";
+import Notice_popup from "../components/Notice_popup.vue";
 // ==================== 基本狀態管理 ====================
 const config = useRuntimeConfig();
 const showDebugTools = ref(false);

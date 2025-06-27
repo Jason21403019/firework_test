@@ -52,7 +52,7 @@ const getAltText = (type) => {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .title-image-container {
   /* border: 1px solid red; */
   max-width: 800px;

@@ -136,6 +136,30 @@ const closeModal = () => {
   margin: 0 auto;
   background: url("/imgs/footer_bg.png") no-repeat center 40px;
   position: relative;
+  @media (max-width: 768px) {
+    background: url("/imgs/m_footer_bg.png") no-repeat center / cover;
+    padding: 40px 20px 670px 20px;
+  }
+  @media (max-width: 640px) {
+    background-size: auto;
+    padding: 40px 0px 580px 0px;
+  }
+  @media (max-width: 550px) {
+    background-size: contain;
+    padding: 40px 12px 530px 12px;
+  }
+  @media (max-width: 480px) {
+    background-size: cover;
+    padding: 40px 12px 340px 12px;
+  }
+  @media (max-width: 410px) {
+    background-size: cover;
+    padding: 40px 12px 300px 12px;
+  }
+  @media (max-width: 360px) {
+    background-size: cover;
+    padding: 40px 12px 300px 12px;
+  }
 
   &::after {
     content: "";
@@ -149,13 +173,36 @@ const closeModal = () => {
     background-repeat: no-repeat;
     background-position: center bottom;
     z-index: 1;
+    @media (max-width: 1480px) {
+      right: 60px;
+      width: 500px;
+      height: 350px;
+    }
+    @media (max-width: 1180px) {
+      right: 30px;
+      width: 400px;
+      height: 300px;
+    }
+    @media (max-width: 992px) {
+      right: 20px;
+      width: 300px;
+      height: 250px;
+    }
+    @media (max-width: 768px) {
+      background-image: none;
+    }
   }
 
   &__buttons {
     display: flex;
     gap: 40px;
     justify-content: center;
-    flex-wrap: wrap;
+    @media (max-width: 360px) {
+      gap: 20px;
+    }
+    @media (max-width: 330px) {
+      gap: 10px;
+    }
   }
 
   &__btn {
@@ -170,6 +217,18 @@ const closeModal = () => {
     border: none;
     transition: all 0.3s ease;
     position: relative;
+    @media (max-width: 992px) {
+      padding: 12px 60px;
+      font-size: 28px;
+    }
+    @media (max-width: 640px) {
+      padding: 12px 40px;
+      font-size: 24px;
+    }
+    @media (max-width: 420px) {
+      padding: 10px 30px;
+      font-size: 20px;
+    }
 
     &::before {
       content: "";
