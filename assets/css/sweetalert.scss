@@ -1,0 +1,96 @@
+/* SweetAlert2 自訂樣式 */
+:global(.custom-popup-class) {
+  border-radius: 15px;
+}
+
+:global(.divination-content) {
+  padding: 15px;
+  text-align: center;
+  background-color: #05a548;
+}
+
+/* 特殊訊息樣式 */
+:global(.special-message) {
+  margin: 15px 0;
+
+  p {
+    margin: 10px 0;
+  }
+
+  .small-text {
+    font-size: 14px;
+    color: #666;
+    margin-top: 15px;
+  }
+}
+
+/* 分享按鈕樣式 */
+:global(.share-buttons) {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+:global(.line-share-button) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #06c755;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #05a548;
+  }
+
+  img {
+    margin-right: 4px;
+  }
+}
+
+:global(.verify-hint) {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #666;
+  font-style: italic;
+}
+
+/* 發光的黃色外框訊息樣式 */
+:global(.glowing-message) {
+  padding: 15px;
+  margin: 20px auto;
+  border-radius: 8px;
+  border: 2px solid #ffcc00;
+  background-color: rgba(255, 250, 230, 0.9); /* 改為淡黃色背景 */
+  color: #d4380d; /* 紅色文字 */
+  font-weight: bold;
+  box-shadow:
+    0 0 10px #ffcc00,
+    0 0 20px rgba(255, 204, 0, 0.5);
+  animation: glowing 1.5s infinite alternate;
+  max-width: 90%; /* 改為百分比值，增加寬度 */
+  text-align: center;
+  font-size: 16px; /* 添加字體大小 */
+  display: block; /* 確保它是區塊元素 */
+  line-height: 1.5; /* 合適的行高 */
+}
+
+@keyframes glowing {
+  from {
+    box-shadow:
+      0 0 10px #ffcc00,
+      0 0 15px rgba(255, 204, 0, 0.5);
+  }
+  to {
+    box-shadow:
+      0 0 15px #ffcc00,
+      0 0 25px rgba(255, 204, 0, 0.7);
+  }
+}

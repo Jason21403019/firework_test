@@ -1,7 +1,7 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   plugins: ["~/plugins/global-components.js"],
-  css: ["~/assets/css/reset.css"],
+  css: ["~/assets/css/reset.css", "~/assets/css/sweetalert.scss"],
 
   app: {
     baseURL: process.env.NUXT_PUBLIC_BASE || "/",

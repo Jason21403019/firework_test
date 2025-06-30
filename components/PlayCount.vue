@@ -112,7 +112,6 @@ watch(
     background-position: center -200px;
   }
 
-  // 旗幟容器
   &__banner {
     position: relative;
     background-image: url("/imgs/flag.png");
@@ -207,7 +206,6 @@ watch(
     }
   }
 
-  // 計數數字樣式
   &__number {
     font-weight: bold;
     color: #c20b46;
@@ -225,7 +223,6 @@ watch(
     }
   }
 
-  // 說明文字
   &__description {
     font-size: 36px;
     font-weight: 500;
@@ -251,7 +248,6 @@ watch(
     }
   }
 
-  // 里程碑容器
   &__milestones {
     display: flex;
     justify-content: center;
@@ -265,7 +261,6 @@ watch(
     }
   }
 
-  // 單個里程碑項目
   &__milestone {
     display: flex;
     flex-direction: column;
@@ -301,6 +296,7 @@ watch(
       color: #fff;
       transition: all 0.3s ease;
       position: relative;
+      filter: brightness(0.7);
       @media (max-width: 1024px) {
         width: 90px;
         height: 130px;
@@ -317,7 +313,6 @@ watch(
         font-size: 24px;
       }
 
-      // 調整數字在背景圖中的位置
       & > span {
         position: absolute;
         top: 60%;

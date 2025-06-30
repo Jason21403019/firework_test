@@ -11,6 +11,13 @@
     <Notice_popup />
     <ToTop />
 
+    <Fortune_result_popup
+      :is-visible="showFortuneResultPopup"
+      :fortune-data="fortuneResultData"
+      :custom-message="fortuneCustomMessage"
+      @close="closeFortune"
+    />
+
     <!-- 開發工具區域 - 按 Shift+D 顯示 -->
     <div v-if="showDebugTools" class="debug-tools">
       <h3>開發測試工具</h3>
@@ -21,9 +28,6 @@
         </button>
         <button @click="logout" class="debug-btn logout">登出</button>
       </div>
-      <button @click="showTestFortuneResult" class="debug-btn">
-        測試占卜結果
-      </button>
       <div class="debug-info">
         <p>登入狀態: {{ isLoggedIn ? "已登入" : "未登入" }}</p>
         <p>
@@ -55,6 +59,7 @@ import PlayCount from "../components/PlayCount.vue";
 import Act_area from "../components/Act_area.vue";
 import ToTop from "../components/ToTop.vue";
 import Notice_popup from "../components/Notice_popup.vue";
+import Fortune_result_popup from "../components/Fortune_result_popup.vue";
 // ==================== 基本狀態管理 ====================
 const config = useRuntimeConfig();
 const showDebugTools = ref(false);
@@ -66,14 +71,24 @@ const isLoggedIn = ref(false);
 const totalPlayCount = ref(0);
 const milestones = [1, 2, 3, 4, 5];
 let lastAchievedMilestone = ref(0);
+const showFortuneResultPopup = ref(false);
+const fortuneResultData = ref({});
+const fortuneCustomMessage = ref("");
 
+if (process.dev) {
+  onMounted(() => {
+    window.showFortuneResult = showFortuneResult;
+    window.showAlreadyPlayedMessage = showAlreadyPlayedMessage;
+    window.generateFortuneResult = generateFortuneResult;
+  });
+}
 const fortuneResults = ref([
   {
     id: "fortune_1",
     title: "心型煙火 | 幸運指數:91%",
     description:
       "今日你愛情能量報表!特別適合告白、約會，\n你的魅力讓你閃閃發光。",
-    image_url: "../imgs/heart.png",
+    image_url: "./imgs/heart.png",
     weight: 20,
   },
   {
@@ -81,7 +96,7 @@ const fortuneResults = ref([
     title: "金浪煙火 | 幸運指數:88%",
     description:
       "財務上有不錯的直覺和機會，適合投資、\n做小額理財規劃。也有機會獲得意外之財或小獎喔!",
-    image_url: "../imgs/goldwave.png",
+    image_url: "./imgs/goldwave.png",
     weight: 20,
   },
   {
@@ -89,7 +104,7 @@ const fortuneResults = ref([
     title: "療癒煙火 | 幸運指數:75%",
     description:
       "今天適合慢下腳步，讓身心放鬆，\n多親近自然或早點休息，補充滿滿能量!",
-    image_url: "../imgs/healing.png",
+    image_url: "./imgs/healing.png",
     weight: 40,
   },
   {
@@ -97,7 +112,7 @@ const fortuneResults = ref([
     title: "金光煙火 | 幸運指數:80%",
     description:
       "你的工作運極佳，有重要會議或報告時表現亮眼，\n適合發展實力的好日子。",
-    image_url: "../imgs/goldlight.png",
+    image_url: "./imgs/goldlight.png",
     weight: 20,
   },
 ]);
@@ -430,7 +445,7 @@ function checkMilestoneAchievement(newCount, oldCount, isFirstTime) {
   // 只有在是首次占卜時才顯示里程碑成就訊息
   if (newAchieved && newAchieved > lastAchievedMilestone.value && isFirstTime) {
     lastAchievedMilestone.value = newAchieved;
-    showMilestoneMessage(newAchieved);
+    // showMilestoneMessage(newAchieved);
   } else {
     // 如果不是首次，只更新里程碑狀態，不顯示訊息
     if (newAchieved && newAchieved > lastAchievedMilestone.value) {
@@ -440,15 +455,15 @@ function checkMilestoneAchievement(newCount, oldCount, isFirstTime) {
 }
 
 // 顯示里程碑達成訊息
-function showMilestoneMessage() {
-  Swal.fire({
-    title: `恭喜完成第一次占卜!`,
-    text: `您已獲得抽獎資格！`,
-    icon: "success",
-    confirmButtonText: "太棒了!",
-    confirmButtonColor: "#fa541c",
-  });
-}
+// function showMilestoneMessage() {
+//   Swal.fire({
+//     title: `恭喜完成第一次占卜!`,
+//     text: `您已獲得抽獎資格！`,
+//     icon: "success",
+//     confirmButtonText: "太棒了!",
+//     confirmButtonColor: "#fa541c",
+//   });
+// }
 
 // 處理里程碑達成
 function handleMilestoneAchieved(milestone) {
@@ -459,9 +474,9 @@ function handleMilestoneAchieved(milestone) {
     lastAchievedMilestone.value = milestone.count;
 
     // 只有在首次占卜時才顯示里程碑成就訊息
-    if (milestone.count === 1 && totalPlayCount.value === 1) {
-      showMilestoneMessage();
-    }
+    // if (milestone.count === 1 && totalPlayCount.value === 1) {
+    //   showMilestoneMessage();
+    // }
   }
 }
 
@@ -494,31 +509,6 @@ function generateFortuneResult() {
   return defaultResult;
 }
 
-// 用於測試顯示占卜結果的函數
-function showTestFortuneResult() {
-  const fortuneData = generateFortuneResult();
-
-  // 測試時也根據當前 totalPlayCount 生成適當的訊息
-  let testResultMessage = "";
-  if (totalPlayCount.value === 1) {
-    testResultMessage =
-      "<div class='glowing-message'>占卜完成!<br>恭喜獲得 LINE Points 5點抽獎資格！</div>";
-  } else if (totalPlayCount.value >= 2 && totalPlayCount.value <= 4) {
-    testResultMessage =
-      "<div class='glowing-message'>占卜完成!<br>明天可以再來占卜</div>";
-  } else if (totalPlayCount.value >= 5) {
-    testResultMessage =
-      "<div class='glowing-message'>太棒了，占卜完成！<br>祝您有美好的一天</div>";
-  } else {
-    // 防止 totalPlayCount 為 0 的情況
-    testResultMessage =
-      "<div class='glowing-message'>測試模式: 占卜完成!</div>";
-  }
-
-  console.log("測試函數 - totalPlayCount:", totalPlayCount.value);
-  console.log("測試函數 - 生成訊息:", testResultMessage);
-  showFortuneResult(fortuneData, testResultMessage);
-}
 // ==================== 流程控制函數 ====================
 // 1. 占卜流程啟動函數
 async function startDivination() {
@@ -777,11 +767,11 @@ async function handleSuccessfulDivination(result) {
 // 生成結果訊息的輔助函數
 function generateResultMessage(playCount) {
   if (playCount === 1) {
-    return "<div class='glowing-message'>占卜完成!<br>恭喜獲得 LINE Points 5點抽獎資格！</div>";
+    return "<div class='glowing-message'><span class='glowing-message-title'>占卜完成!</span><br>恭喜獲得 LINE Points 5點抽獎資格！</div>";
   } else if (playCount >= 2 && playCount <= 4) {
-    return "<div class='glowing-message'>占卜完成!<br>明天可以再來占卜</div>";
+    return "<div class='glowing-message'><span class='glowing-message-title'>占卜完成!</span><br>明天可以再來占卜</div>";
   } else if (playCount >= 5) {
-    return "<div class='glowing-message'>太棒了，占卜完成！<br>祝您有美好的一天</div>";
+    return "<div class='glowing-message'><span class='glowing-message-title'>太棒了，占卜完成！</span><br>祝您有美好的一天</div>";
   }
   return "<div class='glowing-message'>占卜完成！</div>";
 }
@@ -928,63 +918,25 @@ function showAlreadyPlayedMessage() {
 
 // 顯示占卜結果
 function showFortuneResult(fortuneData, customResultMessage) {
-  // 直接使用傳入的訊息，不再重新宣告
   console.log("showFortuneResult - totalPlayCount 值:", totalPlayCount.value);
   console.log("showFortuneResult - customResultMessage:", customResultMessage);
 
-  // 增加檢查，如果 customResultMessage 為空，則加上默認訊息
-  const messageToShow =
+  // 設定彈窗數據
+  fortuneResultData.value = fortuneData;
+  fortuneCustomMessage.value =
     customResultMessage || "<div class='glowing-message'>占卜已完成！</div>";
-  console.log("最終顯示的訊息:", messageToShow);
 
-  // 準備 LINE 分享的文本和 URL
-  const shareTitle = `我在「2025蛇年運勢占卜」中得到了「${fortuneData.title.split("|")[0].trim()}」`;
-  const shareUrl = window.location.href;
+  // 顯示自訂彈窗
+  showFortuneResultPopup.value = true;
 
-  // 建立 LINE 分享連結
-  const lineShareUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareTitle)}`;
-
-  Swal.fire({
-    // 使用完整的標題，已經包含了幸運指數
-    title: fortuneData.title || "您的占卜結果",
-    html: `
-      <div class="divination-content">
-        <p>${fortuneData.description || "您的運勢將會非常好！"}</p>
-        ${messageToShow}
-        <div class="share-buttons">
-          <button id="line-share-btn" class="line-share-button">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/LINE_logo.svg" alt="LINE" width="20" height="20">
-            分享占卜結果
-          </button>
-        </div>
-      </div>
-    `,
-    imageUrl: fortuneData.image_url || "https://example.com/fortune-image.jpg",
-    imageWidth: 440,
-    imageHeight: 340,
-    imageAlt: "占卜卡片",
-    showConfirmButton: false,
-    showCloseButton: true,
-    backdrop: `rgb(0,0,0,0.5)`,
-    customClass: {
-      popup: "custom-popup-class",
-      title: "custom-title-class",
-      content: "custom-content-class",
-      image: "custom-image-class",
-    },
-    didOpen: () => {
-      // 綁定 LINE 分享按鈕事件
-      const lineShareBtn = document.getElementById("line-share-btn");
-      if (lineShareBtn) {
-        lineShareBtn.addEventListener("click", () => {
-          window.open(lineShareUrl, "_blank", "width=600,height=600");
-        });
-      }
-    },
-  }).then(() => {
-    clearCookiesAfterDivination();
-  });
+  console.log("使用自訂彈窗顯示占卜結果");
 }
+
+// 新增：關閉占卜結果彈窗的函數
+const closeFortune = () => {
+  showFortuneResultPopup.value = false;
+  clearCookiesAfterDivination();
+};
 
 // 登入後的驗證對話框
 function showPostLoginVerificationDialog() {
@@ -1775,103 +1727,6 @@ function handleInvalidFlow() {
     &:hover {
       background-color: #40a9ff;
     }
-  }
-}
-
-/* SweetAlert2 自訂樣式 */
-:global(.custom-popup-class) {
-  font-family: "Microsoft JhengHei", sans-serif;
-  border-radius: 15px;
-}
-
-:global(.divination-content) {
-  padding: 15px;
-  text-align: center;
-}
-
-/* 特殊訊息樣式 */
-:global(.special-message) {
-  margin: 15px 0;
-
-  p {
-    margin: 10px 0;
-  }
-
-  .small-text {
-    font-size: 14px;
-    color: #666;
-    margin-top: 15px;
-  }
-}
-
-/* 分享按鈕樣式 */
-:global(.share-buttons) {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-:global(.line-share-button) {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background-color: #06c755;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: #05a548;
-  }
-
-  img {
-    margin-right: 4px;
-  }
-}
-
-:global(.verify-hint) {
-  margin-top: 15px;
-  font-size: 14px;
-  color: #666;
-  font-style: italic;
-}
-
-/* 發光的黃色外框訊息樣式 */
-:global(.glowing-message) {
-  padding: 15px;
-  margin: 20px auto;
-  border-radius: 8px;
-  border: 2px solid #ffcc00;
-  background-color: rgba(255, 250, 230, 0.9); /* 改為淡黃色背景 */
-  color: #d4380d; /* 紅色文字 */
-  font-weight: bold;
-  box-shadow:
-    0 0 10px #ffcc00,
-    0 0 20px rgba(255, 204, 0, 0.5);
-  animation: glowing 1.5s infinite alternate;
-  max-width: 90%; /* 改為百分比值，增加寬度 */
-  text-align: center;
-  font-size: 16px; /* 添加字體大小 */
-  display: block; /* 確保它是區塊元素 */
-  line-height: 1.5; /* 合適的行高 */
-}
-
-@keyframes glowing {
-  from {
-    box-shadow:
-      0 0 10px #ffcc00,
-      0 0 15px rgba(255, 204, 0, 0.5);
-  }
-  to {
-    box-shadow:
-      0 0 15px #ffcc00,
-      0 0 25px rgba(255, 204, 0, 0.7);
   }
 }
 </style>

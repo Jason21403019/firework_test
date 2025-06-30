@@ -4,7 +4,8 @@
 </template>
 
 <style lang="scss">
-@import "~/assets/css/reset.css";
+@use "~/assets/css/reset.css";
+@use "~/assets/css/sweetalert.scss";
 
 html {
   scroll-behavior: smooth;

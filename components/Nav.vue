@@ -94,7 +94,7 @@ import Nav_container from "./Nav_container.vue";
 
 const isMobileMenuOpen = ref(false);
 const isScrolled = ref(false);
-const scrollThreshold = 100;
+const scrollThreshold = 40;
 
 function toggleMobileMenu() {
   isMobileMenuOpen.value = !isMobileMenuOpen.value;
@@ -122,18 +122,11 @@ onBeforeUnmount(() => {
   display: flex;
   background-color: transparent;
   box-shadow: none;
-  padding: 1rem 0;
   width: 100%;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 100;
-  @media (max-width: 640px) {
-    padding: 12px 0 1rem 0;
-  }
-  @media (max-width: 410px) {
-    padding: 4px 0 1rem 0;
-  }
 
   &__content {
     display: flex;
@@ -155,13 +148,13 @@ onBeforeUnmount(() => {
     align-items: center;
     justify-content: center;
     width: 160px;
-    padding: 8px 16px;
+    padding: 4px 8px;
     transition: all 0.3s ease;
     background-color: transparent;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    @media (max-width: 410px) {
-      padding: 4px 8px;
+    @media (max-width: 480px) {
+      width: 130px;
     }
     &-image {
       display: block;
@@ -173,13 +166,13 @@ onBeforeUnmount(() => {
     display: flex;
     align-items: center;
     gap: 1.5rem;
-    padding: 8px 16px;
+    padding: 4px 8px;
     transition: all 0.3s ease;
     background-color: transparent;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    @media (max-width: 410px) {
-      padding: 4px 8px;
+    @media (max-width: 480px) {
+      gap: 0.5rem;
     }
   }
 
@@ -218,6 +211,9 @@ onBeforeUnmount(() => {
   &__social {
     display: flex;
     gap: 0.5rem;
+    @media (max-width: 480px) {
+      gap: 0rem;
+    }
 
     &-link {
       display: flex;
@@ -236,6 +232,10 @@ onBeforeUnmount(() => {
     &-icon {
       width: 36px;
       height: 36px;
+      @media (max-width: 480px) {
+        width: 28px;
+        height: 28px;
+      }
     }
   }
 
@@ -249,6 +249,10 @@ onBeforeUnmount(() => {
     cursor: pointer;
     z-index: 110;
     position: relative;
+    @media (max-width: 480px) {
+      width: 25px;
+      height: 25px;
+    }
 
     &-line {
       display: block;
@@ -307,17 +311,6 @@ onBeforeUnmount(() => {
   }
 }
 
-@keyframes slideDown {
-  from {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
 @media (max-width: 768px) {
   .navbar {
     &__content {
@@ -348,8 +341,7 @@ onBeforeUnmount(() => {
       left: 0;
       width: 100%;
       height: auto;
-      min-height: 50vh;
-
+      min-height: 40vh;
       background: linear-gradient(
         135deg,
         rgba(27, 3, 62, 0.85),
@@ -357,9 +349,8 @@ onBeforeUnmount(() => {
       );
       backdrop-filter: blur(15px) saturate(100%);
       -webkit-backdrop-filter: blur(15px) saturate(100%);
-      border-bottom-left-radius: 20px;
-      border-bottom-right-radius: 20px;
-      padding: 120px 20px 40px;
+      border-radius: 10px;
+      padding: 60px 20px 40px;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
@@ -370,18 +361,19 @@ onBeforeUnmount(() => {
       margin: 0;
       transform: translateY(-100%);
       opacity: 0;
+      visibility: hidden;
       transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
       &--active {
         transform: translateY(0);
         opacity: 1;
-        animation: slideDown 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        visibility: visible;
       }
     }
 
     &__link {
       color: rgba(255, 255, 255, 0.95);
-      font-size: 28px;
+      font-size: 24px;
       font-weight: 400;
       padding: 16px 20px;
       text-align: center;
