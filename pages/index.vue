@@ -17,6 +17,24 @@
       :custom-message="fortuneCustomMessage"
       @close="closeFortune"
     />
+    <Already_played_popup
+      :is-visible="showAlreadyPlayedPopup"
+      :already-played-data="alreadyPlayedData"
+      :total-play-count="totalPlayCount"
+      :is-development="isDevelopment"
+      @close="closeAlreadyPlayedPopup"
+      @clear-record="clearPlayRecord"
+    />
+    <Loading_popup
+      :is-visible="showLoadingPopup"
+      :loading-data="loadingData"
+      @close="closeLoadingPopup"
+    />
+    <Verification_popup
+      :is-visible="showVerificationPopup"
+      @close="closeVerificationPopup"
+      @opened="onVerificationPopupOpened"
+    />
 
     <!-- 開發工具區域 - 按 Shift+D 顯示 -->
     <div v-if="showDebugTools" class="debug-tools">
@@ -60,6 +78,9 @@ import Act_area from "../components/Act_area.vue";
 import ToTop from "../components/ToTop.vue";
 import Notice_popup from "../components/Notice_popup.vue";
 import Fortune_result_popup from "../components/Fortune_result_popup.vue";
+import Already_played_popup from "../components/Already_played_popup.vue";
+import Loading_popup from "../components/Loading_popup.vue";
+import Verification_popup from "../components/Verification_popup.vue";
 // ==================== 基本狀態管理 ====================
 const config = useRuntimeConfig();
 const showDebugTools = ref(false);
@@ -72,14 +93,22 @@ const totalPlayCount = ref(0);
 const milestones = [1, 2, 3, 4, 5];
 let lastAchievedMilestone = ref(0);
 const showFortuneResultPopup = ref(false);
+
+//測試彈窗
 const fortuneResultData = ref({});
 const fortuneCustomMessage = ref("");
+const showAlreadyPlayedPopup = ref(false);
+const alreadyPlayedData = ref({});
+const showLoadingPopup = ref(false);
+const loadingData = ref({});
+const showVerificationPopup = ref(false);
 
 if (process.dev) {
   onMounted(() => {
     window.showFortuneResult = showFortuneResult;
     window.showAlreadyPlayedMessage = showAlreadyPlayedMessage;
     window.generateFortuneResult = generateFortuneResult;
+    window.showLoadingPopup = showLoadingPopup;
   });
 }
 const fortuneResults = ref([
@@ -123,7 +152,7 @@ const isDevelopment = computed(() => {
 });
 
 // Cloudflare Turnstile 配置
-const TURNSTILE_SITE_KEY = "0x4AAAAAAA5howw-D6z-rI8z"; // 實際 key
+const TURNSTILE_SITE_KEY = "0x4AAAAAAA5howw-D6z-rI8z";
 
 // ==================== API URL 管理 ====================
 // 根據環境生成適當的 API URL
@@ -234,17 +263,13 @@ function renderTurnstile() {
           token.substring(0, 10) + "...",
         );
 
-        // 驗證成功，保存 token
         turnstileToken.value = token;
         isTurnstileVerified.value = true;
-
-        // 為確保可靠性，將 token 同時保存到 window 對象和 sessionStorage
         window.temp_turnstile_token = token;
         sessionStorage.setItem("turnstile_token", token);
 
-        // 驗證成功後直接關閉彈窗並執行占卜流程
         setVerificationSuccess();
-        Swal.close();
+        closeVerificationPopup();
         proceedToPerformDivination();
       },
       "expired-callback": function () {
@@ -287,10 +312,8 @@ const securityManager = {
         }
 
         const token = response.data.token;
-        // 改用 sessionStorage 保存，安全性更高
         sessionStorage.setItem("fate2025_flow_token", token);
 
-        // 設置過期時間（5分鐘）
         const expiryTime = Date.now() + 5 * 60 * 1000;
         sessionStorage.setItem(
           "fate2025_flow_token_expiry",
@@ -307,16 +330,13 @@ const securityManager = {
 
     // 獲取已存儲的流程令牌
     get() {
-      // 檢查令牌是否過期
       const expiryTime = parseInt(
         sessionStorage.getItem("fate2025_flow_token_expiry") || "0",
       );
 
-      // 增加2分鐘寬限期
       const graceTime = 2 * 60 * 1000;
 
       if (expiryTime + graceTime < Date.now()) {
-        // 令牌已過期，清除
         console.warn("流程令牌已過期");
         this.clear();
         return null;
@@ -382,9 +402,6 @@ async function hasPlayedToday() {
   }
 
   try {
-    // 移除對 csrf.generate 的調用
-    // 不再需要生成前端的 CSRF 令牌
-
     const apiUrl = getApiUrl("checkPlayStatus.php");
     console.log("從資料庫檢查占卜狀態...");
 
@@ -394,7 +411,7 @@ async function hasPlayedToday() {
     // 發送請求 - 不再手動添加 CSRF 令牌，後端會處理
     const response = await axios.post(apiUrl, requestData, {
       headers: { "Content-Type": "application/json" },
-      withCredentials: true, // 重要：確保傳送 cookie
+      withCredentials: true,
     });
 
     if (
@@ -409,7 +426,6 @@ async function hasPlayedToday() {
     return false;
   } catch (error) {
     console.error("檢查占卜狀態時發生錯誤:", error);
-    // API 出錯時，為安全起見返回 false，避免阻止用戶占卜
     return false;
   }
 }
@@ -439,44 +455,23 @@ function recordPlayToday() {
 
 // 檢查並顯示成就達成訊息 - 只在首次占卜時顯示
 function checkMilestoneAchievement(newCount, oldCount, isFirstTime) {
-  // 找出新達成的里程碑
   const newAchieved = milestones.find((m) => oldCount < m && newCount >= m);
 
-  // 只有在是首次占卜時才顯示里程碑成就訊息
   if (newAchieved && newAchieved > lastAchievedMilestone.value && isFirstTime) {
     lastAchievedMilestone.value = newAchieved;
-    // showMilestoneMessage(newAchieved);
   } else {
-    // 如果不是首次，只更新里程碑狀態，不顯示訊息
     if (newAchieved && newAchieved > lastAchievedMilestone.value) {
       lastAchievedMilestone.value = newAchieved;
     }
   }
 }
 
-// 顯示里程碑達成訊息
-// function showMilestoneMessage() {
-//   Swal.fire({
-//     title: `恭喜完成第一次占卜!`,
-//     text: `您已獲得抽獎資格！`,
-//     icon: "success",
-//     confirmButtonText: "太棒了!",
-//     confirmButtonColor: "#fa541c",
-//   });
-// }
-
 // 處理里程碑達成
 function handleMilestoneAchieved(milestone) {
   console.log(`達成里程碑: ${milestone.count} - ${milestone.prize}`);
 
-  // 如果是首次達到此里程碑，顯示相關訊息
   if (milestone.count > lastAchievedMilestone.value) {
     lastAchievedMilestone.value = milestone.count;
-
-    // 只有在首次占卜時才顯示里程碑成就訊息
-    // if (milestone.count === 1 && totalPlayCount.value === 1) {
-    //   showMilestoneMessage();
-    // }
   }
 }
 
@@ -516,22 +511,18 @@ async function startDivination() {
     if (typeof window === "undefined") return;
 
     // 顯示處理中訊息
-    Swal.fire({
-      title: "處理中...",
-      text: "正在準備占卜流程",
-      allowOutsideClick: false,
-      showConfirmButton: false,
-      willOpen: () => {
-        Swal.showLoading();
-      },
-    });
+    loadingData.value = {
+      message: "處理中...",
+      subMessage: "正在準備占卜流程",
+    };
+    showLoadingPopup.value = true;
 
     // 1. 先更新狀態
     await updatePlayedStatus();
 
     // 2. 檢查用戶今天是否已經占卜過
     if (hasPlayed.value) {
-      Swal.close();
+      closeLoadingPopup();
       showAlreadyPlayedMessage();
       return;
     }
@@ -545,11 +536,11 @@ async function startDivination() {
     // 標記為正常流程
     sessionStorage.setItem("fate2025_normal_flow", "true");
 
-    console.log("正在跳轉到登入頁面...");
     // 跳轉到登入頁面
     window.location.href = loginUrl.value;
   } catch (error) {
     console.error("占卜流程錯誤:", error);
+    closeLoadingPopup();
     Swal.fire({
       icon: "error",
       title: "系統錯誤",
@@ -557,6 +548,9 @@ async function startDivination() {
     });
   }
 }
+const closeLoadingPopup = () => {
+  showLoadingPopup.value = false;
+};
 
 // 2. 驗證成功後執行占卜流程
 async function proceedToPerformDivination() {
@@ -594,22 +588,16 @@ async function proceedToPerformDivination() {
 
     // 步驟3: 顯示占卜進行中的提示
     console.log("開始占卜處理...");
-    Swal.fire({
-      title: "占卜中...",
-      text: "正在解讀您的命運",
-      allowOutsideClick: false,
-      showConfirmButton: false,
-      willOpen: () => {
-        Swal.showLoading();
-      },
-    });
+    loadingData.value = {
+      message: "占卜中...",
+    };
+    showLoadingPopup.value = true;
 
     // 步驟4: 調用 API 保存用戶數據
     console.log("正在發送占卜資料...");
     const result = await saveUserData();
 
-    // 關閉處理中訊息
-    Swal.close();
+    closeLoadingPopup();
 
     console.log("API 回應結果:", result);
 
@@ -874,65 +862,47 @@ async function saveUserData() {
 // ==================== 用戶界面函數 ====================
 // 顯示「今天已經玩過」的提示，區分是否為新會員首日占卜
 function showAlreadyPlayedMessage() {
-  // 獲取用戶ID
   const udnmember = getCookieValue("udnmember") || "";
 
-  let title = "您今天已經占卜過了";
-  let message = "";
   let imgUrl = "";
+  let message = "";
 
   if (totalPlayCount.value < 5) {
-    imgUrl = "../imgs/one_four.png";
+    imgUrl = "./imgs/one_four.png";
   } else {
-    imgUrl = "../imgs/five.png";
-  }
-  // 根據占卜次數決定顯示不同的訊息內容
-  if (totalPlayCount.value === 1) {
-    message =
-      "恭喜獲得 LINE Points 5點抽獎資格！每人每天只能占卜一次，請明天再來！";
+    imgUrl = "./imgs/five.png";
   }
 
-  Swal.fire({
-    title: title,
-    html: `
-      <div class="special-message">
-        <div class="already-played-image">
-          <img src="${imgUrl}" alt="今日已參加過囉!" style="max-width: 100%; margin-bottom: 15px;">
-        </div>
-        ${message ? `<p class="points-message">${message}</p>` : ""}
-        <p>小提醒:天天能占卜，還可抽65吋LED電視、Dyson、咖啡機等好禮喔!</p>
-      </div>
-    `,
-    icon: "info",
-    confirmButtonText: "我知道了",
-    confirmButtonColor: "#1890ff",
-    showDenyButton: isDevelopment.value,
-    denyButtonText: "開發模式：重置記錄",
-    denyButtonColor: "#ff4d4f",
-  }).then((result) => {
-    if (result.isDenied && isDevelopment.value) {
-      clearPlayRecord();
-    }
-  });
+  if (totalPlayCount.value === 1) {
+    message =
+      "恭喜獲得 LINE Points 5點抽獎\n(送完為止)兌換序號將於活動後寄送。";
+  }
+
+  alreadyPlayedData.value = {
+    image_url: imgUrl,
+    message: message,
+    reminder:
+      "小提醒: 天天能占卜，還可抽65吋LED電視、\n Dyson、咖啡機等好禮喔!",
+  };
+
+  showAlreadyPlayedPopup.value = true;
 }
+
+// 關閉已占卜過彈窗的函數
+const closeAlreadyPlayedPopup = () => {
+  showAlreadyPlayedPopup.value = false;
+};
 
 // 顯示占卜結果
 function showFortuneResult(fortuneData, customResultMessage) {
-  console.log("showFortuneResult - totalPlayCount 值:", totalPlayCount.value);
-  console.log("showFortuneResult - customResultMessage:", customResultMessage);
-
-  // 設定彈窗數據
   fortuneResultData.value = fortuneData;
   fortuneCustomMessage.value =
     customResultMessage || "<div class='glowing-message'>占卜已完成！</div>";
 
-  // 顯示自訂彈窗
   showFortuneResultPopup.value = true;
-
-  console.log("使用自訂彈窗顯示占卜結果");
 }
 
-// 新增：關閉占卜結果彈窗的函數
+// 關閉占卜結果彈窗的函數
 const closeFortune = () => {
   showFortuneResultPopup.value = false;
   clearCookiesAfterDivination();
@@ -947,36 +917,30 @@ function showPostLoginVerificationDialog() {
     sessionStorage.setItem("fate2025_auth_backup", currentAuthToken);
   }
 
-  Swal.fire({
-    title: "安全驗證",
-    html: `
-      <div class="verification-content">
-        <p>請先完成下方安全驗證以繼續占卜</p>
-        <div id="turnstile-container" class="turnstile-wrapper"></div>
-        <p class="verify-hint">驗證完成後將自動進行占卜</p>
-      </div>
-    `,
-    showConfirmButton: false,
-    showCloseButton: true,
-    allowOutsideClick: false,
-    didOpen: () => {
-      // 載入 Turnstile
-      loadTurnstileScript();
-    },
-    willClose: () => {
-      // 清理 Turnstile
-      if (
-        typeof window !== "undefined" &&
-        window.turnstile &&
-        turnstileWidgetId.value
-      ) {
-        try {
-          window.turnstile.remove(turnstileWidgetId.value);
-        } catch (e) {}
-      }
-    },
-  });
+  showVerificationPopup.value = true;
 }
+// 關閉驗證彈窗的函數
+const closeVerificationPopup = () => {
+  showVerificationPopup.value = false;
+
+  if (
+    typeof window !== "undefined" &&
+    window.turnstile &&
+    turnstileWidgetId.value
+  ) {
+    try {
+      window.turnstile.remove(turnstileWidgetId.value);
+      turnstileWidgetId.value = null;
+    } catch (e) {
+      console.error("清理 Turnstile 時發生錯誤:", e);
+    }
+  }
+};
+
+// 驗證彈窗開啟時的處理
+const onVerificationPopupOpened = () => {
+  loadTurnstileScript();
+};
 
 // 切換開發工具顯示
 function toggleDebugTools() {

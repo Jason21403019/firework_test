@@ -300,7 +300,7 @@ watch(
       @media (max-width: 1024px) {
         width: 90px;
         height: 130px;
-        font-size: 40px;
+        font-size: 40px; 
       }
       @media (max-width: 480px) {
         width: 80px;

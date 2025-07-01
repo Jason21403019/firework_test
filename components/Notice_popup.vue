@@ -1,6 +1,5 @@
 <template>
   <div class="notice">
-    <!-- 兩個按鈕 -->
     <div class="notice__buttons">
       <button @click="showNoticePopup" class="notice__btn notice__btn--notice">
         注意事項
@@ -13,12 +12,17 @@
       </button>
     </div>
 
-    <!-- 彈窗遮罩 -->
-    <div v-if="isPopupVisible" class="notice__overlay" @click.self="closeModal">
-      <div class="notice__popup">
-        <!-- 內邊框 -->
+    <div
+      v-if="isPopupVisible"
+      class="notice__overlay"
+      :class="{ 'notice__overlay--closing': isClosing }"
+      @click.self="closeModal"
+    >
+      <div
+        class="notice__popup"
+        :class="{ 'notice__popup--closing': isClosing }"
+      >
         <div class="notice__popup-inner">
-          <!-- 關閉按鈕 -->
           <button class="notice__close-btn" @click="closeModal">
             <svg
               width="24"
@@ -37,12 +41,10 @@
             </svg>
           </button>
 
-          <!-- 標題區 -->
           <div class="notice__header">
             <h2 class="notice__title">{{ currentContent.title }}</h2>
           </div>
 
-          <!-- 內容區 -->
           <div class="notice__content">
             <p>{{ currentContent.description }}</p>
             <p>{{ currentContent.extraInfo }}</p>
@@ -65,11 +67,10 @@
 <script setup>
 import { ref, computed } from "vue";
 
-// 狀態管理
 const isPopupVisible = ref(false);
 const activeTab = ref("notice");
+const isClosing = ref(false);
 
-// 內容數據
 const contentData = {
   notice: {
     title: "注意事項",
@@ -117,15 +118,21 @@ const currentContent = computed(() => {
 const showNoticePopup = () => {
   activeTab.value = "notice";
   isPopupVisible.value = true;
+  isClosing.value = false;
 };
 
 const showPrivacyPopup = () => {
   activeTab.value = "privacy";
   isPopupVisible.value = true;
+  isClosing.value = false;
 };
 
 const closeModal = () => {
-  isPopupVisible.value = false;
+  isClosing.value = true;
+  setTimeout(() => {
+    isClosing.value = false;
+    isPopupVisible.value = false;
+  }, 300);
 };
 </script>
 
@@ -159,38 +166,6 @@ const closeModal = () => {
   @media (max-width: 360px) {
     background-size: cover;
     padding: 40px 12px 300px 12px;
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    right: 120px;
-    width: 670px;
-    height: 475px;
-    background-image: url("/imgs/u_baby.png");
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center bottom;
-    z-index: 1;
-    @media (max-width: 1480px) {
-      right: 60px;
-      width: 500px;
-      height: 350px;
-    }
-    @media (max-width: 1180px) {
-      right: 30px;
-      width: 400px;
-      height: 300px;
-    }
-    @media (max-width: 992px) {
-      right: 20px;
-      width: 300px;
-      height: 250px;
-    }
-    @media (max-width: 768px) {
-      background-image: none;
-    }
   }
 
   &__buttons {
@@ -272,6 +247,11 @@ const closeModal = () => {
     align-items: center;
     z-index: 1000;
     padding: 12px;
+    animation: overlayFadeIn 0.3s ease-out;
+
+    &--closing {
+      animation: overlayFadeOut 0.3s ease-out;
+    }
   }
 
   &__popup {
@@ -281,9 +261,12 @@ const closeModal = () => {
     max-width: 1060px;
     max-height: 700px;
     position: relative;
-    // overflow: hidden;
-    animation: modalAppear 0.3s ease-out;
+    animation: modalBounceIn 0.3s ease-out;
     padding: 20px;
+
+    &--closing {
+      animation: modalBounceOut 0.25s ease-in;
+    }
     @media (max-width: 480px) {
       border: none;
     }
@@ -416,14 +399,43 @@ const closeModal = () => {
   }
 }
 
-@keyframes modalAppear {
+@keyframes overlayFadeIn {
   from {
     opacity: 0;
-    transform: translateY(-30px) scale(0.95);
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes overlayFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes modalBounceIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.8);
+  }
+  100% {
+    opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes modalBounceOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.9);
   }
 }
 </style>

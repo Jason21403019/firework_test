@@ -1,16 +1,16 @@
 <template>
   <div
     v-if="isVisible"
-    class="fortune-result__overlay"
-    :class="{ 'fortune-result__overlay--closing': isClosing }"
+    class="already-played__overlay"
+    :class="{ 'already-played__overlay--closing': isClosing }"
     @click.self="closeModal"
   >
     <div
-      class="fortune-result__popup"
-      :class="{ 'fortune-result__popup--closing': isClosing }"
+      class="already-played__popup"
+      :class="{ 'already-played__popup--closing': isClosing }"
     >
-      <div class="fortune-result__popup-inner">
-        <button class="fortune-result__close-btn" @click="closeModal">
+      <div class="already-played__popup-inner">
+        <button class="already-played__close-btn" @click="closeModal">
           <svg
             width="24"
             height="24"
@@ -27,34 +27,38 @@
             />
           </svg>
         </button>
+
+        <div class="already-played__title">
+          <img
+            src="/imgs/play_again.png"
+            alt="您今天已經占卜過了"
+            class="already-played__title-image"
+          />
+        </div>
         <div
-          class="fortune-result__image-container"
-          v-if="fortuneData.image_url"
+          class="already-played__image-container"
+          v-if="alreadyPlayedData.image_url"
         >
           <img
-            :src="fortuneData.image_url"
-            :alt="fortuneData.title"
-            class="fortune-result__image"
+            :src="alreadyPlayedData.image_url"
+            alt="今日已參加過囉!"
+            class="already-played__image"
           />
         </div>
 
-        <h2 class="fortune-result__title">
-          {{ fortuneData.title || "您的占卜結果" }}
-        </h2>
-
-        <div class="fortune-result__content">
-          <p class="fortune-result__description">
-            {{ fortuneData.description || "您的運勢將會非常好！" }}
-          </p>
+        <div class="already-played__content">
           <div
-            v-if="customMessage"
-            v-html="customMessage"
-            class="fortune-result__custom-message"
-          ></div>
-          <div class="fortune-result__share-buttons">
-            <button @click="shareToLine" class="fortune-result__line-button">
-              Line 分享占卜結果
-            </button>
+            v-if="alreadyPlayedData.message"
+            class="already-played__points-message"
+          >
+            {{ alreadyPlayedData.message }}
+          </div>
+
+          <div
+            v-if="alreadyPlayedData.reminder"
+            class="already-played__reminder"
+          >
+            {{ alreadyPlayedData.reminder }}
           </div>
         </div>
       </div>
@@ -63,24 +67,27 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
-
+import { ref } from "vue";
 const props = defineProps({
   isVisible: {
     type: Boolean,
     default: false,
   },
-  fortuneData: {
+  alreadyPlayedData: {
     type: Object,
     default: () => ({}),
   },
-  customMessage: {
-    type: String,
-    default: "",
+  totalPlayCount: {
+    type: Number,
+    default: 0,
+  },
+  isDevelopment: {
+    type: Boolean,
+    default: false,
   },
 });
 
-const emit = defineEmits(["close"]);
+const emit = defineEmits(["close", "clear-record"]);
 
 const isClosing = ref(false);
 
@@ -91,17 +98,10 @@ const closeModal = () => {
     emit("close");
   }, 300);
 };
-
-const shareToLine = () => {
-  const shareTitle = `我在「2025蛇年運勢占卜」中得到了「${props.fortuneData.title?.split("|")[0]?.trim() || "神秘結果"}」`;
-  const shareUrl = window.location.href;
-  const lineShareUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareTitle)}`;
-  window.open(lineShareUrl, "_blank", "width=600,height=600");
-};
 </script>
 
 <style lang="scss" scoped>
-.fortune-result {
+.already-played {
   &__overlay {
     position: fixed;
     top: 0;
@@ -128,8 +128,8 @@ const shareToLine = () => {
     max-width: 600px;
     max-height: 80vh;
     position: relative;
-    animation: modalBounceIn 0.3s ease-out;
     padding: 20px;
+    animation: modalBounceIn 0.3s ease-out;
 
     &--closing {
       animation: modalBounceOut 0.25s ease-in;
@@ -154,6 +154,13 @@ const shareToLine = () => {
       left: 0;
       background: rgba(255, 255, 255, 0.05);
     }
+    &::after {
+      content: url("../imgs/right_circle.png");
+      position: absolute;
+      bottom: -20px;
+      right: 40px;
+      z-index: 10;
+    }
   }
 
   &__popup-inner {
@@ -162,6 +169,7 @@ const shareToLine = () => {
     border-radius: 10px;
     z-index: 1;
     border: 2px solid #577bff52;
+
     &::before {
       content: url("../imgs/left_circle.png");
       position: absolute;
@@ -209,22 +217,19 @@ const shareToLine = () => {
   }
 
   &__title {
-    font-size: 28px;
-    font-weight: bold;
-    color: #f8dfb2;
     text-align: center;
-    margin-bottom: 20px;
-    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+    margin: 40px 0px;
+  }
 
-    @media (max-width: 480px) {
-      font-size: 20px;
-      margin-bottom: 15px;
-    }
+  &__title-image {
+    max-width: 80%;
+    height: auto;
   }
 
   &__image-container {
     text-align: center;
     margin-bottom: 20px;
+
     &::before {
       content: url("../imgs/left_ribbons.png");
       position: absolute;
@@ -241,7 +246,7 @@ const shareToLine = () => {
 
   &__image {
     width: 100%;
-    border-radius: 10px;
+    max-width: 400px;
   }
 
   &__content {
@@ -249,101 +254,28 @@ const shareToLine = () => {
     color: #fff;
   }
 
-  &__description {
-    font-size: 20px;
+  &__points-message {
+    font-size: 22px;
     line-height: 1.6;
     margin-bottom: 20px;
+    color: #f8dfb2;
+    font-weight: bold;
     white-space: pre-line;
 
     @media (max-width: 480px) {
-      font-size: 14px;
+      font-size: 16px;
     }
   }
 
-  &__custom-message {
-    margin: 20px 0;
-
-    :deep(.glowing-message) {
-      padding: 15px;
-      margin: 20px auto;
-      border-radius: 10px;
-      border: 2px solid #f69f2f;
-      background: transparent;
-      color: #fff;
-      font-weight: bold;
-      box-shadow:
-        0 0 10px #f69f2f,
-        inset 0 0 10px #f69f2f;
-      max-width: 90%;
-      text-align: center;
-      font-size: 18px;
-      display: block;
-      line-height: 1.5;
-      .glowing-message-title {
-        font-size: 24px;
-        font-weight: bold;
-        color: #f8dfb2;
-        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
-      }
-
-      &::after {
-        content: url("../imgs/right_circle.png");
-        position: absolute;
-        bottom: 0px;
-        right: -10px;
-      }
-
-      @media (max-width: 480px) {
-        font-size: 14px;
-        padding: 12px;
-      }
-    }
-  }
-
-  &__share-buttons {
-    margin-top: 25px;
-    display: flex;
-    justify-content: center;
-    margin-bottom: -60px;
-  }
-
-  &__line-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background: linear-gradient(to right, #f7c439, #f69c2e); // 您指定的漸層色
-    color: white;
-    border: none;
-    border-radius: 50px;
-    font-weight: 600;
-    max-width: 480px;
-    padding: 16px 60px;
-    font-size: 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    white-space: nowrap; // 防止文字換行
-    box-sizing: border-box;
-
-    &:hover {
-      background: linear-gradient(
-        to right,
-        #f69c2e,
-        #f7c439
-      ); // hover 時反轉漸層
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(247, 196, 57, 0.4);
-    }
-
-    img {
-      margin-right: 4px;
-      flex-shrink: 0; // 防止圖片被壓縮
-    }
+  &__reminder {
+    font-size: 22px;
+    line-height: 1.5;
+    margin-bottom: 40px;
+    color: #fff;
+    white-space: pre-line;
 
     @media (max-width: 480px) {
-      padding: 10px 16px;
-      font-size: 14px;
-      max-width: 180px; // 手機版進一步縮小
+      font-size: 16px;
     }
   }
 }
