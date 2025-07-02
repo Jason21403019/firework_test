@@ -26,6 +26,7 @@ export default defineNuxtConfig({
       baseUrl: process.env.NUXT_PUBLIC_BASE_URL,
       domain: process.env.NUXT_PUBLIC_DOMAIN,
       base: process.env.NUXT_PUBLIC_BASE,
+      turnstileSiteKey: process.env.NUXT_PUBLIC_TURNSTILE_SITE_KEY,
     },
   },
 

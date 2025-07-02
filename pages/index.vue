@@ -300,7 +300,7 @@ const isDevelopment = computed(() => {
 });
 
 // Cloudflare Turnstile 配置
-const TURNSTILE_SITE_KEY = "0x4AAAAAAA5howw-D6z-rI8z";
+const TURNSTILE_SITE_KEY = config.public.turnstileSiteKey;
 
 // ==================== API URL 管理 ====================
 // 根據環境生成適當的 API URL

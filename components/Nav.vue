@@ -34,8 +34,8 @@
             >
             <NuxtLink
               to="/"
-              class="navbar__link"
-              @click="isMobileMenuOpen = false"
+              class="navbar__link navbar__link--button"
+              @click="handleWinnerListClick"
               >中獎名單</NuxtLink
             >
           </div>
@@ -85,16 +85,51 @@
       class="navbar__backdrop"
       @click="isMobileMenuOpen = false"
     ></div>
+
+    <Universal_popup
+      :is-visible="showWinnerListPopup"
+      :popup-data="winnerListPopupData"
+      @close="closeWinnerListPopup"
+      @confirm="handleWinnerListConfirm"
+    />
   </nav>
 </template>
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import Nav_container from "./Nav_container.vue";
+import Universal_popup from "./Universal_popup.vue";
 
 const isMobileMenuOpen = ref(false);
 const isScrolled = ref(false);
+const showWinnerListPopup = ref(false);
 const scrollThreshold = 40;
+
+const winnerListConfig = {
+  announceDate: "2025年8月15日",
+  winnerListUrl: "https://udn.com/news/index",
+  isAnnounced: false,
+};
+const winnerListPopupData = computed(() => {
+  if (winnerListConfig.isAnnounced) {
+    return {
+      icon: "success",
+      title: "中獎名單",
+      text: "恭喜得獎者！點擊下方按鈕查看完整中獎名單。",
+      confirmButtonText: "查看中獎名單",
+      showCancelButton: true,
+      cancelButtonText: "稍後查看",
+    };
+  } else {
+    return {
+      icon: "warning",
+      title: "中獎名單尚未公布",
+      text: `中獎名單將於 ${winnerListConfig.announceDate} 公布，\n敬請期待！`,
+      confirmButtonText: "我知道了",
+      showCancelButton: false,
+    };
+  }
+});
 
 function toggleMobileMenu() {
   isMobileMenuOpen.value = !isMobileMenuOpen.value;
@@ -102,6 +137,29 @@ function toggleMobileMenu() {
 
 function handleScroll() {
   isScrolled.value = window.scrollY > scrollThreshold;
+}
+// 處理中獎名單點擊
+function handleWinnerListClick() {
+  // 關閉手機選單
+  isMobileMenuOpen.value = false;
+
+  // 顯示中獎名單彈窗
+  showWinnerListPopup.value = true;
+}
+
+// 關閉中獎名單彈窗
+function closeWinnerListPopup() {
+  showWinnerListPopup.value = false;
+}
+
+// 處理中獎名單確認
+function handleWinnerListConfirm() {
+  if (winnerListConfig.isAnnounced) {
+    // 如果已公布，導向中獎名單頁面
+    window.open(winnerListConfig.winnerListUrl, "_blank");
+  }
+
+  closeWinnerListPopup();
 }
 
 onMounted(() => {
@@ -205,6 +263,19 @@ onBeforeUnmount(() => {
       top: 45%;
       transform: translateY(-50%);
       color: #fff;
+    }
+    &--button {
+      font-family: inherit;
+
+      &:hover {
+        color: #f0f0f0;
+      }
+
+      &:focus {
+        outline: 2px solid rgba(255, 255, 255, 0.5);
+        outline-offset: 2px;
+        border-radius: 4px;
+      }
     }
   }
 
