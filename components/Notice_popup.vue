@@ -168,6 +168,7 @@ const closeModal = () => {
     padding: 40px 12px 300px 12px;
   }
 
+  &::after {
   &__buttons {
     display: flex;
     gap: 40px;

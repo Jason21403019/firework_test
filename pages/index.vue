@@ -36,6 +36,14 @@
       @opened="onVerificationPopupOpened"
     />
 
+    <Universal_popup
+      :is-visible="showUniversalPopup"
+      :popup-data="universalPopupData"
+      @close="closeUniversalPopup"
+      @confirm="handleUniversalConfirm"
+      @cancel="handleUniversalCancel"
+    />
+
     <!-- 開發工具區域 - 按 Shift+D 顯示 -->
     <div v-if="showDebugTools" class="debug-tools">
       <h3>開發測試工具</h3>
@@ -81,6 +89,7 @@ import Fortune_result_popup from "../components/Fortune_result_popup.vue";
 import Already_played_popup from "../components/Already_played_popup.vue";
 import Loading_popup from "../components/Loading_popup.vue";
 import Verification_popup from "../components/Verification_popup.vue";
+import Universal_popup from "../components/Universal_popup.vue";
 // ==================== 基本狀態管理 ====================
 const config = useRuntimeConfig();
 const showDebugTools = ref(false);
@@ -102,6 +111,8 @@ const alreadyPlayedData = ref({});
 const showLoadingPopup = ref(false);
 const loadingData = ref({});
 const showVerificationPopup = ref(false);
+const showUniversalPopup = ref(false);
+const universalPopupData = ref({});
 
 if (process.dev) {
   onMounted(() => {
@@ -109,8 +120,145 @@ if (process.dev) {
     window.showAlreadyPlayedMessage = showAlreadyPlayedMessage;
     window.generateFortuneResult = generateFortuneResult;
     window.showLoadingPopup = showLoadingPopup;
+    window.closeLoadingPopup = closeLoadingPopup;
+    window.showUniversalPopup = showUniversalPopup;
+    window.closeUniversalPopup = closeUniversalPopup;
+    window.showUniversalDialog = showUniversalDialog;
+    // 添加 Universal 彈窗測試函數
+    window.testApiError = () => {
+      showUniversalDialog({
+        icon: "err  r",
+        title: "占卜失敗",
+        text: "測試：伺服器錯誤，請稍後再試",
+        confirmButtonText: "確定",
+        showCancelButton: true,
+        cancelButtonText: "重新嘗試",
+      }).then((modalResult) => {
+        if (modalResult.isDismissed || modalResult.dismiss === "cancel") {
+          console.log("用戶選擇重新嘗試");
+        }
+      });
+    };
+
+    window.testRobotFail = () => {
+      showUniversalDialog({
+        icon: "warning",
+        title: "機器人驗證失敗",
+        text: "請重新進行驗證",
+        confirmButtonText: "重新驗證",
+        showCancelButton: false,
+      }).then(() => {
+        console.log("機器人驗證失敗測試完成");
+      });
+    };
+
+    window.testAutomationDetection = () => {
+      showUniversalDialog({
+        icon: "error",
+        title: "安全警告",
+        text: "系統檢測到自動化行為，請勿使用機器人或腳本，請使用正常瀏覽器操作。",
+        confirmButtonText: "重新驗證",
+        showCancelButton: false,
+      }).then(() => {
+        console.log("自動化行為檢測測試完成");
+      });
+    };
+
+    window.testSystemError = () => {
+      showUniversalDialog({
+        icon: "error",
+        title: "系統錯誤",
+        text: "啟動占卜流程時發生錯誤，請稍後再試",
+      });
+    };
+
+    window.testSecurityFail = () => {
+      showUniversalDialog({
+        icon: "warning",
+        title: "安全驗證失敗",
+        text: "驗證已過期，需要重新開始占卜流程",
+        confirmButtonText: "重新開始",
+        showCancelButton: false,
+      }).then(() => {
+        console.log("安全驗證失敗測試完成");
+      });
+    };
+
+    window.testWrongFlow = () => {
+      showUniversalDialog({
+        icon: "warning",
+        title: "請使用正確的占卜流程",
+        text: "請從活動首頁點擊「立即占卜」按鈕來完成占卜流程，直接使用登入網址將無法取得占卜結果。",
+        confirmButtonText: "我知道了",
+        showCancelButton: false,
+      });
+    };
+
+    window.testInvalidFlow = () => {
+      showUniversalDialog({
+        icon: "warning",
+        title: "請注意",
+        text: "建議從活動首頁點擊「立即占卜」按鈕開始。您要繼續嗎？",
+        confirmButtonText: "繼續占卜",
+        showCancelButton: true,
+        cancelButtonText: "返回首頁",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          console.log("用戶選擇繼續占卜");
+        } else {
+          console.log("用戶選擇返回首頁");
+        }
+      });
+    };
   });
 }
+
+// 創建統一的彈窗顯示函數
+function showUniversalDialog(options) {
+  universalPopupData.value = {
+    icon: options.icon || null,
+    title: options.title || "",
+    text: options.text || "",
+    html: options.html || "",
+    showConfirmButton: options.showConfirmButton !== false,
+    showCancelButton: options.showCancelButton || false,
+    confirmButtonText: options.confirmButtonText || "確定",
+    cancelButtonText: options.cancelButtonText || "取消",
+    allowOutsideClick: options.allowOutsideClick !== false,
+    showCloseButton: options.showCloseButton !== false,
+  };
+
+  showUniversalPopup.value = true;
+
+  // 返回 Promise 以支持 .then() 語法
+  return new Promise((resolve) => {
+    const handleClose = (result) => {
+      showUniversalPopup.value = false;
+      resolve(result);
+    };
+
+    // 設置臨時事件處理器
+    window._universalPopupResolve = handleClose;
+  });
+}
+
+// 關閉彈窗的函數
+const closeUniversalPopup = () => {
+  showUniversalPopup.value = false;
+};
+
+const handleUniversalConfirm = () => {
+  if (window._universalPopupResolve) {
+    window._universalPopupResolve({ isConfirmed: true });
+  }
+};
+
+const handleUniversalCancel = () => {
+  if (window._universalPopupResolve) {
+    window._universalPopupResolve({ isDismissed: true, dismiss: "cancel" });
+  }
+};
+
 const fortuneResults = ref([
   {
     id: "fortune_1",
@@ -541,7 +689,7 @@ async function startDivination() {
   } catch (error) {
     console.error("占卜流程錯誤:", error);
     closeLoadingPopup();
-    Swal.fire({
+    showUniversalDialog({
       icon: "error",
       title: "系統錯誤",
       text: "啟動占卜流程時發生錯誤，請稍後再試",
@@ -566,7 +714,7 @@ async function proceedToPerformDivination() {
 
     if (!flowToken) {
       console.error("流程安全令牌不存在或已過期");
-      Swal.fire({
+      showUniversalDialog({
         icon: "warning",
         title: "安全驗證失敗",
         text: "驗證已過期，需要重新開始占卜流程",
@@ -613,15 +761,11 @@ async function proceedToPerformDivination() {
     }
   } catch (error) {
     console.error("占卜流程執行錯誤:", error);
-    Swal.close(); // 確保關閉任何開啟的對話框
-
-    Swal.fire({
+    closeLoadingPopup();
+    showUniversalDialog({
       icon: "error",
       title: "系統錯誤",
-      text: "執行占卜時發生錯誤: " + (error.message || "未知錯誤"),
-      confirmButtonText: "確定",
-      showCancelButton: true,
-      cancelButtonText: "重新嘗試",
+      text: "啟動占卜流程時發生錯誤，請稍後再試",
     }).then((result) => {
       if (result.isDismissed) {
         showPostLoginVerificationDialog();
@@ -659,11 +803,12 @@ async function handleApiError(result) {
   // 機器人驗證失敗
   if (result.message && result.message.includes("機器人驗證失敗")) {
     console.log("機器人驗證失敗，要求重新驗證");
-    Swal.fire({
+    showUniversalDialog({
       icon: "warning",
       title: "機器人驗證失敗",
       text: "請重新進行驗證",
       confirmButtonText: "重新驗證",
+      showCancelButton: false,
     }).then(() => {
       showPostLoginVerificationDialog();
     });
@@ -673,12 +818,12 @@ async function handleApiError(result) {
   // 自動化行為檢測
   if (result.message && result.message.includes("系統檢測到自動化行為")) {
     console.log("檢測到自動化行為");
-    Swal.fire({
+    showUniversalDialog({
       icon: "error",
       title: "安全警告",
       text: "系統檢測到自動化行為，請勿使用機器人或腳本，請使用正常瀏覽器操作。",
       confirmButtonText: "重新驗證",
-      confirmButtonColor: "#ff4d4f",
+      showCancelButton: false,
     }).then(() => {
       showPostLoginVerificationDialog();
     });
@@ -687,7 +832,7 @@ async function handleApiError(result) {
 
   // 其他錯誤（包括500錯誤）- 不要設置 hasPlayed.value = true
   console.log("其他 API 錯誤，不更新占卜狀態:", result.message);
-  Swal.fire({
+  showUniversalDialog({
     icon: "error",
     title: "占卜失敗",
     text: result.message || "伺服器錯誤，請稍後再試",
@@ -695,10 +840,7 @@ async function handleApiError(result) {
     showCancelButton: true,
     cancelButtonText: "重新嘗試",
   }).then((modalResult) => {
-    if (
-      modalResult.isDismissed ||
-      modalResult.dismiss === Swal.DismissReason.cancel
-    ) {
+    if (modalResult.isDismissed || modalResult.dismiss === "cancel") {
       // 使用者點擊了「重新嘗試」或取消按鈕
       showPostLoginVerificationDialog();
     }
@@ -962,14 +1104,14 @@ async function clearPlayRecord() {
   // 重要：立即更新占卜狀態
   hasPlayed.value = false;
 
-  Swal.fire({
-    toast: true,
-    icon: "success",
-    title: "占卜記錄已清除",
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 1500,
-  });
+  // Swal.fire({
+  //   toast: true,
+  //   icon: "success",
+  //   title: "占卜記錄已清除",
+  //   position: "top-end",
+  //   showConfirmButton: false,
+  //   timer: 1500,
+  // });
 }
 
 // 檢查資料庫狀態
@@ -1163,16 +1305,16 @@ function logout() {
   }
 
   // 提示用戶
-  Swal.fire({
-    icon: "success",
-    title: "登出成功",
-    text: "您已成功登出系統",
-    confirmButtonText: "確定",
-  }).then(() => {
-    // 使用更可靠的頁面刷新方法 - 設定不使用快取
-    window.location.href =
-      window.location.pathname + "?t=" + new Date().getTime();
-  });
+  // Swal.fire({
+  //   icon: "success",
+  //   title: "登出成功",
+  //   text: "您已成功登出系統",
+  //   confirmButtonText: "確定",
+  // }).then(() => {
+  //   // 使用更可靠的頁面刷新方法 - 設定不使用快取
+  //   window.location.href =
+  //     window.location.pathname + "?t=" + new Date().getTime();
+  // });
 }
 // 修改 clearCookiesAfterDivination 函數
 function clearCookiesAfterDivination() {
@@ -1412,12 +1554,12 @@ async function handleNonNormalLogin() {
   if (!isNormalFlow) {
     console.log("檢測到用戶不是從正常流程登入");
 
-    Swal.fire({
+    showUniversalDialog({
       icon: "warning",
       title: "請使用正確的占卜流程",
-      text: "請從活動首頁點擊「立即占卜」按鈕來完成占卜流程，直接使用登入網址將無法取得占卜結果。",
+      text: "請從活動首頁點擊「立即占卜」按鈕來完成占卜流程，\n直接使用登入網址將無法取得占卜結果。",
       confirmButtonText: "我知道了",
-      confirmButtonColor: "#1890ff",
+      showCancelButton: false,
     });
   }
 }
@@ -1463,11 +1605,10 @@ async function handlePostLoginProcess() {
     showPostLoginVerificationDialog();
   } catch (error) {
     console.error("登入後流程錯誤:", error);
-    Swal.fire({
+    showUniversalDialog({
       icon: "error",
       title: "系統錯誤",
-      text: "執行占卜流程時發生錯誤: " + (error.message || "未知錯誤"),
-      confirmButtonText: "確定",
+      text: "啟動占卜流程時發生錯誤，請稍後再試",
     });
   }
 }
@@ -1499,12 +1640,11 @@ function handleInvalidFlow() {
   console.log("檢測到用戶未經過正確占卜流程");
 
   // 顯示警告但給用戶選擇繼續的機會
-  Swal.fire({
+  showUniversalDialog({
     icon: "warning",
     title: "請注意",
     text: "建議從活動首頁點擊「立即占卜」按鈕開始。您要繼續嗎？",
     confirmButtonText: "繼續占卜",
-    confirmButtonColor: "#1890ff",
     showCancelButton: true,
     cancelButtonText: "返回首頁",
   }).then((result) => {
