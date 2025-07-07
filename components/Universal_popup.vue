@@ -241,6 +241,12 @@ const handleCancel = () => {
     z-index: 1000;
     padding: 12px;
     animation: overlayFadeIn 0.3s ease-out;
+    @media (max-width: 640px) {
+      padding: 32px;
+    }
+    @media (max-width: 380px) {
+      padding: 22px;
+    }
 
     &--closing {
       animation: overlayFadeOut 0.3s ease-out;
@@ -284,6 +290,11 @@ const handleCancel = () => {
       position: absolute;
       top: 170px;
       right: -30px;
+      @media (max-width: 460px) {
+        top: 140px;
+        right: -20px;
+        z-index: 1004;
+      }
     }
   }
 
@@ -299,6 +310,10 @@ const handleCancel = () => {
       position: absolute;
       top: 220px;
       left: -40px;
+      @media (max-width: 460px) {
+        top: 180px;
+        left: -30px;
+      }
     }
 
     @media (max-width: 768px) {
@@ -333,6 +348,12 @@ const handleCancel = () => {
       top: -20px;
       right: -20px;
     }
+    @media (max-width: 410px) {
+      width: 36px;
+      height: 36px;
+      top: -25px;
+      right: -23px;
+    }
 
     &:hover {
       transform: scale(1.1);
@@ -354,6 +375,12 @@ const handleCancel = () => {
       position: absolute;
       top: 80px;
       left: -35px;
+      @media (max-width: 460px) {
+        left: -30px;
+      }
+      @media (max-width: 360px) {
+        top: 60px;
+      }
     }
   }
 
@@ -382,6 +409,9 @@ const handleCancel = () => {
 
     @media (max-width: 480px) {
       font-size: 24px;
+    }
+    @media (max-width: 360px) {
+      font-size: 22px;
     }
   }
 

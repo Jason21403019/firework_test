@@ -1,7 +1,6 @@
 <?php
 require_once('config.php');
 
-// 回傳資料 param: $data(array or string), $status(boolean)
 function JSONReturn($data, $status = false)
 {   
     $dataRes = [];
@@ -24,93 +23,166 @@ function JSONReturn($data, $status = false)
 }
 
 // Cloudflare Turnstile 驗證
-function checkTurnstileAuth($token)
-{
-    $secretKey = '0x4AAAAAAA5ho0moD45CWi2cFX9SYn9fBjc'; 
+function verifyTurnstileToken($token) {
+    if (empty($token)) {
+        return [
+            'success' => false,
+            'error_codes' => ['missing-input-response'],
+            'is_bot' => true
+        ];
+    }
     
+    $secret = defined('TURNSTILE_SECRET_KEY') ? TURNSTILE_SECRET_KEY : '0x4AAAAAAA5ho0moD45CWi2cFX9SYn9fBjc';
+    $ip = getIP();
+    
+    $url = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
     $data = [
-        'secret' => $secretKey,
+        'secret' => $secret,
         'response' => $token,
-        'remoteip' => getIP()
+        'remoteip' => $ip
     ];
-
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, "https://challenges.cloudflare.com/turnstile/v0/siteverify");
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     
-    $response = curl_exec($ch);
-    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $ch = curl_init();
+    curl_setopt_array($ch, [
+        CURLOPT_URL => $url,
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => http_build_query($data),
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_HTTPHEADER => [
+            'Content-Type: application/x-www-form-urlencoded',
+            'User-Agent: Mozilla/5.0 (compatible; Turnstile-Verifier/1.0)'
+        ]
+    ]);
+    
+    $result = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
+    
     curl_close($ch);
     
-    if ($httpcode != 200) {
-        return false;
+    if ($curlError) {
+        error_log("Turnstile cURL 錯誤: " . $curlError);
+        return [
+            'success' => false,
+            'error_codes' => ['network-error'],
+            'is_bot' => true
+        ];
     }
     
-    $result = json_decode($response, true);
-    return isset($result['success']) && $result['success'] === true;
-}
-
-// 強制使用 HTTPS，確保請求安全性
-function isHttps() {
-    if (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] === 'on' || $_SERVER['HTTPS'] == 1)) {
-        return true;
+    if ($httpCode !== 200) {
+        error_log("Turnstile HTTP 錯誤: " . $httpCode);
+        return [
+            'success' => false,
+            'error_codes' => ['http-error-' . $httpCode],
+            'is_bot' => true
+        ];
     }
-    if (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443) {
-        return true;
+    
+    $response = json_decode($result, true);
+    
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        error_log("Turnstile 回應 JSON 解析錯誤: " . json_last_error_msg());
+        return [
+            'success' => false,
+            'error_codes' => ['json-parse-error'],
+            'is_bot' => true
+        ];
     }
-    if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
-        return true;
+    
+    error_log("Turnstile API response: " . print_r($response, true));
+    
+    if (!isset($response['success']) || $response['success'] !== true) {
+        $errorCodes = $response['error-codes'] ?? ['unknown_error'];
+        error_log("Turnstile validation failed: " . implode(', ', $errorCodes));
+        
+        return [
+            'success' => false,
+            'error_codes' => $errorCodes,
+            'is_bot' => true
+        ];
     }
-    return false;
-}
-
-
-// 確認是否有資料，並增加 post 安全性
-function postEmpty($field)
-{
-    if (empty($field)) {
-        return false;
-    }
-    return htmlspecialchars(stripslashes(trim($field)));
-}
-
-// 檢查 email 格式
-function checkEmailFormat($email)
-{
-    if (filter_var($email, FILTER_VALIDATE_EMAIL) || preg_match("/([\w\-]+\@[\w\-]+\.[\w\-]+)/", $email)) {
-        return true;
-    } else {
-        return false;
-    }
+    
+    return [
+        'success' => true,
+        'cdata' => $response['cdata'] ?? null,
+        'hostname' => $response['hostname'] ?? null,
+        'challenge_ts' => $response['challenge_ts'] ?? null
+    ];
 }
 
 // 取得用戶資料
-function getUdnMember($udnmember, $um2)
+function getMemberMail($memberId)
 {
-    $data = [
-        'account' => $udnmember,
-        'um2' => $um2,
-        'json' => 'Y',
-        'site' => 'bd_game2024'
-    ];
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, "https://umapi.udn.com/member/wbs/MemberUm2Check");
-    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $email = null;
+    $verified = false;
+    $apiUrl = "https://umapi.udn.com/member/wbs/MemberUm2Check";
 
-    $response = curl_exec($ch);
-    if (curl_errno($ch)) {
-        $error = curl_error($ch);
-        $arrResponse = json_decode($error, true);
-        $logData = initLog("U01", $arrResponse, getUser());
-        insertFile($logData);
+    $udnmember = !empty($_COOKIE['udnmember']) ? $_COOKIE['udnmember'] : ($_COOKIE['udnland'] ?? '');
+    $um2 = $_COOKIE['um2'] ?? '';
+
+    if (!empty($udnmember) && !empty($um2)) {
+        $um2Encoded = urlencode($um2);
+
+        $data = [
+            'account' => $udnmember,
+            'um2' => $um2Encoded,
+            'json' => 'Y',
+            'site' => 'fate_event',
+            'check_ts' => 'S'
+        ];
+
+        $ch = curl_init();
+
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $apiUrl,
+            CURLOPT_POSTFIELDS => http_build_query($data),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false
+        ]);
+
+        $response = curl_exec($ch);
+        
+        if (curl_error($ch)) {
+            error_log("cURL 錯誤: " . curl_error($ch));
+        }
+        
+        curl_close($ch);
+
+        if ($response) {
+            $data = json_decode($response, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                if (isset($data['response']) && isset($data['response']['status']) && $data['response']['status'] === 'success') {
+                    if (isset($data['response']['email'])) {
+                        $email = filter_var($data['response']['email'], FILTER_SANITIZE_EMAIL);
+                    }
+                    $verified = true;
+                } else {
+                    $verified = false;
+                    error_log("Member verification failed: " . json_encode($data));
+                }
+            } else {
+                $verified = false;
+                error_log("Failed to parse member API response: " . $response);
+            }
+        }
     } else {
-        $arrResponse = json_decode($response, true);
+        $verified = false;
     }
-    curl_close($ch);
-    return $arrResponse;
+
+    if (empty($email) && isset($_COOKIE['fg_mail'])) {
+        $email = filter_var(urldecode($_COOKIE['fg_mail']), FILTER_SANITIZE_EMAIL);
+    }
+
+    error_log("Member email fetched: " . ($email ?: 'NULL') . " for ID: " . $memberId);
+
+    return [
+        'member_id' => $memberId,
+        'email' => $email,
+        'verified' => $verified
+    ];
 }
 
 // 取得用戶 email
@@ -202,4 +274,72 @@ function setCorsHeaders($methods = 'GET, OPTIONS', $headers = 'Content-Type') {
     header('Access-Control-Allow-Methods: ' . $methods);
     header('Access-Control-Allow-Headers: ' . $headers);
     header('Access-Control-Allow-Credentials: true');
+}
+
+// 將輸入數據轉換為日誌安全格式
+ function sanitizeForLog($input, $maxLength = 1000) {
+    if (!is_string($input)) {
+        $input = (string) $input;
+    }
+    
+    $sanitized = str_replace(["\n", "\r", "\t"], ['\n', '\r', '\t'], $input);
+    
+    if (strlen($sanitized) > $maxLength) {
+        $sanitized = substr($sanitized, 0, $maxLength) . '...[truncated]';
+    }
+    
+    $sanitized = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $sanitized);
+    
+    return $sanitized;
+}
+
+// 將輸出數據轉換為安全格式
+function sanitizeOutput($data) {
+    if (is_array($data)) {
+        return array_map('sanitizeOutput', $data);
+    }
+    if (is_string($data)) {
+        return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
+    }
+    if (is_numeric($data)) {
+        return is_int($data) ? intval($data) : floatval($data);
+    }
+    if (is_bool($data)) {
+        return $data;
+    }
+    if (is_null($data)) {
+        return null;
+    }
+    return $data;
+}
+
+// 處理 API 請求
+function handleApiRequest($allowedMethods = ['POST'], $requireJson = true) {
+    // 處理 OPTIONS 請求
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        exit(0);
+    }
+    
+    // 檢查請求方法
+    if (!in_array($_SERVER['REQUEST_METHOD'], $allowedMethods)) {
+        $methodsStr = implode(', ', $allowedMethods);
+        echo json_encode(['status' => false, 'message' => "請使用 {$methodsStr} 請求"]);
+        exit;
+    }
+    
+    // 如果需要 JSON 數據，則解析並返回
+    if ($requireJson) {
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+        
+        // 檢查 JSON 解析是否成功
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            echo json_encode(['status' => false, 'message' => 'JSON 格式錯誤']);
+            exit;
+        }
+        
+        return $data;
+    }
+    
+    return null;
 }

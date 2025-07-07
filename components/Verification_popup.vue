@@ -116,6 +116,12 @@ onUnmounted(() => {
     z-index: 1000;
     padding: 12px;
     animation: overlayFadeIn 0.3s ease-out;
+    @media (max-width: 640px) {
+      padding: 32px;
+    }
+    @media (max-width: 380px) {
+      padding: 22px;
+    }
 
     &--closing {
       animation: overlayFadeOut 0.3s ease-out;
@@ -160,12 +166,17 @@ onUnmounted(() => {
       position: absolute;
       top: 100px;
       right: -30px;
+      @media (max-width: 460px) {
+        top: 120px;
+        right: -10px;
+        z-index: 1004;
+      }
     }
   }
 
   &__popup-inner {
     position: relative;
-    padding: 10px 20px;
+    padding: 10px 10px;
     border-radius: 10px;
     z-index: 1;
     border: 2px solid #577bff52;
@@ -176,6 +187,13 @@ onUnmounted(() => {
       position: absolute;
       top: 200px;
       left: -40px;
+      @media (max-width: 460px) {
+        top: 240px;
+        left: -30px;
+      }
+      @media (max-width: 360px) {
+        left: -20px;
+      }
     }
 
     @media (max-width: 768px) {
@@ -210,6 +228,12 @@ onUnmounted(() => {
       top: -20px;
       right: -20px;
     }
+    @media (max-width: 410px) {
+      width: 36px;
+      height: 36px;
+      top: -25px;
+      right: -23px;
+    }
 
     &:hover {
       transform: scale(1.1);
@@ -231,6 +255,12 @@ onUnmounted(() => {
       position: absolute;
       top: 40px;
       left: -35px;
+      @media (max-width: 460px) {
+        left: -30px;
+      }
+      @media (max-width: 360px) {
+        left: -20px;
+      }
     }
   }
 
@@ -264,7 +294,14 @@ onUnmounted(() => {
     justify-content: center;
     align-items: center;
     position: relative;
+    max-width: 250px;
+    transform: scale(0.9);
     z-index: 1003;
+    @media (max-width: 480px) {
+      width: 100%;
+      transform: scale(0.8);
+      transform-origin: center;
+    }
   }
 
   &__hint {

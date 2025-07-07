@@ -84,6 +84,12 @@ const closeModal = () => {
     z-index: 1000;
     padding: 12px;
     animation: overlayFadeIn 0.3s ease-out;
+    @media (max-width: 640px) {
+      padding: 32px;
+    }
+    @media (max-width: 380px) {
+      padding: 22px;
+    }
 
     &--closing {
       animation: overlayFadeOut 0.3s ease-out;
@@ -107,7 +113,7 @@ const closeModal = () => {
       border: none;
       max-width: 95vw;
     }
-    @media (max-width: 360px) {
+    @media (max-width: 410px) {
       padding: 10px;
     }
 
@@ -127,6 +133,9 @@ const closeModal = () => {
       position: absolute;
       top: 100px;
       right: -30px;
+      @media (max-width: 410px) {
+        top: 80px;
+      }
     }
   }
 
@@ -142,16 +151,17 @@ const closeModal = () => {
       position: absolute;
       top: 140px;
       left: -40px;
+      @media (max-width: 410px) {
+        top: 110px;
+        left: -30px;
+      }
     }
 
-    @media (max-width: 768px) {
-      padding: 30px 20px;
-    }
-    @media (max-width: 480px) {
-      padding: 25px 15px;
+    @media (max-width: 410px) {
+      padding: 10px 80px;
     }
     @media (max-width: 360px) {
-      padding: 20px 10px;
+      // padding: 20px 10px;
     }
   }
 
@@ -176,6 +186,12 @@ const closeModal = () => {
       top: -20px;
       right: -20px;
     }
+    @media (max-width: 410px) {
+      width: 36px;
+      height: 36px;
+      top: -25px;
+      right: -30px;
+    }
 
     &:hover {
       transform: scale(1.1);
@@ -196,6 +212,9 @@ const closeModal = () => {
       position: absolute;
       top: 10px;
       left: -35px;
+      @media (max-width: 410px) {
+        left: -30px;
+      }
     }
   }
 

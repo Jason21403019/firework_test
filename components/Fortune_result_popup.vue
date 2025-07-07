@@ -92,10 +92,54 @@ const closeModal = () => {
   }, 300);
 };
 
+const generateShareUrl = () => {
+  const resultMap = {
+    fortune_1: "heart",
+    fortune_2: "goldwave",
+    fortune_3: "healing",
+    fortune_4: "goldlight",
+  };
+
+  const resultType = resultMap[props.fortuneData.id] || "heart";
+  const baseUrl = "https://lab-event.udn.com/bd_fate2025_test";
+  return `${baseUrl}/share/${resultType}.html`;
+};
+
+const getResultName = () => {
+  const resultMap = {
+    fortune_1: "心型煙火",
+    fortune_2: "金浪煙火",
+    fortune_3: "療癒煙火",
+    fortune_4: "金光煙火",
+  };
+
+  return resultMap[props.fortuneData.id] || "神秘結果";
+};
+
 const shareToLine = () => {
-  const shareTitle = `我在「2025蛇年運勢占卜」中得到了「${props.fortuneData.title?.split("|")[0]?.trim() || "神秘結果"}」`;
-  const shareUrl = window.location.href;
-  const lineShareUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareTitle)}`;
+  const shareUrl = generateShareUrl();
+  const resultName = getResultName();
+  const shareText = `我在「幸福煙火轉一夏」中得到了「${resultName}」！你的運勢如何？快來測試看看吧！`;
+
+  // 保存占卜結果到 localStorage 供導覽列分享使用
+  const resultMap = {
+    fortune_1: "heart",
+    fortune_2: "goldwave",
+    fortune_3: "healing",
+    fortune_4: "goldlight",
+  };
+  const shareResultType = resultMap[props.fortuneData.id] || "heart";
+  localStorage.setItem("last_fortune_result", shareResultType);
+
+  console.log("Share URL:", shareUrl);
+  console.log("Result Name:", resultName);
+  console.log("Share Text:", shareText);
+
+  const lineShareUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
+
+  console.log("Final LINE Share URL:", lineShareUrl);
+
+  // 開啟 LINE 分享視窗
   window.open(lineShareUrl, "_blank", "width=600,height=600");
 };
 </script>
@@ -116,6 +160,12 @@ const shareToLine = () => {
     z-index: 1000;
     padding: 12px;
     animation: overlayFadeIn 0.3s ease-out;
+    @media (max-width: 640px) {
+      padding: 32px;
+    }
+    @media (max-width: 380px) {
+      padding: 22px;
+    }
 
     &--closing {
       animation: overlayFadeOut 0.3s ease-out;
@@ -126,7 +176,7 @@ const shareToLine = () => {
     background: linear-gradient(to bottom, #05026a, #4a46fc);
     border-radius: 10px;
     max-width: 600px;
-    max-height: 80vh;
+    max-height: 90vh;
     position: relative;
     animation: modalBounceIn 0.3s ease-out;
     padding: 20px;
@@ -135,11 +185,12 @@ const shareToLine = () => {
       animation: modalBounceOut 0.25s ease-in;
     }
 
-    @media (max-width: 480px) {
+    @media (max-width: 640px) {
       border: none;
       max-width: 95vw;
     }
-    @media (max-width: 360px) {
+    @media (max-width: 410px) {
+      max-width: 90vw;
       padding: 10px;
     }
 
@@ -167,6 +218,12 @@ const shareToLine = () => {
       position: absolute;
       top: 370px;
       left: -40px;
+      @media (max-width: 410px) {
+        left: -30px;
+      }
+      @media (max-width: 380px) {
+        top: 300px;
+      }
     }
 
     @media (max-width: 768px) {
@@ -175,7 +232,7 @@ const shareToLine = () => {
     @media (max-width: 480px) {
       padding: 25px 15px;
     }
-    @media (max-width: 360px) {
+    @media (max-width: 410px) {
       padding: 20px 10px;
     }
   }
@@ -201,6 +258,12 @@ const shareToLine = () => {
       top: -20px;
       right: -20px;
     }
+    @media (max-width: 410px) {
+      width: 36px;
+      height: 36px;
+      top: -25px;
+      right: -30px;
+    }
 
     &:hover {
       transform: scale(1.1);
@@ -216,9 +279,11 @@ const shareToLine = () => {
     margin-bottom: 20px;
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
 
-    @media (max-width: 480px) {
+    @media (max-width: 640px) {
+      font-size: 24px;
+    }
+    @media (max-width: 410px) {
       font-size: 20px;
-      margin-bottom: 15px;
     }
   }
 
@@ -230,12 +295,22 @@ const shareToLine = () => {
       position: absolute;
       top: 160px;
       left: -35px;
+      @media (max-width: 410px) {
+        left: -30px;
+      }
     }
     &::after {
       content: url("../imgs/right_ribbons.png");
       position: absolute;
       top: 240px;
       right: -50px;
+      @media (max-width: 410px) {
+        right: -30px;
+      }
+      @media (max-width: 380px) {
+        right: -35px;
+        top: 180px;
+      }
     }
   }
 
@@ -255,8 +330,15 @@ const shareToLine = () => {
     margin-bottom: 20px;
     white-space: pre-line;
 
+    @media (max-width: 640px) {
+      font-size: 18px;
+    }
+
     @media (max-width: 480px) {
       font-size: 14px;
+    }
+    @media (max-width: 380px) {
+      font-size: 12px;
     }
   }
 
@@ -284,6 +366,9 @@ const shareToLine = () => {
         font-weight: bold;
         color: #f8dfb2;
         text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+        @media (max-width: 410px) {
+          font-size: 20px;
+        }
       }
 
       &::after {
@@ -291,11 +376,20 @@ const shareToLine = () => {
         position: absolute;
         bottom: 0px;
         right: -10px;
+        @media (max-width: 380px) {
+          bottom: -10px;
+        }
+      }
+      @media (max-width: 640px) {
+        font-size: 16px;
       }
 
       @media (max-width: 480px) {
         font-size: 14px;
-        padding: 12px;
+        padding: 8px;
+      }
+      @media (max-width: 380px) {
+        font-size: 12px;
       }
     }
   }
@@ -339,11 +433,13 @@ const shareToLine = () => {
       margin-right: 4px;
       flex-shrink: 0; // 防止圖片被壓縮
     }
+    @media (max-width: 640px) {
+      padding: 12px 24px;
+      font-size: 18px;
+    }
 
     @media (max-width: 480px) {
       padding: 10px 16px;
-      font-size: 14px;
-      max-width: 180px; // 手機版進一步縮小
     }
   }
 }

@@ -42,7 +42,7 @@
 
           <div class="navbar__social">
             <a
-              href="https://www.facebook.com/share"
+              :href="facebookShareUrl"
               target="_blank"
               class="navbar__social-link navbar__social-link--facebook"
               aria-label="分享到臉書"
@@ -54,7 +54,7 @@
               />
             </a>
             <a
-              href="https://line.me/R/msg/text/"
+              :href="lineShareUrl"
               target="_blank"
               class="navbar__social-link navbar__social-link--line"
               aria-label="分享到LINE"
@@ -96,7 +96,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 import Nav_container from "./Nav_container.vue";
 import Universal_popup from "./Universal_popup.vue";
 
@@ -138,29 +138,42 @@ function toggleMobileMenu() {
 function handleScroll() {
   isScrolled.value = window.scrollY > scrollThreshold;
 }
-// 處理中獎名單點擊
 function handleWinnerListClick() {
-  // 關閉手機選單
   isMobileMenuOpen.value = false;
 
-  // 顯示中獎名單彈窗
   showWinnerListPopup.value = true;
 }
 
-// 關閉中獎名單彈窗
 function closeWinnerListPopup() {
   showWinnerListPopup.value = false;
 }
 
-// 處理中獎名單確認
 function handleWinnerListConfirm() {
   if (winnerListConfig.isAnnounced) {
-    // 如果已公布，導向中獎名單頁面
     window.open(winnerListConfig.winnerListUrl, "_blank");
   }
 
   closeWinnerListPopup();
 }
+
+const getLastFortuneResult = () => {
+  return localStorage.getItem("last_fortune_result") || "heart";
+};
+
+const baseShareUrl = computed(() => {
+  const lastResult = getLastFortuneResult();
+  const baseUrl = "https://lab-event.udn.com/bd_fate2025_test";
+  return `${baseUrl}/share/${lastResult}.html`;
+});
+
+const facebookShareUrl = computed(() => {
+  return `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(baseShareUrl.value)}`;
+});
+
+const lineShareUrl = computed(() => {
+  const shareText = "快來幸福花火轉一夏！看看你會抽到什麼煙火！";
+  return `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(baseShareUrl.value)}&text=${encodeURIComponent(shareText)}`;
+});
 
 onMounted(() => {
   if (window.scrollY > scrollThreshold) {

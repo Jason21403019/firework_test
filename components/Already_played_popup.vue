@@ -116,7 +116,12 @@ const closeModal = () => {
     z-index: 1000;
     padding: 12px;
     animation: overlayFadeIn 0.3s ease-out;
-
+    @media (max-width: 640px) {
+      padding: 32px;
+    }
+    @media (max-width: 380px) {
+      padding: 22px;
+    }
     &--closing {
       animation: overlayFadeOut 0.3s ease-out;
     }
@@ -133,6 +138,14 @@ const closeModal = () => {
 
     &--closing {
       animation: modalBounceOut 0.25s ease-in;
+    }
+    @media (max-width: 640px) {
+      border: none;
+      max-width: 95vw;
+    }
+    @media (max-width: 410px) {
+      max-width: 90vw;
+      padding: 10px;
     }
 
     @media (max-width: 480px) {
@@ -175,6 +188,12 @@ const closeModal = () => {
       position: absolute;
       top: 370px;
       left: -40px;
+      @media (max-width: 410px) {
+        left: -30px;
+      }
+      @media (max-width: 380px) {
+        top: 300px;
+      }
     }
 
     @media (max-width: 768px) {
@@ -209,6 +228,12 @@ const closeModal = () => {
       top: -20px;
       right: -20px;
     }
+    @media (max-width: 410px) {
+      width: 36px;
+      height: 36px;
+      top: -25px;
+      right: -30px;
+    }
 
     &:hover {
       transform: scale(1.1);
@@ -235,18 +260,32 @@ const closeModal = () => {
       position: absolute;
       top: 160px;
       left: -35px;
+      @media (max-width: 410px) {
+        left: -30px;
+      }
     }
     &::after {
       content: url("../imgs/right_ribbons.png");
       position: absolute;
       top: 240px;
       right: -50px;
+      @media (max-width: 410px) {
+        right: -30px;
+        top: 190px;
+      }
+      @media (max-width: 380px) {
+        right: -35px;
+        top: 180px;
+      }
     }
   }
 
   &__image {
     width: 100%;
     max-width: 400px;
+    @media (max-width: 640px) {
+      max-width: 300px;
+    }
   }
 
   &__content {
@@ -261,9 +300,14 @@ const closeModal = () => {
     color: #f8dfb2;
     font-weight: bold;
     white-space: pre-line;
-
+    @media (max-width: 640px) {
+      font-size: 18px;
+    }
     @media (max-width: 480px) {
       font-size: 16px;
+    }
+    @media (max-width: 460px) {
+      white-space: normal;
     }
   }
 
@@ -273,9 +317,14 @@ const closeModal = () => {
     margin-bottom: 40px;
     color: #fff;
     white-space: pre-line;
-
+    @media (max-width: 640px) {
+      font-size: 18px;
+    }
     @media (max-width: 480px) {
       font-size: 16px;
+    }
+    @media (max-width: 460px) {
+      white-space: normal;
     }
   }
 }
