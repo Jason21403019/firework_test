@@ -1,8 +1,6 @@
 <template>
   <Banner @startDivination="startDivination" />
   <div class="divination-container">
-    <!-- <button @click="startDivination" class="fortune-btn">立即占卜</button> -->
-
     <PlayCount
       :count="totalPlayCount"
       @milestone-achieved="handleMilestoneAchieved"
@@ -210,14 +208,12 @@ if (process.dev) {
         }
       });
     };
-    // 添加驗證彈窗測試函數
     window.showVerificationPopup = showVerificationPopup;
     window.testVerificationPopup = () => {
       showVerificationPopup.value = true;
       console.log("顯示驗證彈窗:", showVerificationPopup.value);
     };
 
-    // 關閉驗證彈窗測試函數
     window.closeVerificationPopupTest = () => {
       showVerificationPopup.value = false;
       console.log("關閉驗證彈窗:", showVerificationPopup.value);
@@ -242,14 +238,12 @@ function showUniversalDialog(options) {
 
   showUniversalPopup.value = true;
 
-  // 返回 Promise 以支持 .then() 語法
   return new Promise((resolve) => {
     const handleClose = (result) => {
       showUniversalPopup.value = false;
       resolve(result);
     };
 
-    // 設置臨時事件處理器
     window._universalPopupResolve = handleClose;
   });
 }
@@ -654,7 +648,6 @@ function generateFortuneResult() {
 async function handleSuccessfulDivination(result) {
   console.log("=== 處理成功的占卜結果 ===");
 
-  // 清理令牌
   securityManager.flow.clear();
   sessionStorage.removeItem("temp_turnstile_token");
 
@@ -664,25 +657,19 @@ async function handleSuccessfulDivination(result) {
     totalPlayCount.value = parseInt(result.db_info.play_times_total);
     console.log("累計占卜次數更新為:", totalPlayCount.value);
   } else {
-    // 如果 API 沒有返回次數，本地增加計數
     totalPlayCount.value++;
     console.log("本地更新累計占卜次數為:", totalPlayCount.value);
   }
 
-  // 判斷是否是首次占卜
   const isFirstTime = result.message && result.message.includes("首次占卜成功");
   console.log("是否首次占卜:", isFirstTime);
 
-  // 檢查里程碑成就
   checkMilestoneAchievement(totalPlayCount.value, oldCount, isFirstTime);
 
-  // 記錄占卜成功
   recordPlayToday();
 
-  // 生成占卜結果
   const fortuneData = generateFortuneResult();
 
-  // 保存最後的占卜結果供分享使用
   const resultMap = {
     fortune_1: "heart",
     fortune_2: "goldwave",
@@ -880,16 +867,15 @@ async function saveUserData() {
     let email = udnmember || `user_${Date.now()}@example.com`;
 
     const userData = {
-      udnmember,
-      um2,
-      email,
+      udnmember: sanitizeInput(udnmember),
+      um2: sanitizeInput(um2),
+      email: sanitizeInput(email),
       flow_token: flowToken,
       turnstile_token: turnstileTokenValue || null,
     };
 
     console.log("準備發送的用戶數據:", userData);
 
-    // 發送請求
     console.log("開始發送 API 請求...");
     const response = await axios.post(apiUrl, userData, {
       headers: {
@@ -897,7 +883,7 @@ async function saveUserData() {
         "X-Requested-With": "XMLHttpRequest",
       },
       withCredentials: true,
-      timeout: 60000,
+      timeout: 30000,
     });
 
     console.log("API 回應成功:", response.data);
@@ -922,8 +908,6 @@ async function saveUserData() {
     }
     if (error.response && error.response.data) {
       const responseData = error.response.data;
-
-      // 檢查特定的錯誤條件
       if (
         responseData.message &&
         responseData.message.includes("系統檢測到自動化行為")
@@ -1010,6 +994,22 @@ async function handleApiError(result) {
       showPostLoginVerificationDialog();
     }
   });
+}
+
+// ========== XSS 和 Script 注入防護函數 ==========
+function sanitizeInput(input) {
+  if (!input || typeof input !== "string") {
+    return input;
+  }
+
+  return input
+    .replace(/<[^>]*>/g, "")
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/javascript:/gi, "")
+    .replace(/\bon\w+\s*=/gi, "")
+    .replace(/&lt;script/gi, "")
+    .replace(/&lt;\/script/gi, "")
+    .substring(0, 200);
 }
 
 // ==================== 用戶界面函數 ====================
@@ -1354,7 +1354,7 @@ function clearCookiesAfterDivination() {
     console.error("清除 Cookie 過程中發生錯誤:", e);
   }
 }
-// ==================== 生命週期鉤子 ====================
+// ==================== 生命週期 ====================
 onMounted(async () => {
   // 第1部分：基本初始化設置
   // ------------------------------------------
@@ -1426,7 +1426,7 @@ onMounted(async () => {
   }
 });
 
-// ==================== 提取的輔助函數 ====================
+// ==================== 主要占卜函數 ====================
 
 // 獲取用戶占卜數據
 async function fetchUserPlayData() {

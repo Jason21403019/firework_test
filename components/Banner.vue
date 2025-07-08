@@ -9,7 +9,11 @@
     </div>
 
     <div class="banner__content">
-      <div class="banner__trigger-area" @click="handleDivination"></div>
+      <div
+        class="banner__trigger-area"
+        @click="handleDivination"
+        data-action="submit"
+      ></div>
     </div>
   </div>
 </template>
