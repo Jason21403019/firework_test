@@ -11,9 +11,17 @@
   <!-- End Google Tag Manager (noscript) --><noscript>
     <img src="http://b.scorecardresearch.com/p?c1=2&c2=7390954&cv=2.0&cj=1" />
   </noscript>
-  <Nav />
+
+  <!-- 只在非 admin 頁面顯示導覽列 -->
+  <Nav v-if="!isAdminPage" />
   <NuxtPage />
 </template>
+
+<script setup>
+// 檢查當前路由是否為 admin 頁面
+const route = useRoute();
+const isAdminPage = computed(() => route.name === "admin");
+</script>
 
 <style lang="scss">
 @use "~/assets/css/reset.css";

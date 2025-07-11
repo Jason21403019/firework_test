@@ -82,10 +82,8 @@ try {
     ]);
     
 } catch(PDOException $e) {
-    error_log("刪除記錄錯誤: " . $e->getMessage());
     echo json_encode(['status' => 'error', 'message' => '刪除記錄失敗: ' . $e->getMessage()]);
 } catch(Exception $e) {
-    error_log("一般錯誤: " . $e->getMessage());
     echo json_encode(['status' => 'error', 'message' => '系統錯誤: ' . $e->getMessage()]);
 }
 ?>

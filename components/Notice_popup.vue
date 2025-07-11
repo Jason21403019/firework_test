@@ -370,6 +370,9 @@ const closeModal = () => {
     font-weight: bold;
     color: #fbcf47;
     text-align: left;
+    @media (max-width: 480px) {
+      font-size: 24px;
+    }
   }
 
   &__content {
@@ -383,6 +386,7 @@ const closeModal = () => {
     }
     @media (max-width: 480px) {
       padding: 2px 20px 2px 2px;
+      font-size: 16px;
     }
     @media (max-width: 360px) {
       padding: 2px 10px 2px 2px;
@@ -426,6 +430,9 @@ const closeModal = () => {
     counter-increment: list-counter;
     &:first-child {
       padding-top: 0;
+    }
+    @media (max-width: 480px) {
+      font-size: 16px;
     }
   }
 }

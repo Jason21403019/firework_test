@@ -128,7 +128,6 @@ NUXT_PUBLIC_TURNSTILE_SITE_KEY=Cloudflare_Turnstile_網站金鑰
 - `saveUserData.php`: 保存占卜資料
 - `checkPlayStatus.php`: 檢查占卜狀態
 - `resetDatabase.php`: 重置資料庫（開發用）
-- `csrf_token.php`: 生成 CSRF 令牌
 
 ## 開發工具
 

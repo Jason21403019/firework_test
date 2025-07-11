@@ -100,9 +100,7 @@ const generateShareUrl = () => {
     fortune_4: "goldlight",
   };
 
-  const resultType = resultMap[props.fortuneData.id] || "heart";
-  const baseUrl = "https://lab-event.udn.com/bd_fate2025_test";
-  return `${baseUrl}/share/${resultType}.html`;
+  return "https://lab-event.udn.com/bd_fate2025_test";
 };
 
 const getResultName = () => {
@@ -121,7 +119,6 @@ const shareToLine = () => {
   const resultName = getResultName();
   const shareText = `我在「幸福煙火轉一夏」中得到了「${resultName}」！你的運勢如何？快來測試看看吧！`;
 
-  // 保存占卜結果到 localStorage 供導覽列分享使用
   const resultMap = {
     fortune_1: "heart",
     fortune_2: "goldwave",
@@ -139,7 +136,6 @@ const shareToLine = () => {
 
   console.log("Final LINE Share URL:", lineShareUrl);
 
-  // 開啟 LINE 分享視窗
   window.open(lineShareUrl, "_blank", "width=600,height=600");
 };
 </script>

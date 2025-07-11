@@ -1,15 +1,21 @@
 <?php
 require_once('config.php');
 
-function JSONReturn($data, $status = false)
-{   
+define('FILTER_SANITIZE_FLAGS', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+
+function JSONReturn($data, $status = false) {   
+    header('Content-Type: application/json; charset=utf-8');
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: DENY');
+    header('X-XSS-Protection: 1; mode=block');
+    
     $dataRes = [];
     if (is_array($data)) {
         $dataRes = $data;
         $dataRes['status'] = $status;
     } elseif (is_string($data)){
         $dataRes = [
-            'message' => $data, 
+            'message' => $data,  
             'status' => $status
         ];
     } else {
@@ -18,10 +24,46 @@ function JSONReturn($data, $status = false)
             'status' => $status
         ];
     }
-    echo filter_var(json_encode($dataRes));
+    
+    $filteredData = sanitizeOutput($dataRes);
+    
+    echo json_encode($filteredData, JSON_UNESCAPED_UNICODE);
     die;
 }
 
+function sanitizeOutput($data) 
+{
+    if (is_array($data)) {
+        $cleaned = [];
+        foreach ($data as $key => $value) {
+            if (is_string($key)) {
+                $cleanKey = filter_var($key, FILTER_SANITIZE_FLAGS);
+            } else {
+                $cleanKey = $key;
+            }
+            $cleaned[$cleanKey] = sanitizeOutput($value);
+        }
+        return $cleaned;
+    }
+    
+    if (is_string($data)) {
+        return filter_var($data, FILTER_SANITIZE_FLAGS);
+    }
+    
+    if (is_numeric($data)) {
+        return is_int($data) ? intval($data) : floatval($data);
+    }
+    
+    if (is_bool($data)) {
+        return $data;
+    }
+    
+    if (is_null($data)) {
+        return null;
+    }
+    
+    return filter_var((string)$data, FILTER_SANITIZE_FLAGS);
+}
 // Cloudflare Turnstile 驗證
 function verifyTurnstileToken($token) {
     if (empty($token)) {
@@ -64,7 +106,6 @@ function verifyTurnstileToken($token) {
     curl_close($ch);
     
     if ($curlError) {
-        error_log("Turnstile cURL 錯誤: " . $curlError);
         return [
             'success' => false,
             'error_codes' => ['network-error'],
@@ -73,7 +114,6 @@ function verifyTurnstileToken($token) {
     }
     
     if ($httpCode !== 200) {
-        error_log("Turnstile HTTP 錯誤: " . $httpCode);
         return [
             'success' => false,
             'error_codes' => ['http-error-' . $httpCode],
@@ -84,7 +124,6 @@ function verifyTurnstileToken($token) {
     $response = json_decode($result, true);
     
     if (json_last_error() !== JSON_ERROR_NONE) {
-        error_log("Turnstile 回應 JSON 解析錯誤: " . json_last_error_msg());
         return [
             'success' => false,
             'error_codes' => ['json-parse-error'],
@@ -92,12 +131,9 @@ function verifyTurnstileToken($token) {
         ];
     }
     
-    error_log("Turnstile API response: " . print_r($response, true));
     
     if (!isset($response['success']) || $response['success'] !== true) {
         $errorCodes = $response['error-codes'] ?? ['unknown_error'];
-        error_log("Turnstile validation failed: " . implode(', ', $errorCodes));
-        
         return [
             'success' => false,
             'error_codes' => $errorCodes,
@@ -114,8 +150,7 @@ function verifyTurnstileToken($token) {
 }
 
 // 取得用戶資料
-function getMemberMail($memberId)
-{
+function getMemberMail($memberId){
     $email = null;
     $verified = false;
     $apiUrl = "https://umapi.udn.com/member/wbs/MemberUm2Check";
@@ -146,7 +181,7 @@ function getMemberMail($memberId)
         $response = curl_exec($ch);
         
         if (curl_error($ch)) {
-            error_log("cURL 錯誤: " . curl_error($ch));
+            // cURL 錯誤處理 - 不記錄詳細錯誤訊息
         }
         
         curl_close($ch);
@@ -161,11 +196,9 @@ function getMemberMail($memberId)
                     $verified = true;
                 } else {
                     $verified = false;
-                    error_log("Member verification failed: " . json_encode($data));
                 }
             } else {
                 $verified = false;
-                error_log("Failed to parse member API response: " . $response);
             }
         }
     } else {
@@ -175,9 +208,8 @@ function getMemberMail($memberId)
     if (empty($email) && isset($_COOKIE['fg_mail'])) {
         $email = filter_var(urldecode($_COOKIE['fg_mail']), FILTER_SANITIZE_EMAIL);
     }
-
-    error_log("Member email fetched: " . ($email ?: 'NULL') . " for ID: " . $memberId);
-
+    $safeMemberId = sanitizeForLog($memberId, 50); 
+    $safeEmail = sanitizeForLog($email ?: 'NULL', 100); 
     return [
         'member_id' => $memberId,
         'email' => $email,
@@ -186,8 +218,7 @@ function getMemberMail($memberId)
 }
 
 // 取得用戶 email
-function getMail()
-{
+function getMail(){
     $udnmember = $_COOKIE["udnmember"];
     $um2 = urlencode($_COOKIE["um2"]);
     $response = getUdnMember($udnmember, $um2);
@@ -196,8 +227,7 @@ function getMail()
 }
 
 // 取得用戶 IP
-function getIP()
-{
+function getIP(){
     if (isset($_SERVER['HTTP_AKACIP'])) {
         $ip = $_SERVER['HTTP_AKACIP'];
     } elseif (isset($_SERVER['HTTP_VERCIP'])) {
@@ -232,8 +262,7 @@ function getIP()
 }
 
 // 取得用戶名稱
-function getUser()
-{
+function getUser(){
     if (isset($_COOKIE["udnmember"])) {
         $user = $_COOKIE["udnmember"];
     } else {
@@ -243,8 +272,7 @@ function getUser()
 }
 
 // 檢查 email 是否已是 udn 會員
-function checkEmail($email)
-{
+function checkEmail($email){
     $data = array(
         'email' => "$email",
         'json' => 'Y',
@@ -293,46 +321,19 @@ function setCorsHeaders($methods = 'GET, OPTIONS', $headers = 'Content-Type') {
     return $sanitized;
 }
 
-// 將輸出數據轉換為安全格式
-function sanitizeOutput($data) {
-    if (is_array($data)) {
-        return array_map('sanitizeOutput', $data);
-    }
-    if (is_string($data)) {
-        return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
-    }
-    if (is_numeric($data)) {
-        return is_int($data) ? intval($data) : floatval($data);
-    }
-    if (is_bool($data)) {
-        return $data;
-    }
-    if (is_null($data)) {
-        return null;
-    }
-    return $data;
-}
-
 // 處理 API 請求
 function handleApiRequest($allowedMethods = ['POST'], $requireJson = true) {
-    // 處理 OPTIONS 請求
     if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
         exit(0);
     }
-    
-    // 檢查請求方法
     if (!in_array($_SERVER['REQUEST_METHOD'], $allowedMethods)) {
         $methodsStr = implode(', ', $allowedMethods);
         echo json_encode(['status' => false, 'message' => "請使用 {$methodsStr} 請求"]);
         exit;
     }
-    
-    // 如果需要 JSON 數據，則解析並返回
     if ($requireJson) {
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
-        
-        // 檢查 JSON 解析是否成功
         if (json_last_error() !== JSON_ERROR_NONE) {
             echo json_encode(['status' => false, 'message' => 'JSON 格式錯誤']);
             exit;

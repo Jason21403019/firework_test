@@ -18,28 +18,19 @@ class CSRFHandler {
         if (session_status() != PHP_SESSION_ACTIVE) {
             session_start();
         }
-        
         if (!isset($_SESSION["fate2025_csrf_{$action}"])) {
-            error_log("CSRF 驗證失敗：找不到 {$action} 的令牌");
             return false;
         }
-        
         if (isset($_SESSION["fate2025_csrf_{$action}_expiry"]) && 
             $_SESSION["fate2025_csrf_{$action}_expiry"] < time()) {
-            error_log("CSRF 驗證失敗：{$action} 令牌已過期");
             self::clear($action);
             return false;
         }
-        
         $stored_token = $_SESSION["fate2025_csrf_{$action}"];
         $valid = hash_equals($stored_token, $token);
-        
         if (!$valid) {
-            error_log("CSRF 驗證失敗：令牌不匹配 (提供的: {$token}, 儲存的: {$stored_token})");
         }
-        
         self::clear($action);
-        
         return $valid;
     }
     
