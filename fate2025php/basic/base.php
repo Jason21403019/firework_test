@@ -64,7 +64,6 @@ function verifyTurnstileToken($token) {
     curl_close($ch);
     
     if ($curlError) {
-        error_log("Turnstile cURL 錯誤: " . $curlError);
         return [
             'success' => false,
             'error_codes' => ['network-error'],
@@ -73,7 +72,6 @@ function verifyTurnstileToken($token) {
     }
     
     if ($httpCode !== 200) {
-        error_log("Turnstile HTTP 錯誤: " . $httpCode);
         return [
             'success' => false,
             'error_codes' => ['http-error-' . $httpCode],
@@ -84,7 +82,6 @@ function verifyTurnstileToken($token) {
     $response = json_decode($result, true);
     
     if (json_last_error() !== JSON_ERROR_NONE) {
-        error_log("Turnstile 回應 JSON 解析錯誤: " . json_last_error_msg());
         return [
             'success' => false,
             'error_codes' => ['json-parse-error'],
@@ -92,12 +89,9 @@ function verifyTurnstileToken($token) {
         ];
     }
     
-    error_log("Turnstile API response: " . print_r($response, true));
     
     if (!isset($response['success']) || $response['success'] !== true) {
         $errorCodes = $response['error-codes'] ?? ['unknown_error'];
-        error_log("Turnstile validation failed: " . implode(', ', $errorCodes));
-        
         return [
             'success' => false,
             'error_codes' => $errorCodes,
@@ -146,7 +140,7 @@ function getMemberMail($memberId)
         $response = curl_exec($ch);
         
         if (curl_error($ch)) {
-            error_log("cURL 錯誤: " . curl_error($ch));
+            // cURL 錯誤處理 - 不記錄詳細錯誤訊息
         }
         
         curl_close($ch);
@@ -161,11 +155,9 @@ function getMemberMail($memberId)
                     $verified = true;
                 } else {
                     $verified = false;
-                    error_log("Member verification failed: " . json_encode($data));
                 }
             } else {
                 $verified = false;
-                error_log("Failed to parse member API response: " . $response);
             }
         }
     } else {
@@ -175,9 +167,8 @@ function getMemberMail($memberId)
     if (empty($email) && isset($_COOKIE['fg_mail'])) {
         $email = filter_var(urldecode($_COOKIE['fg_mail']), FILTER_SANITIZE_EMAIL);
     }
-
-    error_log("Member email fetched: " . ($email ?: 'NULL') . " for ID: " . $memberId);
-
+    $safeMemberId = sanitizeForLog($memberId, 50); 
+    $safeEmail = sanitizeForLog($email ?: 'NULL', 100); 
     return [
         'member_id' => $memberId,
         'email' => $email,
@@ -293,7 +284,10 @@ function setCorsHeaders($methods = 'GET, OPTIONS', $headers = 'Content-Type') {
     return $sanitized;
 }
 
-// 將輸出數據轉換為安全格式
+// JSON 安全輸出標志
+define('JSON_SAFE_FLAGS', JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+
+// 你現有的 sanitizeOutput 函數
 function sanitizeOutput($data) {
     if (is_array($data)) {
         return array_map('sanitizeOutput', $data);
@@ -312,7 +306,6 @@ function sanitizeOutput($data) {
     }
     return $data;
 }
-
 // 處理 API 請求
 function handleApiRequest($allowedMethods = ['POST'], $requireJson = true) {
     // 處理 OPTIONS 請求

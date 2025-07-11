@@ -9,12 +9,14 @@
     <Notice_popup />
     <ToTop />
 
+    <!-- 占卜結果彈窗 -->
     <Fortune_result_popup
       :is-visible="showFortuneResultPopup"
       :fortune-data="fortuneResultData"
       :custom-message="fortuneCustomMessage"
       @close="closeFortune"
     />
+    <!-- 已經占卜過的彈窗 -->
     <Already_played_popup
       :is-visible="showAlreadyPlayedPopup"
       :already-played-data="alreadyPlayedData"
@@ -23,17 +25,19 @@
       @close="closeAlreadyPlayedPopup"
       @clear-record="clearPlayRecord"
     />
+    <!-- 加載中彈窗 -->
     <Loading_popup
       :is-visible="showLoadingPopup"
       :loading-data="loadingData"
       @close="closeLoadingPopup"
     />
+    <!-- 驗證彈窗 -->
     <Verification_popup
       :is-visible="showVerificationPopup"
       @close="closeVerificationPopup"
       @opened="onVerificationPopupOpened"
     />
-
+    <!-- 通用彈窗 -->
     <Universal_popup
       :is-visible="showUniversalPopup"
       :popup-data="universalPopupData"
@@ -328,10 +332,8 @@ function getApiUrl(endpoint) {
 const loginUrl = computed(() => {
   if (typeof window === "undefined") return "#";
 
-  // 安全地獲取當前主機名，而不是完整 URL
   const hostname = window.location.hostname;
 
-  // 使用白名單驗證主機名
   const allowedHosts = ["lab-event.udn.com", "event.udn.com", "localhost"];
 
   let redirectUrl;
@@ -345,7 +347,6 @@ const loginUrl = computed(() => {
   ) {
     redirectUrl = "https://lab-event.udn.com/bd_fate2025_test/";
   } else {
-    // 對於未知主機，使用預設安全 URL
     redirectUrl = "https://lab-event.udn.com/bd_fate2025_test/";
   }
 
@@ -361,10 +362,32 @@ function isUrlSafe(url) {
       "lab-event.udn.com",
       "event.udn.com",
     ];
-    return (
-      urlObj.protocol === "https:" && allowedHosts.includes(urlObj.hostname)
+
+    if (urlObj.protocol !== "https:") {
+      return false;
+    }
+
+    if (!allowedHosts.includes(urlObj.hostname)) {
+      return false;
+    }
+
+    const allowedPaths = [
+      "/member/login.jsp",
+      "/bd_fate2025/",
+      "/bd_fate2025_test/",
+    ];
+
+    const isValidPath = allowedPaths.some((path) =>
+      urlObj.pathname.startsWith(path),
     );
+
+    if (!isValidPath) {
+      return false;
+    }
+
+    return true;
   } catch (e) {
+    console.error("URL 驗證錯誤:", e);
     return false;
   }
 }
@@ -743,7 +766,7 @@ async function startDivination() {
     // 跳轉到登入頁面
     const targetUrl = loginUrl.value;
     if (isUrlSafe(targetUrl)) {
-      window.location.href = targetUrl;
+      window.location.assign(targetUrl);
     } else {
       throw new Error("不安全的重定向 URL");
     }

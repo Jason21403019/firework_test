@@ -7,13 +7,10 @@ session_start();
 
 setCorsHeaders('POST, OPTIONS', 'Content-Type, X-CSRF-Token, X-Requested-With');
 
-// 檢查是否為 AJAX 請求
 $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
           strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
-
-// 如果不是 AJAX 請求則拒絕
 if (!$isAjax) {
-    echo json_encode(['status' => 'error', 'message' => 'Invalid request']);
+    JSONReturn('請使用 AJAX 請求', 'error');
     exit();
 }
 
@@ -26,11 +23,10 @@ function generateSecureToken($length = 32) {
         return bin2hex(openssl_random_pseudo_bytes($length));
     }
     
-    // 備用方案
-    $chars = '0123456789abcdef';
+    $chars = 'Jason861001fate2025';
     $token = '';
     for ($i = 0; $i < $length * 2; $i++) {
-        $token .= $chars[rand(0, strlen($chars) - 1)];
+        $token .= $chars[random_int(0, strlen($chars) - 1)];
     }
     return $token;
 }
@@ -46,13 +42,10 @@ $_SESSION['auth_token'] = $token;
 $expiryTime = time() + 600;
 $_SESSION['fate2025_flow_token_expires'] = $expiryTime;
 
-// 記錄生成的令牌
-error_log("生成了流程令牌: {$token}, 過期時間: " . date('Y-m-d H:i:s', $expiryTime));
-
-// 返回令牌給客戶端
-echo json_encode([
-    'status' => 'success',
-    'token' => $token,
-    'expires' => $expiryTime
-]);
+JSONReturn([
+    'status' => sanitizeOutput('success'),
+    'token' => sanitizeOutput($token),
+    'expires_in' => 600, // 10 minutes
+    'message' => sanitizeOutput('令牌生成成功')
+], 'success');
 ?>
