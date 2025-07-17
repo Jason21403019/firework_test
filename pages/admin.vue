@@ -813,7 +813,11 @@ $accent-purple: rgba(109, 39, 234, 0.1);
     &:hover {
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(109, 39, 234, 0.3);
-      background: linear-gradient(135deg, $dark-purple 0%, $primary-purple 100%);
+      background: linear-gradient(
+        135deg,
+        $dark-purple 0%,
+        $primary-purple 100%
+      );
     }
 
     &:active {

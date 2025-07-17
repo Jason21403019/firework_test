@@ -18,6 +18,7 @@ if (isset($data['admin_mode']) && $data['admin_mode'] === true) {
         $stmt->execute();
         $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
+<<<<<<< HEAD
         // 直接在 PHP 端計算統計數據
         $totalUsers = count($records);
         $totalDivinations = 0;
@@ -59,6 +60,11 @@ if (isset($data['admin_mode']) && $data['admin_mode'] === true) {
                 'lastWeek' => $lastWeek,
                 'query_time' => date('Y-m-d H:i:s')
             ]
+=======
+        JSONReturn([
+            'status' => 'success',
+            'records' => $records
+>>>>>>> 7d0c44934d50bac6e99a36fc70f7f486f59f3a23
         ], 'success');
     } catch(PDOException $e) {
         JSONReturn([
