@@ -321,31 +321,6 @@ function setCorsHeaders($methods = 'GET, OPTIONS', $headers = 'Content-Type') {
     return $sanitized;
 }
 
-<<<<<<< HEAD
-=======
-// JSON 安全輸出標志
-define('JSON_SAFE_FLAGS', JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
-
-// 你現有的 sanitizeOutput 函數
-function sanitizeOutput($data) {
-    if (is_array($data)) {
-        return array_map('sanitizeOutput', $data);
-    }
-    if (is_string($data)) {
-        return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
-    }
-    if (is_numeric($data)) {
-        return is_int($data) ? intval($data) : floatval($data);
-    }
-    if (is_bool($data)) {
-        return $data;
-    }
-    if (is_null($data)) {
-        return null;
-    }
-    return $data;
-}
->>>>>>> 7d0c44934d50bac6e99a36fc70f7f486f59f3a23
 // 處理 API 請求
 function handleApiRequest($allowedMethods = ['POST'], $requireJson = true) {
     if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {

@@ -36,13 +36,7 @@ define('CORS_ALLOWED_ORIGIN', 'https://lab-event.udn.com');
 // define('CORS_ALLOWED_ORIGIN', 'https://event.udn.com');
 
 // Cloudflare Turnstile 設定
-<<<<<<< HEAD
 define('TURNSTILE_SECRET_KEY', getenv('TURNSTILE_SECRET_KEY'));
-=======
-$key_prefix = '0x4AAAAAAA5ho0moD45CWi2c';
-$key_suffix = 'FX9SYn9fBjc';
-define('TURNSTILE_SECRET_KEY', $key_prefix . $key_suffix);
->>>>>>> 7d0c44934d50bac6e99a36fc70f7f486f59f3a23
 
 // 活動期間
 define('EVENT_START', date('Y-m-d H:i:s', strtotime('2025-06-09 10:00:00')));

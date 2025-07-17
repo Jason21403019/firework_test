@@ -42,11 +42,7 @@ if ($csrf_token) {
 
 // 驗證 session token
 if (empty($session_token)) {
-<<<<<<< HEAD
     echo filter_var(json_encode(['status' => 'error', 'message' => sanitizeOutput('安全驗證失敗，請重新開始占卜流程 (缺少會話令牌)')]));
-=======
-    echo filter_var(json_encode(['status' => 'error', 'message' => sanitizeOutput('安全驗證失敗，請重新開始占卜流程 (缺少會話令牌)')], JSON_SAFE_FLAGS));
->>>>>>> 7d0c44934d50bac6e99a36fc70f7f486f59f3a23
     exit;
 }
 
@@ -124,12 +120,6 @@ try {
             }
         }
     }
-<<<<<<< HEAD
-=======
-    if (empty($email)) {
-        $email = $udnmember . '@example.com';
-    }
->>>>>>> 7d0c44934d50bac6e99a36fc70f7f486f59f3a23
     
     $ip = getIP();
     $ipCheckStmt = $pdo->prepare("SELECT MAX(updated_at) AS last_attempt FROM test_fate_event WHERE ip = :ip");
