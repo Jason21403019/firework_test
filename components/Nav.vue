@@ -6,7 +6,7 @@
         :class="{ 'navbar__content--scrolled': isScrolled }"
       >
         <div class="navbar__logo">
-          <NuxtLink to="/">
+          <NuxtLink to="https://udn.com/news/index" target="_blank">
             <img
               src="/imgs/logo.png"
               alt="logo_udn_Logo"
@@ -163,7 +163,7 @@ const getLastFortuneResult = () => {
 const baseShareUrl = computed(() => {
   const lastResult = getLastFortuneResult();
   const baseUrl = "https://lab-event.udn.com/bd_fate2025_test";
-  return `${baseUrl}/share/${lastResult}.html`;
+  return `${baseUrl}`;
 });
 
 const facebookShareUrl = computed(() => {

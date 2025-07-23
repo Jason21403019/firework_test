@@ -1,5 +1,5 @@
 <template>
-  <Banner @startDivination="startDivination" />
+  <Banner @startDivination="startDivination" :loginUrl="loginUrl" />
   <div class="divination-container">
     <PlayCount
       :count="totalPlayCount"
@@ -464,7 +464,7 @@ function renderTurnstile() {
         turnstileToken.value = token;
         isTurnstileVerified.value = true;
         window.temp_turnstile_token = token;
-        sessionStorage.setItem("turnstile_token", token);
+        localStorage.setItem("turnstile_token", token);
 
         setVerificationSuccess();
         closeVerificationPopup();
@@ -475,7 +475,7 @@ function renderTurnstile() {
         turnstileToken.value = null;
         isTurnstileVerified.value = false;
         window.temp_turnstile_token = null;
-        sessionStorage.removeItem("turnstile_token");
+        localStorage.removeItem("turnstile_token");
       },
     });
   } catch (error) {
@@ -508,18 +508,12 @@ const securityManager = {
         }
 
         const token = response.data.token;
-        sessionStorage.setItem("fate2025_flow_token", token);
+        localStorage.setItem("fate2025_flow_token", token);
         const expiryTime = Date.now() + 5 * 60 * 1000;
-        sessionStorage.setItem(
-          "fate2025_flow_token_expiry",
-          String(expiryTime),
-        );
+        localStorage.setItem("fate2025_flow_token_expiry", String(expiryTime));
 
         console.log("流程令牌獲取成功:", token.substring(0, 10) + "...");
-        sessionStorage.setItem(
-          "fate2025_flow_token_expiry",
-          String(expiryTime),
-        );
+        localStorage.setItem("fate2025_flow_token_expiry", String(expiryTime));
 
         console.log("流程令牌獲取成功:", token.substring(0, 10) + "...");
         return token;
@@ -531,9 +525,9 @@ const securityManager = {
 
     // 獲取已存儲的流程令牌
     get() {
-      const token = sessionStorage.getItem("fate2025_flow_token");
+      const token = localStorage.getItem("fate2025_flow_token");
       const expiryTime = parseInt(
-        sessionStorage.getItem("fate2025_flow_token_expiry") || "0",
+        localStorage.getItem("fate2025_flow_token_expiry") || "0",
       );
 
       const graceTime = 2 * 60 * 1000;
@@ -549,8 +543,8 @@ const securityManager = {
 
     // 清除流程令牌
     clear() {
-      sessionStorage.removeItem("fate2025_flow_token");
-      sessionStorage.removeItem("fate2025_flow_token_expiry");
+      localStorage.removeItem("fate2025_flow_token");
+      localStorage.removeItem("fate2025_flow_token_expiry");
     },
   },
 
@@ -672,7 +666,7 @@ async function handleSuccessfulDivination(result) {
   console.log("=== 處理成功的占卜結果 ===");
 
   securityManager.flow.clear();
-  sessionStorage.removeItem("temp_turnstile_token");
+  localStorage.removeItem("temp_turnstile_token");
 
   // 更新占卜次數
   const oldCount = totalPlayCount.value;
@@ -709,6 +703,8 @@ async function handleSuccessfulDivination(result) {
   let resultMessage = generateResultMessage(totalPlayCount.value);
   console.log("生成的結果訊息:", resultMessage);
 
+  notifyOtherTabs();
+
   // 顯示占卜結果
   console.log("準備顯示占卜結果彈窗");
   showFortuneResult(fortuneData, resultMessage);
@@ -729,6 +725,40 @@ function generateResultMessage(playCount) {
     return "<div class='glowing-message'><span class='glowing-message-title'>太棒了，占卜完成！</span><br>祝您有美好的一天</div>";
   }
   return "<div class='glowing-message'>占卜完成！</div>";
+}
+
+// ==================== 簡單跨分頁同步 ====================
+// 監聽其他分頁的占卜完成
+function initSimpleSync() {
+  window.addEventListener("storage", (event) => {
+    if (event.key === "fate2025_divination_sync") {
+      const data = JSON.parse(event.newValue || "{}");
+      console.log("檢測到其他分頁完成占卜");
+
+      // 簡單更新狀態
+      hasPlayed.value = true;
+      if (data.totalCount) {
+        totalPlayCount.value = data.totalCount;
+      }
+
+      // 顯示已占卜過訊息
+      setTimeout(() => {
+        showAlreadyPlayedMessage();
+      }, 1000);
+    }
+  });
+}
+
+// 通知其他分頁占卜完成
+function notifyOtherTabs() {
+  localStorage.setItem(
+    "fate2025_divination_sync",
+    JSON.stringify({
+      completed: true,
+      totalCount: totalPlayCount.value,
+      timestamp: Date.now(),
+    }),
+  );
 }
 
 // ==================== 流程控制函數 ====================
@@ -757,19 +787,21 @@ async function startDivination() {
     // 3. 生成流程安全令牌
     await securityManager.flow.generate();
 
-    // 4. 設置流程標記 - 只使用 sessionStorage
-    sessionStorage.setItem("fate2025_just_logged_in", "true");
-    sessionStorage.setItem("fate2025_normal_flow", "true");
+    // 4. 設置流程標記 - 只使用 localStorage
+    localStorage.setItem("fate2025_just_logged_in", "true");
+    localStorage.setItem("fate2025_normal_flow", "true");
 
     closeLoadingPopup();
 
-    // 跳轉到登入頁面
-    const targetUrl = loginUrl.value;
-    if (isUrlSafe(targetUrl)) {
-      window.location.assign(targetUrl);
-    } else {
-      throw new Error("不安全的重定向 URL");
-    }
+    // // 跳轉到登入頁面
+    // const targetUrl = loginUrl.value;
+    // if (isUrlSafe(targetUrl)) {
+    //   window.location.href = targetUrl;
+    //   // window.open(targetUrl, "_blank");
+    // } else {
+    //   throw new Error("不安全的重定向 URL");
+    // }
+    return true;
   } catch (error) {
     console.error("占卜流程錯誤:", error);
     closeLoadingPopup();
@@ -790,7 +822,7 @@ async function proceedToPerformDivination() {
     console.log("=== 開始執行占卜流程 ===");
 
     // 清除登入標記，確保一次性使用
-    sessionStorage.removeItem("fate2025_just_logged_in");
+    localStorage.removeItem("fate2025_just_logged_in");
 
     // 步驟1: 檢查流程安全令牌
     console.log("檢查流程安全令牌...");
@@ -865,7 +897,7 @@ async function saveUserData() {
     // 檢查 turnstile token 存在性
     const turnstileTokenValue =
       turnstileToken.value ||
-      sessionStorage.getItem("temp_turnstile_token") ||
+      localStorage.getItem("temp_turnstile_token") ||
       null;
 
     console.log("Turnstile Token 狀態:", !!turnstileTokenValue);
@@ -958,7 +990,7 @@ async function handleApiError(result) {
 
     // 清理令牌
     securityManager.flow.clear();
-    sessionStorage.removeItem("temp_turnstile_token");
+    localStorage.removeItem("temp_turnstile_token");
 
     // 更新占卜次數
     if (result.db_info && result.db_info.play_times_total !== undefined) {
@@ -1308,9 +1340,9 @@ function logout() {
     }
 
     // 清除登入檢查標記
-    sessionStorage.removeItem("login_checked");
+    localStorage.removeItem("login_checked");
 
-    sessionStorage.clear();
+    localStorage.clear();
 
     // 立即更新 UI 狀態
     hasPlayed.value = false;
@@ -1366,7 +1398,7 @@ function clearCookiesAfterDivination() {
     localStorage.clear(); // 直接清空
 
     // 清除 session storage
-    sessionStorage.clear();
+    localStorage.clear();
 
     // 更新 UI 狀態
     isTurnstileVerified.value = false;
@@ -1379,6 +1411,7 @@ function clearCookiesAfterDivination() {
 }
 // ==================== 生命週期 ====================
 onMounted(async () => {
+  initSimpleSync();
   // 第1部分：基本初始化設置
   // ------------------------------------------
   // 註冊開發工具鍵盤快捷鍵
@@ -1429,7 +1462,7 @@ onMounted(async () => {
   // 第5部分：登入流程檢查
   // ------------------------------------------
   // 檢查是否首次訪問頁面
-  const isFirstTimeCheck = !sessionStorage.getItem("login_checked");
+  const isFirstTimeCheck = !localStorage.getItem("login_checked");
 
   // 處理非正常流程登入的情況
   if (isLoggedIn.value && isFirstTimeCheck) {
@@ -1440,7 +1473,7 @@ onMounted(async () => {
   // ------------------------------------------
   // 檢查是否從會員登入頁面返回
   const justLoggedIn =
-    sessionStorage.getItem("fate2025_just_logged_in") === "true";
+    localStorage.getItem("fate2025_just_logged_in") === "true";
 
   if (justLoggedIn && isLoggedIn.value) {
     await handlePostLoginProcess();
@@ -1532,11 +1565,10 @@ function initializeAchievedMilestone() {
 // 處理非正常流程登入
 async function handleNonNormalLogin() {
   // 標記已經檢查過登入狀態
-  sessionStorage.setItem("login_checked", "true");
+  localStorage.setItem("login_checked", "true");
 
   // 檢查是否通過正常流程登入
-  const isNormalFlow =
-    sessionStorage.getItem("fate2025_normal_flow") === "true";
+  const isNormalFlow = localStorage.getItem("fate2025_normal_flow") === "true";
 
   // 如果沒有通過正確流程但已經登入，顯示提示
   if (!isNormalFlow) {
@@ -1558,8 +1590,7 @@ async function handlePostLoginProcess() {
 
   // 檢查流程有效性
   const hasFlowToken = !!securityManager.flow.get();
-  const isNormalFlow =
-    sessionStorage.getItem("fate2025_normal_flow") === "true";
+  const isNormalFlow = localStorage.getItem("fate2025_normal_flow") === "true";
 
   console.log("流程檢查結果:", {
     hasFlowToken,

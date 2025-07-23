@@ -9,25 +9,36 @@
     </div>
 
     <div class="banner__content">
-      <div
+      <!-- ref="contentRef" -->
+      <a
+        ref="triggerLink"
         class="banner__trigger-area"
-        @click="handleDivination"
+        :href="loginUrl"
+        target="_blank"
+        rel="noopener noreferrer"
         data-action="submit"
-      ></div>
+        @click="handleDivination"
+      ></a>
     </div>
   </div>
 </template>
 
 <script setup>
-import { defineEmits } from "vue";
+import { defineEmits, defineProps } from "vue";
 
 const emit = defineEmits(["startDivination"]);
+const props = defineProps({
+  loginUrl: {
+    type: String,
+    required: true,
+  },
+});
 
-function handleDivination() {
-  emit("startDivination");
+async function handleDivination(event) {
+  await emit("startDivination");
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .banner {
   width: 100%;
   background-image: url("/imgs/banner.png");

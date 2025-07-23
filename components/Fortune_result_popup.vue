@@ -128,13 +128,7 @@ const shareToLine = () => {
   const shareResultType = resultMap[props.fortuneData.id] || "heart";
   localStorage.setItem("last_fortune_result", shareResultType);
 
-  console.log("Share URL:", shareUrl);
-  console.log("Result Name:", resultName);
-  console.log("Share Text:", shareText);
-
   const lineShareUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
-
-  console.log("Final LINE Share URL:", lineShareUrl);
 
   window.open(lineShareUrl, "_blank", "width=600,height=600");
 };
