@@ -1,53 +1,53 @@
 <template>
-  <Banner @startDivination="startDivination" :loginUrl="loginUrl" />
+  <!-- <Banner @startDivination="startDivination" :loginUrl="loginUrl" /> -->
   <div class="divination-container">
-    <PlayCount
+    <!-- <PlayCount
       :count="totalPlayCount"
       @milestone-achieved="handleMilestoneAchieved"
     />
     <Act_area />
     <Notice_popup />
-    <ToTop />
+    <ToTop /> -->
 
     <!-- 占卜結果彈窗 -->
-    <Fortune_result_popup
+    <!-- <Fortune_result_popup
       :is-visible="showFortuneResultPopup"
       :fortune-data="fortuneResultData"
       :custom-message="fortuneCustomMessage"
       @close="closeFortune"
-    />
+    /> -->
     <!-- 已經占卜過的彈窗 -->
-    <Already_played_popup
+    <!-- <Already_played_popup
       :is-visible="showAlreadyPlayedPopup"
       :already-played-data="alreadyPlayedData"
       :total-play-count="totalPlayCount"
       :is-development="isDevelopment"
       @close="closeAlreadyPlayedPopup"
       @clear-record="clearPlayRecord"
-    />
+    /> -->
     <!-- 加載中彈窗 -->
-    <Loading_popup
+    <!-- <Loading_popup
       :is-visible="showLoadingPopup"
       :loading-data="loadingData"
       @close="closeLoadingPopup"
-    />
+    /> -->
     <!-- 驗證彈窗 -->
-    <Verification_popup
+    <!-- <Verification_popup
       :is-visible="showVerificationPopup"
       @close="closeVerificationPopup"
       @opened="onVerificationPopupOpened"
-    />
+    /> -->
     <!-- 通用彈窗 -->
-    <Universal_popup
+    <!-- <Universal_popup
       :is-visible="showUniversalPopup"
       :popup-data="universalPopupData"
       @close="closeUniversalPopup"
       @confirm="handleUniversalConfirm"
       @cancel="handleUniversalCancel"
-    />
+    /> -->
 
     <!-- 開發工具區域 - 按 Shift+D 顯示 -->
-    <div v-if="showDebugTools" class="debug-tools">
+    <!-- <div v-if="showDebugTools" class="debug-tools">
       <h3>開發測試工具</h3>
       <div class="debug-actions">
         <button @click="clearPlayRecord" class="debug-btn">清除占卜記錄</button>
@@ -74,7 +74,8 @@
       <div class="shortcut-info">
         <p>按下 Shift+D 可隱藏此工具</p>
       </div>
-    </div>
+    </div> -->
+    <Questionnaire />
   </div>
 </template>
 
@@ -92,6 +93,9 @@ import Already_played_popup from "../components/Already_played_popup.vue";
 import Loading_popup from "../components/Loading_popup.vue";
 import Verification_popup from "../components/Verification_popup.vue";
 import Universal_popup from "../components/Universal_popup.vue";
+
+import Questionnaire from "../components/Questionnaire.vue";
+
 // ==================== 基本狀態管理 ====================
 const config = useRuntimeConfig();
 const showDebugTools = ref(false);

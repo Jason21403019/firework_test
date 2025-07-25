@@ -13,7 +13,7 @@
   </noscript>
 
   <!-- 只在非 admin 頁面顯示導覽列 -->
-  <Nav v-if="!isAdminPage" />
+  <!-- <Nav v-if="!isAdminPage" /> -->
   <NuxtPage />
 </template>
 
