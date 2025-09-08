@@ -100,7 +100,7 @@ const generateShareUrl = () => {
     fortune_4: "goldlight",
   };
 
-  return "https://lab-event.udn.com/bd_fate2025_test";
+  return "https://lab-event.udn.com/bd_fate_2025";
 };
 
 const getResultName = () => {

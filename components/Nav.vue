@@ -162,7 +162,7 @@ const getLastFortuneResult = () => {
 
 const baseShareUrl = computed(() => {
   const lastResult = getLastFortuneResult();
-  const baseUrl = "https://lab-event.udn.com/bd_fate2025_test";
+  const baseUrl = "https://lab-event.udn.com/bd_fate_2025";
   return `${baseUrl}`;
 });
 
@@ -194,7 +194,7 @@ onBeforeUnmount(() => {
   background-color: transparent;
   box-shadow: none;
   width: 100%;
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   z-index: 100;

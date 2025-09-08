@@ -217,15 +217,6 @@ function getMemberMail($memberId){
     ];
 }
 
-// 取得用戶 email
-function getMail(){
-    $udnmember = $_COOKIE["udnmember"];
-    $um2 = urlencode($_COOKIE["um2"]);
-    $response = getUdnMember($udnmember, $um2);
-    $email = filter_var($response["response"]["email"], FILTER_SANITIZE_EMAIL);
-    return $email;
-}
-
 // 取得用戶 IP
 function getIP(){
     if (isset($_SERVER['HTTP_AKACIP'])) {

@@ -317,11 +317,11 @@ const TURNSTILE_SITE_KEY = config.public.turnstileSiteKey;
 function getApiUrl(endpoint) {
   const baseUrl = (() => {
     if (config.public.domain?.includes("lab-event")) {
-      return "https://lab-event.udn.com/bd_fate2025_test/fate2025php";
+      return "https://lab-event.udn.com/bd_fate_2025/fate2025php";
     } else if (config.public.domain?.includes("event.udn")) {
-      return "https://event.udn.com/bd_fate2025/fate2025php";
+      return "https://event.udn.com/bd_fate_2025/fate2025php";
     } else {
-      return "https://lab-event.udn.com/bd_fate2025_test/fate2025php";
+      return "https://lab-event.udn.com/bd_fate_2025/fate2025php";
     }
   })();
 
@@ -338,19 +338,19 @@ const loginUrl = computed(() => {
 
   let redirectUrl;
   if (hostname === "lab-event.udn.com") {
-    redirectUrl = "https://lab-event.udn.com/bd_fate2025_test/";
+    redirectUrl = "https://lab-event.udn.com/bd_fate_2025/";
   } else if (hostname === "event.udn.com") {
-    redirectUrl = "https://event.udn.com/bd_fate2025/";
+    redirectUrl = "https://event.udn.com/bd_fate_2025/";
   } else if (
     allowedHosts.includes(hostname) ||
     hostname.startsWith("localhost")
   ) {
-    redirectUrl = "https://lab-event.udn.com/bd_fate2025_test/";
+    redirectUrl = "https://lab-event.udn.com/bd_fate_2025/";
   } else {
-    redirectUrl = "https://lab-event.udn.com/bd_fate2025_test/";
+    redirectUrl = "https://lab-event.udn.com/bd_fate_2025/";
   }
 
-  return `https://member.udn.com/member/login.jsp?site=bd_fate2025&again=y&redirect=${redirectUrl}`;
+  return `https://member.udn.com/member/login.jsp?site=bd_fate_2025&again=y&redirect=${redirectUrl}`;
 });
 
 // URL 安全驗證函數
@@ -373,8 +373,8 @@ function isUrlSafe(url) {
 
     const allowedPaths = [
       "/member/login.jsp",
-      "/bd_fate2025/",
-      "/bd_fate2025_test/",
+      "/bd_fate_2025/",
+      "/bd_fate_2025/",
     ];
 
     const isValidPath = allowedPaths.some((path) =>
@@ -509,7 +509,7 @@ const securityManager = {
 
         const token = response.data.token;
         localStorage.setItem("fate2025_flow_token", token);
-        const expiryTime = Date.now() + 5 * 60 * 1000;
+        const expiryTime = Date.now() + 2 * 60 * 1000;
         localStorage.setItem("fate2025_flow_token_expiry", String(expiryTime));
 
         console.log("流程令牌獲取成功:", token.substring(0, 10) + "...");
@@ -1318,7 +1318,7 @@ function logout() {
       "lab-event.udn.com",
     ];
 
-    const paths = ["/", "/bd_fate2025", "/bd_fate2025_test"];
+    const paths = ["/", "/bd_fate_2025", "/bd_fate_2025"];
     const cookieNames = ["udnmember", "um2", "nickname", "fg_mail"];
 
     // 對每個可能的域名和路徑嘗試清除 cookie
@@ -1379,7 +1379,7 @@ function clearCookiesAfterDivination() {
       ".lab-event.udn.com",
     ];
 
-    const paths = ["/", "/bd_fate2025/", "/bd_fate2025_test/"];
+    const paths = ["/", "/bd_fate_2025/", "/bd_fate_2025/"];
 
     domains.forEach((domain) => {
       paths.forEach((path) => {

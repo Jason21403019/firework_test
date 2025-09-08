@@ -18,26 +18,22 @@ export default defineNuxtConfig({
         { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       ],
       script: [
-        // Google Tag Manager
+        // comScore 追蹤代碼
         {
           innerHTML: `
-            (function(w, d, s, l, i) {
-                w[l] = w[l] || [];
-                w[l].push({
-                    'gtm.start': new Date().getTime(),
-                    event: 'gtm.js'
-                });
-                var f = d.getElementsByTagName(s)[0],
-                    j = d.createElement(s),
-                    dl = l != 'dataLayer' ? '&l=' + l : '';
-                j.async = true;
-                j.src =
-                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
-                f.parentNode.insertBefore(j, f);
-            })(window, document, 'script', 'dataLayer', 'GTM-NMFFZ35');
+            var _comscore = _comscore || [];
+            _comscore.push({ c1: "2", c2: "7390954" });
+            (function() {
+              var s = document.createElement("script"), 
+                  el = document.getElementsByTagName("script")[0]; 
+              s.async = true;
+              s.src = (document.location.protocol == "https:" ? "https://sb" : "http://b") + ".scorecardresearch.com/beacon.js";
+              el.parentNode.insertBefore(s, el);
+            })();
           `,
           type: "text/javascript",
         },
+
         // Data Layer
         {
           innerHTML: `
@@ -80,18 +76,23 @@ export default defineNuxtConfig({
           src: "https://p.udn.com.tw/upf/static/common/udn-fingerprint.umd.js?12",
           async: true,
         },
-        // comScore 追蹤代碼
+        // Google Tag Manager
         {
           innerHTML: `
-            var _comscore = _comscore || [];
-            _comscore.push({ c1: "2", c2: "7390954" });
-            (function() {
-              var s = document.createElement("script"), 
-                  el = document.getElementsByTagName("script")[0]; 
-              s.async = true;
-              s.src = (document.location.protocol == "https:" ? "https://sb" : "http://b") + ".scorecardresearch.com/beacon.js";
-              el.parentNode.insertBefore(s, el);
-            })();
+            (function(w, d, s, l, i) {
+                w[l] = w[l] || [];
+                w[l].push({
+                    'gtm.start': new Date().getTime(),
+                    event: 'gtm.js'
+                });
+                var f = d.getElementsByTagName(s)[0],
+                    j = d.createElement(s),
+                    dl = l != 'dataLayer' ? '&l=' + l : '';
+                j.async = true;
+                j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+                f.parentNode.insertBefore(j, f);
+            })(window, document, 'script', 'dataLayer', 'GTM-NMFFZ35');
           `,
           type: "text/javascript",
         },

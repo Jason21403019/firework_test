@@ -48,15 +48,15 @@ if (empty($session_token)) {
 
 if (!isset($_SESSION['fate2025_flow_token'])) {
     if (!isset($_SESSION['auth_token'])) {
-        JSONReturn('安全驗證失敗，請重新開始占卜流程 (缺少會話令牌)', 'error');
+        JSONReturn('安全驗證失敗，請重新開始占卜流程', 'error');
     } else {
         if ($_SESSION['auth_token'] !== $session_token) {
-             JSONReturn('安全驗證失敗，請重新開始占卜流程 (會話令牌無效)', 'error');
+             JSONReturn('安全驗證失敗，請重新開始占卜流程', 'error');
         }
     }
 } else {
     if ($_SESSION['fate2025_flow_token'] !== $session_token) {
-        JSONReturn('安全驗證失敗，請重新開始占卜流程 (令牌不匹配)', 'error');
+        JSONReturn('安全驗證失敗，請重新開始占卜流程', 'error');
     }
 }
 

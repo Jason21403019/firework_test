@@ -21,39 +21,21 @@ import { ref } from "vue";
 const prizes = ref([
   {
     id: 1,
-    image: "./imgs/tv.png",
-    title: "星光劇院獎",
-    subtitle: "小米 65 吋LED 電視 | 1名",
+    image: "./imgs/dyson1.png",
+    title: "閃耀風光獎",
+    subtitle: "Dyson 三合一涼暖空氣清淨機 | 1 名",
   },
   {
     id: 2,
-    image: "./imgs/dyson.png",
-    title: "閃耀風光獎",
-    subtitle: "Dyson 二合一涼風空氣清淨機 | 2 名",
-  },
-  {
-    id: 3,
-    image: "./imgs/barista.png",
-    title: "啡常幸運獎",
-    subtitle: "Barista C2+ 全自動義式咖啡機 | 1 名",
-  },
-  {
-    id: 4,
-    image: "./imgs/wang1000.png",
-    title: "煙火食光獎",
-    subtitle: "王品集團 $1,000 即享券雙人 | 5 名",
-  },
-  {
-    id: 5,
-    image: "./imgs/linepoints5.png",
-    title: "轉運流星獎",
-    subtitle: "LINE POINTS 5點 | 1 萬組送完為止  ",
-  },
-  {
-    id: 6,
     image: "./imgs/citycoffee.png",
     title: "Line 好運加碼禮",
     subtitle: "CITY CAFÉ 提貨券 | 50 名",
+  },
+  {
+    id: 3,
+    image: "./imgs/linepoints5.png",
+    title: "轉運流星獎",
+    subtitle: "LINE POINTS 5點 | 8 千組送完為止  ",
   },
 ]);
 </script>
@@ -74,13 +56,16 @@ const prizes = ref([
 .prize-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, 1fr);
+  grid-template-rows: repeat(1, 1fr);
   gap: 25px;
   @media (max-width: 1180px) {
     gap: 20px;
   }
   @media (max-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(1, 1fr);
   }
   @media (max-width: 360px) {
     gap: 12px;
@@ -173,11 +158,11 @@ const prizes = ref([
       font-size: 20px;
     }
     @media (max-width: 480px) {
-      font-size: 18px;
-      letter-spacing: normal;
+      font-size: 24px;
+      letter-spacing: 2px;
     }
     @media (max-width: 360px) {
-      font-size: 16px;
+      font-size: 20px;
     }
   }
 
@@ -188,10 +173,10 @@ const prizes = ref([
     line-height: 1.5;
     display: inline-block;
     @media (max-width: 480px) {
-      font-size: 14px;
+      font-size: 16px;
     }
     @media (max-width: 360px) {
-      font-size: 12px;
+      font-size: 14px;
     }
   }
 }

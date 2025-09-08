@@ -314,11 +314,11 @@ const config = useRuntimeConfig();
 function getApiUrl(endpoint) {
   const baseUrl = (() => {
     if (config.public.domain?.includes("lab-event")) {
-      return "https://lab-event.udn.com/bd_fate2025_test/fate2025php";
+      return "https://lab-event.udn.com/bd_fate_2025/fate2025php";
     } else if (config.public.domain?.includes("event.udn")) {
-      return "https://event.udn.com/bd_fate2025/fate2025php";
+      return "https://event.udn.com/bd_fate_2025/fate2025php";
     } else {
-      return "https://lab-event.udn.com/bd_fate2025_test/fate2025php";
+      return "https://lab-event.udn.com/bd_fate_2025/fate2025php";
     }
   })();
   return `${baseUrl}/${endpoint}`;

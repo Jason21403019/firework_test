@@ -31,6 +31,8 @@
         class="play-count__milestone"
         :class="{
           'play-count__milestone--achieved': count >= milestone.count,
+          'play-count__milestone--hidden-mobile':
+            milestone.count === 2 || milestone.count === 4,
         }"
       >
         <div
@@ -58,10 +60,10 @@ const props = defineProps({
     type: Array,
     default: () => [
       { count: 1, prize: "LINE POINTS\n5 點" },
-      { count: 2, prize: "王品\n雙人即享券" },
-      { count: 3, prize: "Barista\n義式咖啡機" },
-      { count: 4, prize: "Dyson\n涼風空氣清淨機" },
-      { count: 5, prize: "65 吋\nLED 電視" },
+      { count: 2, prize: "" },
+      { count: 3, prize: "CITY CAFÉ 提貨券" },
+      { count: 4, prize: "" },
+      { count: 5, prize: "Dyson 三合一\n涼暖空氣清淨機" },
     ],
   },
 });
@@ -108,6 +110,7 @@ watch(
     background-position: center -250px;
   }
   @media (max-width: 480px) {
+    margin-bottom: 60px;
     padding: 50px 12px 0 12px;
     background-position: center -200px;
   }
@@ -268,6 +271,11 @@ watch(
     justify-content: center;
     max-width: 100%;
     transition: all 0.4s ease;
+    &--hidden-mobile {
+      @media (max-width: 768px) {
+        display: none;
+      }
+    }
     @media (max-width: 768px) {
       flex-direction: row;
     }
@@ -300,7 +308,7 @@ watch(
       @media (max-width: 1024px) {
         width: 90px;
         height: 130px;
-        font-size: 40px; 
+        font-size: 40px;
       }
       @media (max-width: 480px) {
         width: 80px;
@@ -334,17 +342,17 @@ watch(
         font-size: 18px;
       }
       @media (max-width: 768px) {
-        font-size: 36px;
+        font-size: 30px;
         margin-top: 30px;
         margin-left: 10px;
         text-align: left;
         white-space: nowrap;
       }
       @media (max-width: 480px) {
-        font-size: 24px;
+        font-size: 20px;
       }
       @media (max-width: 360px) {
-        font-size: 20px;
+        font-size: 18px;
       }
     }
   }
