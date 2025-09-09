@@ -22,20 +22,20 @@ const prizes = ref([
   {
     id: 1,
     image: "./imgs/dyson1.png",
-    title: "閃耀風光獎",
+    title: "幸福閃耀獎",
     subtitle: "Dyson 三合一涼暖空氣清淨機 | 1 名",
   },
   {
     id: 2,
-    image: "./imgs/citycoffee.png",
-    title: "Line 好運加碼禮",
-    subtitle: "CITY CAFÉ 提貨券 | 50 名",
+    image: "./imgs/linepoints5.png",
+    title: "流星轉運獎",
+    subtitle: "LINE POINTS 5點 | 8 千組送完為止  ",
   },
   {
     id: 3,
-    image: "./imgs/linepoints5.png",
-    title: "轉運流星獎",
-    subtitle: "LINE POINTS 5點 | 8 千組送完為止  ",
+    image: "./imgs/citycoffee.png",
+    title: "LINE 加碼禮",
+    subtitle: "CITY CAFÉ 提貨券 | 100 名",
   },
 ]);
 </script>

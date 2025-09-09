@@ -7,15 +7,51 @@ export default defineNuxtConfig({
     baseURL: process.env.NUXT_PUBLIC_BASE || "/",
     buildAssetsDir: "/_nuxt/",
     head: {
-      title: "幸福煙火轉一夏｜聯合新聞網",
+      title: "幸福花火 秋好運｜聯合新聞網",
       meta: [
         { name: "viewport", content: "width=device-width, initial-scale=1" },
         { charset: "utf-8" },
-        { name: "description", content: "幸福煙火轉一夏｜聯合新聞網" },
+        {
+          name: "description",
+          content:
+            "幸福花火秋好運，每天來占卜，驚喜好禮LINE POINTS免費領，Dyson豪禮抱回家！",
+        },
+        {
+          name: "keywords",
+          content:
+            "占卜、秋天、花火、輪盤、轉好運、摩天輪、LINE POINTS 、免費領、Dyson清淨機、CITY CAFF券",
+        },
+        // Open Graph 標籤
+        {
+          property: "og:title",
+          content: "幸福花火 秋好運｜聯合新聞網",
+        },
+        {
+          property: "og:description",
+          content:
+            "幸福花火秋好運，每天來占卜，驚喜好禮LINE POINTS免費領，Dyson豪禮抱回家！",
+        },
+        {
+          property: "og:url",
+          content: "https://event.udn.com/bd_fate_2025",
+        },
+        {
+          property: "og:type",
+          content: "website",
+        },
+        {
+          property: "og:site_name",
+          content: "聯合新聞網",
+        },
+        // {
+        //   property: "og:image",
+        //   content: "https://event.udn.com/bd_fate_2025/imgs/login.png",
+        // },
       ],
       link: [
         { rel: "icon", type: "image/x-icon" },
         { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+        { rel: "canonical", href: "https://event.udn.com/bd_fate_2025" },
       ],
       script: [
         // comScore 追蹤代碼
@@ -62,7 +98,7 @@ export default defineNuxtConfig({
                 'user_id': user_id,
                 'google_id': google_id,
                 'cat': ['event', '', '', '', ''],
-                'content_tag': '',
+                'content_tag': '占卜',
                 'auth_type': auth_type,
                 'publication_date': '',
                 'ffid': JSON.parse(localStorage.getItem('UDN_FID'))?.FFID,
@@ -100,6 +136,11 @@ export default defineNuxtConfig({
       __dangerouslyDisableSanitizers: ["script"],
     },
   },
+  nitro: {
+    output: {
+      dir: "./dist",
+    },
+  },
 
   runtimeConfig: {
     public: {
@@ -110,5 +151,5 @@ export default defineNuxtConfig({
     },
   },
 
-  compatibilityDate: "2025-05-29",
+  compatibilityDate: "2025-09-22",
 });

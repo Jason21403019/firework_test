@@ -1089,8 +1089,7 @@ function showAlreadyPlayedMessage() {
   alreadyPlayedData.value = {
     image_url: imgUrl,
     message: message,
-    reminder:
-      "小提醒: 天天能占卜，還可抽65吋LED電視、\n Dyson、咖啡機等好禮喔!",
+    reminder: "小提醒: 每天來占卜，累積好運抽Dyson 清淨機大獎喔！",
   };
 
   showAlreadyPlayedPopup.value = true;

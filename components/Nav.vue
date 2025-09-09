@@ -106,7 +106,7 @@ const showWinnerListPopup = ref(false);
 const scrollThreshold = 40;
 
 const winnerListConfig = {
-  announceDate: "2025年8月15日",
+  announceDate: "2025年10月23日",
   winnerListUrl: "https://udn.com/news/index",
   isAnnounced: false,
 };
@@ -171,8 +171,7 @@ const facebookShareUrl = computed(() => {
 });
 
 const lineShareUrl = computed(() => {
-  const shareText = "快來幸福花火轉一夏！看看你會抽到什麼煙火！";
-  return `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(baseShareUrl.value)}&text=${encodeURIComponent(shareText)}`;
+  return `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(baseShareUrl.value)}`;
 });
 
 onMounted(() => {
