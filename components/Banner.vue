@@ -2,7 +2,6 @@
   <div class="banner">
     <!-- 煙火特效元素 -->
     <div class="fireworks">
-      <div class="firework firework-1"></div>
       <div class="firework firework-2"></div>
       <div class="firework firework-3"></div>
       <div class="firework firework-4"></div>
@@ -68,13 +67,6 @@ async function handleDivination(event) {
     aspect-ratio: 16 / 9;
     width: 30%;
     filter: blur(0px);
-  }
-
-  .firework-1 {
-    top: 10%;
-    left: -12%;
-    background-image: url("/imgs/fireworks1.png");
-    animation: flashSoft 6s infinite 0.5s;
   }
 
   .firework-2 {
@@ -289,18 +281,6 @@ async function handleDivination(event) {
     background-position: center top;
     position: relative;
     aspect-ratio: 640 / 1076;
-    .firework-1 {
-      width: 400px;
-      height: 300px;
-      top: -8%;
-      left: -17%;
-      @media (max-width: 430px) {
-        width: 300px;
-        height: 200px;
-        top: -10%;
-        left: -20%;
-      }
-    }
 
     .firework-2 {
       width: 300px;

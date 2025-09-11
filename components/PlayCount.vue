@@ -37,7 +37,7 @@
       >
         <div
           class="play-count__milestone-number"
-          :style="{ backgroundImage: 'url(./imgs/fire.png)' }"
+          :style="{ backgroundImage: 'url(./imgs/leaf.png)' }"
         >
           <span>{{ milestone.count }}</span>
         </div>
@@ -107,12 +107,12 @@ watch(
   }
   @media (max-width: 768px) {
     padding: 100px 12px 0 12px;
-    background-position: center -250px;
+    background-position: center -60px;
   }
   @media (max-width: 480px) {
     margin-bottom: 60px;
     padding: 50px 12px 0 12px;
-    background-position: center -200px;
+    background-position: center -100px;
   }
 
   &__banner {
@@ -129,6 +129,29 @@ watch(
     display: flex;
     align-items: center;
     justify-content: center;
+    &::before {
+      content: "";
+      position: absolute;
+      top: 40%;
+      left: -27%;
+      width: 55%;
+      height: 100%;
+      background-image: url("/imgs/flag_leave.png");
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      z-index: 1;
+      @media (max-width: 768px) {
+        width: 70%;
+        left: -25%;
+        top: 42%;
+      }
+      @media (max-width: 360px) {
+        width: 80%;
+        left: -35%;
+        top: 40%;
+      }
+    }
     @media (max-width: 1024px) {
       width: 80%;
       height: 100px;
@@ -186,8 +209,8 @@ watch(
   &__text {
     width: auto;
     max-width: 540px;
-    background: rgba(255, 255, 255, 0.6);
-    color: #c20b46;
+    background: rgba(207, 65, 55, 1);
+    color: #f5f5f5;
     font-size: 40px;
     font-weight: 500;
     margin-left: 40px;
@@ -211,7 +234,7 @@ watch(
 
   &__number {
     font-weight: bold;
-    color: #c20b46;
+    color: #f5f5f5;
     font-size: 40px;
     backdrop-filter: blur(4px);
     border-radius: 4px;
@@ -291,8 +314,8 @@ watch(
       }
     }
     &-number {
-      width: 134px;
-      height: 170px;
+      width: 166px;
+      height: 155px;
       background-repeat: no-repeat;
       background-size: contain;
       background-position: center;
@@ -306,9 +329,14 @@ watch(
       position: relative;
       filter: brightness(0.7);
       @media (max-width: 1024px) {
-        width: 90px;
+        width: 130px;
         height: 130px;
         font-size: 40px;
+      }
+      @media (max-width: 768px) {
+        width: 100px;
+        height: 100px;
+        font-size: 30px;
       }
       @media (max-width: 480px) {
         width: 80px;
@@ -323,8 +351,8 @@ watch(
 
       & > span {
         position: absolute;
-        top: 60%;
-        left: 53%;
+        top: 55%;
+        left: 49%;
         transform: translate(-50%, -50%);
       }
     }
@@ -342,8 +370,7 @@ watch(
         font-size: 18px;
       }
       @media (max-width: 768px) {
-        font-size: 30px;
-        margin-top: 30px;
+        font-size: 28px;
         margin-left: 10px;
         text-align: left;
         white-space: nowrap;

@@ -512,10 +512,10 @@ const securityManager = {
         const expiryTime = Date.now() + 2 * 60 * 1000;
         localStorage.setItem("fate2025_flow_token_expiry", String(expiryTime));
 
-        console.log("流程令牌獲取成功:", token.substring(0, 10) + "...");
+        // console.log("流程令牌獲取成功:", token.substring(0, 10) + "...");
         localStorage.setItem("fate2025_flow_token_expiry", String(expiryTime));
 
-        console.log("流程令牌獲取成功:", token.substring(0, 10) + "...");
+        // console.log("流程令牌獲取成功:", token.substring(0, 10) + "...");
         return token;
       } catch (error) {
         console.error("生成流程令牌錯誤:", error);
@@ -733,7 +733,7 @@ function initSimpleSync() {
   window.addEventListener("storage", (event) => {
     if (event.key === "fate2025_divination_sync") {
       const data = JSON.parse(event.newValue || "{}");
-      console.log("檢測到其他分頁完成占卜");
+      // console.log("檢測到其他分頁完成占卜");
 
       // 簡單更新狀態
       hasPlayed.value = true;
@@ -1112,7 +1112,7 @@ function showFortuneResult(fortuneData, customResultMessage) {
 // 關閉占卜結果彈窗的函數
 const closeFortune = () => {
   showFortuneResultPopup.value = false;
-  clearCookiesAfterDivination();
+  // clearCookiesAfterDivination();
 };
 
 // 登入後的驗證對話框
@@ -1222,17 +1222,13 @@ async function debugCheckDatabase() {
   } catch (error) {
     console.error("檢查資料庫時發生錯誤:", error);
 
-    // 提供更詳細的錯誤訊息
     let errorMessage = "未知錯誤";
 
     if (error.response) {
-      // 伺服器回應了錯誤
       errorMessage = `服務器回應錯誤 (${error.response.status}): ${JSON.stringify(error.response.data)}`;
     } else if (error.request) {
-      // 請求已發出但沒有收到回應
       errorMessage = "無法連接到伺服器，請檢查網路連接或API是否可用";
     } else {
-      // 請求設置有誤
       errorMessage = `請求錯誤: ${error.message}`;
     }
 
@@ -1265,7 +1261,6 @@ async function resetDatabase() {
   try {
     const apiUrl = getApiUrl("resetDatabase.php");
 
-    // 發送重置請求，包含安全密鑰
     const response = await axios.post(
       apiUrl,
       { security_key: "reset2025fate" },
@@ -1282,10 +1277,8 @@ async function resetDatabase() {
         confirmButtonText: "確定",
       });
 
-      // 同時清除本地存儲
       localStorage.clear();
 
-      // 重新載入頁面
       setTimeout(() => window.location.reload(), 1500);
     } else {
       throw new Error(response.data.message || "重置失敗");
@@ -1306,13 +1299,12 @@ function logout() {
   if (typeof window === "undefined") return;
 
   try {
-    // 清除 cookie 的更全面方法
     const domains = [
-      "", // 無域名版本
-      window.location.hostname, // 當前域名
-      `.${window.location.hostname}`, // 帶點的當前域名
-      "udn.com", // 頂層域名
-      ".udn.com", // 帶點的頂層域名
+      "",
+      window.location.hostname,
+      `.${window.location.hostname}`,
+      "udn.com",
+      ".udn.com",
       "event.udn.com",
       "lab-event.udn.com",
     ];
@@ -1320,7 +1312,6 @@ function logout() {
     const paths = ["/", "/bd_fate_2025", "/bd_fate_2025"];
     const cookieNames = ["udnmember", "um2", "nickname", "fg_mail"];
 
-    // 對每個可能的域名和路徑嘗試清除 cookie
     domains.forEach((domain) => {
       paths.forEach((path) => {
         cookieNames.forEach((name) => {
@@ -1330,7 +1321,6 @@ function logout() {
       });
     });
 
-    // 特別處理：清除所有 fate2025 相關的本地存儲
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key && key.includes("fate2025")) {
@@ -1338,12 +1328,10 @@ function logout() {
       }
     }
 
-    // 清除登入檢查標記
     localStorage.removeItem("login_checked");
 
     localStorage.clear();
 
-    // 立即更新 UI 狀態
     hasPlayed.value = false;
     isTurnstileVerified.value = false;
     isLoggedIn.value = false;
@@ -1358,15 +1346,8 @@ function clearCookiesAfterDivination() {
   if (typeof window === "undefined") return;
 
   try {
-    // 不同的方法清除 cookie
     const cookieNames = ["udnmember", "um2", "nickname", "fg_mail"];
 
-    // 方法 1: 直接設置過期時間為過去
-    cookieNames.forEach((name) => {
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
-    });
-
-    // 方法 2: 使用更多的域名組合
     const domains = [
       window.location.hostname,
       `.${window.location.hostname}`,
@@ -1378,7 +1359,7 @@ function clearCookiesAfterDivination() {
       ".lab-event.udn.com",
     ];
 
-    const paths = ["/", "/bd_fate_2025/", "/bd_fate_2025/"];
+    const paths = ["/", "/bd_fate_2025/"];
 
     domains.forEach((domain) => {
       paths.forEach((path) => {
@@ -1389,17 +1370,9 @@ function clearCookiesAfterDivination() {
       });
     });
 
-    // 方法 3: 對於 UDN 域名的特殊處理
-    cookieNames.forEach((name) => {
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.udn.com`;
-    });
-
-    localStorage.clear(); // 直接清空
-
-    // 清除 session storage
     localStorage.clear();
+    sessionStorage.clear();
 
-    // 更新 UI 狀態
     isTurnstileVerified.value = false;
     isLoggedIn.value = false;
 

@@ -130,7 +130,7 @@ const closeModal = () => {
   &__popup {
     background: linear-gradient(to bottom, #05026a, #4a46fc);
     border-radius: 10px;
-    max-width: 600px;
+    max-width: 400px;
     max-height: 80vh;
     position: relative;
     padding: 20px;
@@ -147,7 +147,6 @@ const closeModal = () => {
       max-width: 90vw;
       padding: 10px;
     }
-
     @media (max-width: 480px) {
       border: none;
       max-width: 95vw;
@@ -244,6 +243,24 @@ const closeModal = () => {
   &__title {
     text-align: center;
     margin: 40px 0px;
+    &::after {
+      content: url("../imgs/title_right_leaf.png");
+      position: absolute;
+      right: -20px;
+      top: 150px;
+      width: 100px;
+      height: 100px;
+      z-index: 10;
+    }
+    &::before {
+      content: url("../imgs/title_left_top_leaf.png");
+      position: absolute;
+      left: -30px;
+      top: -30px;
+      width: 100px;
+      height: 100px;
+      z-index: 10;
+    }
   }
 
   &__title-image {

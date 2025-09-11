@@ -157,7 +157,7 @@ const closeModal = () => {
   }
   @media (max-width: 480px) {
     background-size: cover;
-    padding: 40px 12px 340px 12px;
+    padding: 40px 12px 400px 12px;
   }
   @media (max-width: 410px) {
     background-size: cover;
@@ -166,6 +166,31 @@ const closeModal = () => {
   @media (max-width: 360px) {
     background-size: cover;
     padding: 40px 12px 300px 12px;
+  }
+  &::before {
+    content: "";
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    width: 650px;
+    height: 120px;
+    background-image: url("/imgs/footer_leaf.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 1;
+    @media (max-width: 1480px) {
+      width: 500px;
+      height: 110px;
+    }
+    @media (max-width: 1180px) {
+      bottom: 20px;
+      width: 400px;
+      height: 90px;
+    }
+    @media (max-width: 768px) {
+      background-image: none;
+    }
   }
 
   &::after {

@@ -1,10 +1,7 @@
 <template>
   <nav class="navbar">
     <Nav_container>
-      <div
-        class="navbar__content"
-        :class="{ 'navbar__content--scrolled': isScrolled }"
-      >
+      <div class="navbar__content">
         <div class="navbar__logo">
           <NuxtLink to="https://udn.com/news/index" target="_blank">
             <img
@@ -101,7 +98,6 @@ import Nav_container from "./Nav_container.vue";
 import Universal_popup from "./Universal_popup.vue";
 
 const isMobileMenuOpen = ref(false);
-const isScrolled = ref(false);
 const showWinnerListPopup = ref(false);
 const scrollThreshold = 40;
 
@@ -135,9 +131,6 @@ function toggleMobileMenu() {
   isMobileMenuOpen.value = !isMobileMenuOpen.value;
 }
 
-function handleScroll() {
-  isScrolled.value = window.scrollY > scrollThreshold;
-}
 function handleWinnerListClick() {
   isMobileMenuOpen.value = false;
 
@@ -173,18 +166,6 @@ const facebookShareUrl = computed(() => {
 const lineShareUrl = computed(() => {
   return `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(baseShareUrl.value)}`;
 });
-
-onMounted(() => {
-  if (window.scrollY > scrollThreshold) {
-    isScrolled.value = true;
-  }
-
-  window.addEventListener("scroll", handleScroll);
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener("scroll", handleScroll);
-});
 </script>
 
 <style lang="scss" scoped>
@@ -204,13 +185,6 @@ onBeforeUnmount(() => {
     align-items: center;
     width: 100%;
     border-radius: 8px;
-
-    &--scrolled {
-      background-color: rgba(109, 39, 234, 0.25);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: 1px 1px 5px rgb(109, 39, 234);
-    }
   }
 
   &__logo {
