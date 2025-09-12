@@ -71,7 +71,7 @@ const closeModal = () => {
   setTimeout(() => {
     isClosing.value = false;
     emit("close");
-  }, 300);
+  });
 };
 
 watch(
@@ -80,7 +80,7 @@ watch(
     if (newValue) {
       setTimeout(() => {
         emit("opened");
-      }, 100);
+      });
     }
   },
 );

@@ -89,46 +89,17 @@ const closeModal = () => {
   setTimeout(() => {
     isClosing.value = false;
     emit("close");
-  }, 300);
+  });
 };
 
 const generateShareUrl = () => {
-  const resultMap = {
-    fortune_1: "heart",
-    fortune_2: "goldwave",
-    fortune_3: "healing",
-    fortune_4: "goldlight",
-  };
-
   return "https://lab-event.udn.com/bd_fate_2025";
-};
-
-const getResultName = () => {
-  const resultMap = {
-    fortune_1: "心型煙火",
-    fortune_2: "金浪煙火",
-    fortune_3: "療癒煙火",
-    fortune_4: "金光煙火",
-  };
-
-  return resultMap[props.fortuneData.id] || "神秘結果";
 };
 
 const shareToLine = () => {
   const shareUrl = generateShareUrl();
-  const resultName = getResultName();
-  const shareText = `我在「幸福煙火轉一夏」中得到了「${resultName}」！你的運勢如何？快來測試看看吧！`;
 
-  const resultMap = {
-    fortune_1: "heart",
-    fortune_2: "goldwave",
-    fortune_3: "healing",
-    fortune_4: "goldlight",
-  };
-  const shareResultType = resultMap[props.fortuneData.id] || "heart";
-  localStorage.setItem("last_fortune_result", shareResultType);
-
-  const lineShareUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
+  const lineShareUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}`;
 
   window.open(lineShareUrl, "_blank", "width=600,height=600");
 };

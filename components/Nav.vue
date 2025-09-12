@@ -99,7 +99,6 @@ import Universal_popup from "./Universal_popup.vue";
 
 const isMobileMenuOpen = ref(false);
 const showWinnerListPopup = ref(false);
-const scrollThreshold = 40;
 
 const winnerListConfig = {
   announceDate: "2025年10月23日",
@@ -149,22 +148,37 @@ function handleWinnerListConfirm() {
   closeWinnerListPopup();
 }
 
-const getLastFortuneResult = () => {
-  return localStorage.getItem("last_fortune_result") || "heart";
+// const getLastFortuneResult = () => {
+//   return localStorage.getItem("last_fortune_result") || "heart";
+// };
+
+const config = useRuntimeConfig();
+
+// 如果你想讓分享直接使用當前頁面的 OG 標籤
+const getCurrentPageUrl = () => {
+  if (typeof window === "undefined") {
+    // SSR 時使用環境變數
+    const domain = config.public.domain;
+    if (domain?.includes("lab-event")) {
+      return "https://lab-event.udn.com/bd_fate_2025";
+    } else if (domain?.includes("event.udn")) {
+      return "https://event.udn.com/bd_fate_2025";
+    } else {
+      return "https://lab-event.udn.com/bd_fate_2025";
+    }
+  }
+  // 瀏覽器端使用當前 URL
+  return window.location.href;
 };
 
-const baseShareUrl = computed(() => {
-  const lastResult = getLastFortuneResult();
-  const baseUrl = "https://lab-event.udn.com/bd_fate_2025";
-  return `${baseUrl}`;
-});
-
 const facebookShareUrl = computed(() => {
-  return `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(baseShareUrl.value)}`;
+  const currentUrl = getCurrentPageUrl();
+  return `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`;
 });
 
 const lineShareUrl = computed(() => {
-  return `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(baseShareUrl.value)}`;
+  const currentUrl = getCurrentPageUrl();
+  return `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(currentUrl)}`;
 });
 </script>
 

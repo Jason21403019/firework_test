@@ -59,9 +59,9 @@ const props = defineProps({
   milestones: {
     type: Array,
     default: () => [
-      { count: 1, prize: "CITY CAFÉ\n提貨券" },
+      { count: 1, prize: "LINE POINTS\n5 點" },
       { count: 2, prize: "" },
-      { count: 3, prize: "LINE POINTS\n5 點" },
+      { count: 3, prize: "CITY CAFÉ\n提貨券" },
       { count: 4, prize: "" },
       { count: 5, prize: "Dyson 三合一\n涼暖空氣清淨機" },
     ],
@@ -362,7 +362,7 @@ watch(
       font-size: 22px;
       line-height: 1.5;
       font-weight: 500;
-      color: rgba(204, 204, 204, 0.5);
+      color: rgba(0, 0, 0, 0.5);
       text-align: center;
       transition: all 0.3s ease;
       white-space: pre-line;

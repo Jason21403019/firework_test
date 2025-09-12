@@ -64,7 +64,7 @@ const closeModal = () => {
   setTimeout(() => {
     isClosing.value = false;
     emit("close");
-  }, 300);
+  });
 };
 </script>
 

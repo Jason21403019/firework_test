@@ -132,7 +132,7 @@ const closeModal = () => {
   setTimeout(() => {
     isClosing.value = false;
     isPopupVisible.value = false;
-  }, 300);
+  });
 };
 </script>
 

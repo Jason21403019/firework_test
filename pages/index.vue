@@ -330,24 +330,30 @@ function getApiUrl(endpoint) {
 
 // 使用固定的登入 URL
 const loginUrl = computed(() => {
-  if (typeof window === "undefined") return "#";
-
-  const hostname = window.location.hostname;
-
-  const allowedHosts = ["lab-event.udn.com", "event.udn.com", "localhost"];
-
   let redirectUrl;
-  if (hostname === "lab-event.udn.com") {
-    redirectUrl = "https://lab-event.udn.com/bd_fate_2025/";
-  } else if (hostname === "event.udn.com") {
-    redirectUrl = "https://event.udn.com/bd_fate_2025/";
-  } else if (
-    allowedHosts.includes(hostname) ||
-    hostname.startsWith("localhost")
-  ) {
-    redirectUrl = "https://lab-event.udn.com/bd_fate_2025/";
+
+  if (typeof window !== "undefined") {
+    // 瀏覽器環境：使用當前 hostname
+    const hostname = window.location.hostname;
+
+    if (hostname === "lab-event.udn.com") {
+      redirectUrl = "https://lab-event.udn.com/bd_fate_2025/";
+    } else if (hostname === "event.udn.com") {
+      redirectUrl = "https://event.udn.com/bd_fate_2025/";
+    } else {
+      redirectUrl = "https://lab-event.udn.com/bd_fate_2025/";
+    }
   } else {
-    redirectUrl = "https://lab-event.udn.com/bd_fate_2025/";
+    // SSR 環境：使用環境變數
+    const domain = config.public.domain;
+
+    if (domain?.includes("lab-event")) {
+      redirectUrl = "https://lab-event.udn.com/bd_fate_2025/";
+    } else if (domain?.includes("event.udn")) {
+      redirectUrl = "https://event.udn.com/bd_fate_2025/";
+    } else {
+      redirectUrl = "https://lab-event.udn.com/bd_fate_2025/";
+    }
   }
 
   return `https://member.udn.com/member/login.jsp?site=bd_fate_2025&again=y&redirect=${redirectUrl}`;
@@ -687,15 +693,15 @@ async function handleSuccessfulDivination(result) {
 
   const fortuneData = generateFortuneResult();
 
-  const resultMap = {
-    fortune_1: "heart",
-    fortune_2: "goldwave",
-    fortune_3: "healing",
-    fortune_4: "goldlight",
-  };
+  // const resultMap = {
+  //   fortune_1: "heart",
+  //   fortune_2: "goldwave",
+  //   fortune_3: "healing",
+  //   fortune_4: "goldlight",
+  // };
 
-  const shareResultType = resultMap[fortuneData.id] || "heart";
-  localStorage.setItem("last_fortune_result", shareResultType);
+  // const shareResultType = resultMap[fortuneData.id] || "heart";
+  // localStorage.setItem("last_fortune_result", shareResultType);
 
   console.log("占卜結果:", fortuneData);
 
@@ -1112,8 +1118,36 @@ function showFortuneResult(fortuneData, customResultMessage) {
 // 關閉占卜結果彈窗的函數
 const closeFortune = () => {
   showFortuneResultPopup.value = false;
-  // clearCookiesAfterDivination();
+
+  // 記錄應該登出的時間點
+  const logoutTime = Date.now() + 10 * 60 * 1000; // 10分鐘後
+  localStorage.setItem("fate2025_logout_time", String(logoutTime));
+
+  // 設置 setTimeout 作為備用
+  setTimeout(
+    () => {
+      clearCookiesAfterDivination();
+    },
+    10 * 60 * 1000,
+  );
 };
+
+// 檢查是否應該自動登出
+function checkAutoLogout() {
+  if (typeof window === "undefined") return;
+
+  const logoutTime = localStorage.getItem("fate2025_logout_time");
+  if (!logoutTime) return;
+
+  const now = Date.now();
+  const shouldLogout = parseInt(logoutTime);
+
+  if (now >= shouldLogout) {
+    console.log("自動登出時間已到，清除登入狀態");
+    localStorage.removeItem("fate2025_logout_time");
+    clearCookiesAfterDivination();
+  }
+}
 
 // 登入後的驗證對話框
 function showPostLoginVerificationDialog() {
@@ -1381,8 +1415,36 @@ function clearCookiesAfterDivination() {
     console.error("清除 Cookie 過程中發生錯誤:", e);
   }
 }
+// ==================== 瀏覽器檢測和跳轉 ====================
+const checkAndRedirect = () => {
+  const u = navigator.userAgent;
+  const ua = navigator.userAgent.toLowerCase();
+  const isLineApp = /Line/i.test(ua);
+  const isFbApp = /FBAV/i.test(ua) || /FBAN/i.test(ua);
+  const isExAppUrl = /[?&]openExternalBrowser=1\b/.test(window.location.href);
+
+  if (isLineApp && !isExAppUrl) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("openExternalBrowser", "1");
+    window.location.replace(url.toString());
+  }
+  if (isFbApp) {
+    showDialog({
+      icon: "warning",
+      title: "您正在使用 Facebook 內建瀏覽器",
+      text: "建議使用外部瀏覽器開啟，以獲得最佳體驗",
+      confirmButtonText: "確定",
+      showCancelButton: false,
+    });
+  }
+};
 // ==================== 生命週期 ====================
 onMounted(async () => {
+  checkAndRedirect();
+
+  // 第一件事：檢查是否應該自動登出
+  checkAutoLogout();
+
   initSimpleSync();
   // 第1部分：基本初始化設置
   // ------------------------------------------
