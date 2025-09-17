@@ -122,7 +122,7 @@ try {
     }
     
     $ip = getIP();
-    $ipCheckStmt = $pdo->prepare("SELECT MAX(updated_at) AS last_attempt FROM test_fate_event WHERE ip = :ip");
+    $ipCheckStmt = $pdo->prepare("SELECT MAX(updated_at) AS last_attempt FROM act2025_bd_fate_2025 WHERE ip = :ip");
     $ipCheckStmt->bindParam(':ip', $ip);
     $ipCheckStmt->execute();
     $ipResult = $ipCheckStmt->fetch(PDO::FETCH_ASSOC);
@@ -137,7 +137,7 @@ try {
     
     
     $today = date('Y-m-d');
-    $stmt = $pdo->prepare("SELECT * FROM test_fate_event WHERE email = :email");
+    $stmt = $pdo->prepare("SELECT * FROM act2025_bd_fate_2025 WHERE email = :email");
     $stmt->bindParam(':email', $email);
     $stmt->execute();
     
@@ -164,7 +164,7 @@ try {
         }
         
         $play_times_total = intval($row['play_times_total']) + 1;
-        $updateStmt = $pdo->prepare("UPDATE test_fate_event SET 
+        $updateStmt = $pdo->prepare("UPDATE act2025_bd_fate_2025 SET 
             username = :username,
             play_times_total = :play_times_total,
             updated_at = NOW(),
@@ -176,7 +176,7 @@ try {
         $updateStmt->bindParam(':ip', $ip);
         $updateStmt->bindParam(':email', $email);
         $updateStmt->execute();
-        $fetchStmt = $pdo->prepare("SELECT * FROM test_fate_event WHERE email = :email");
+        $fetchStmt = $pdo->prepare("SELECT * FROM act2025_bd_fate_2025 WHERE email = :email");
         $fetchStmt->bindParam(':email', $email);
         $fetchStmt->execute();
         $userData = $fetchStmt->fetch(PDO::FETCH_ASSOC);
@@ -194,7 +194,7 @@ try {
         ], 'success');
     } else {
         // 創建新用戶
-        $stmt = $pdo->prepare("INSERT INTO test_fate_event 
+        $stmt = $pdo->prepare("INSERT INTO act2025_bd_fate_2025 
             (email, username, ip, play_times_total, created_at, updated_at) 
             VALUES (:email, :username, :ip, 1, NOW(), NOW())");
         
@@ -205,7 +205,7 @@ try {
         
         // 獲取剛創建的用戶數據
         $newId = $pdo->lastInsertId();
-        $fetchStmt = $pdo->prepare("SELECT * FROM test_fate_event WHERE id = :id");
+        $fetchStmt = $pdo->prepare("SELECT * FROM act2025_bd_fate_2025 WHERE id = :id");
         $fetchStmt->bindParam(':id', $newId);
         $fetchStmt->execute();
         $userData = $fetchStmt->fetch(PDO::FETCH_ASSOC);

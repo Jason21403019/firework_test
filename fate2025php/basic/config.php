@@ -39,6 +39,6 @@ define('CORS_ALLOWED_ORIGIN', 'https://lab-event.udn.com');
 define('TURNSTILE_SECRET_KEY', getenv('TURNSTILE_SECRET_KEY'));
 
 // 活動期間
-define('EVENT_START', date('Y-m-d H:i:s', strtotime('2025-06-09 10:00:00')));
-define('EVENT_END', date('Y-m-d H:i:s', strtotime('2025-06-30 10:00:00')));
-define('EVENT_WINNER', date('Y-m-d H:i:s', strtotime('2025-07-08 10:00:00')));
+define('EVENT_START', date('Y-m-d H:i:s', strtotime('2025-09-22 10:00:00')));
+define('EVENT_END', date('Y-m-d H:i:s', strtotime('2025-10-14 10:00:00')));
+define('EVENT_WINNER', date('Y-m-d H:i:s', strtotime('2025-10-23 10:00:00')));

@@ -516,6 +516,7 @@ const securityManager = {
         const token = response.data.token;
         localStorage.setItem("fate2025_flow_token", token);
         const expiryTime = Date.now() + 2 * 60 * 1000;
+        // const expiryTime = Date.now() + 10 * 1000;
         localStorage.setItem("fate2025_flow_token_expiry", String(expiryTime));
 
         // console.log("流程令牌獲取成功:", token.substring(0, 10) + "...");
@@ -537,6 +538,7 @@ const securityManager = {
       );
 
       const graceTime = 2 * 60 * 1000;
+      // const graceTime = 10 * 1000;
 
       if (expiryTime + graceTime < Date.now()) {
         console.warn("流程令牌已過期");
@@ -724,11 +726,11 @@ async function handleSuccessfulDivination(result) {
 // 生成結果訊息
 function generateResultMessage(playCount) {
   if (playCount === 1) {
-    return "<div class='glowing-message'><span class='glowing-message-title'>占卜完成!</span><br>恭喜獲得 LINE Points 5點抽獎資格！</div>";
+    return "<div class='glowing-message'><span class='glowing-message-title'>占卜完成!</span><br>恭喜獲得 LINE Points 5 點抽獎資格！</div>";
   } else if (playCount >= 2 && playCount <= 4) {
     return "<div class='glowing-message'><span class='glowing-message-title'>占卜完成!</span><br>明天可以再來占卜</div>";
   } else if (playCount >= 5) {
-    return "<div class='glowing-message'><span class='glowing-message-title'>太棒了，占卜完成！</span><br>祝您有美好的一天</div>";
+    return "<div class='glowing-message'><span class='glowing-message-title'>太棒了，占卜完成！</span><br>已獲得 Dyson 大獎抽獎資格</div>";
   }
   return "<div class='glowing-message'>占卜完成！</div>";
 }
@@ -1076,26 +1078,27 @@ function sanitizeInput(input) {
 // ==================== 用戶界面函數 ====================
 // 顯示「今天已經玩過」的提示，區分是否為新會員首日占卜
 function showAlreadyPlayedMessage() {
-  const udnmember = getCookieValue("udnmember") || "";
+  // const udnmember = getCookieValue("udnmember") || "";
 
   let imgUrl = "";
   let message = "";
+  let reminder = "小提醒: 每天來占卜，累積好運抽 Dyson 清淨機大獎喔！";
 
-  if (totalPlayCount.value < 5) {
-    imgUrl = "./imgs/one_four.png";
-  } else {
-    imgUrl = "./imgs/five.png";
-  }
+  imgUrl = "./imgs/one_four.png";
 
   if (totalPlayCount.value === 1) {
     message =
-      "恭喜獲得 LINE Points 5點抽獎\n(送完為止)兌換序號將於活動後寄送。";
+      "恭喜獲得 LINE Points 5 點抽獎\n(送完為止)兌換序號將於活動後寄送。";
+  }
+  if (totalPlayCount.value >= 5) {
+    message = "已獲得 Dyson 大獎抽獎資格";
+    reminder = "";
   }
 
   alreadyPlayedData.value = {
     image_url: imgUrl,
     message: message,
-    reminder: "小提醒: 每天來占卜，累積好運抽Dyson 清淨機大獎喔！",
+    reminder: reminder,
   };
 
   showAlreadyPlayedPopup.value = true;
@@ -1120,7 +1123,7 @@ const closeFortune = () => {
   showFortuneResultPopup.value = false;
 
   // 記錄應該登出的時間點
-  const logoutTime = Date.now() + 10 * 60 * 1000; // 10分鐘後
+  const logoutTime = Date.now() + 4 * 60 * 1000;
   localStorage.setItem("fate2025_logout_time", String(logoutTime));
 
   // 設置 setTimeout 作為備用
@@ -1128,7 +1131,7 @@ const closeFortune = () => {
     () => {
       clearCookiesAfterDivination();
     },
-    10 * 60 * 1000,
+    4 * 60 * 1000,
   );
 };
 

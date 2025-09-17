@@ -27,15 +27,15 @@ const prizes = ref([
   },
   {
     id: 2,
-    image: "./imgs/linepoints5.png",
-    title: "流星轉運獎",
-    subtitle: "LINE POINTS 5點 | 8 千組送完為止  ",
+    image: "./imgs/citycoffee.png",
+    title: "啡常幸運獎",
+    subtitle: "CITY CAFÉ 提貨券 | 100 名",
   },
   {
     id: 3,
-    image: "./imgs/citycoffee.png",
-    title: "LINE 加碼禮",
-    subtitle: "CITY CAFÉ 提貨券 | 100 名",
+    image: "./imgs/linepoints5.png",
+    title: "星點好運獎",
+    subtitle: "LINE POINTS 5 點 | 8 千組送完為止  ",
   },
 ]);
 </script>

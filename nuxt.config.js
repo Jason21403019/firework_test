@@ -43,10 +43,10 @@ export default defineNuxtConfig({
           property: "og:site_name",
           content: "聯合新聞網",
         },
-        // {
-        //   property: "og:image",
-        //   content: "https://event.udn.com/bd_fate_2025/imgs/login.png",
-        // },
+        {
+          property: "og:image",
+          content: "https://event.udn.com/bd_fate_2025/imgs/meta_img.png",
+        },
       ],
       link: [
         { rel: "icon", type: "image/x-icon" },
