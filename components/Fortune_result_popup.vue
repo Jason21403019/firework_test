@@ -93,7 +93,7 @@ const closeModal = () => {
 };
 
 const generateShareUrl = () => {
-  return "https://lab-event.udn.com/bd_fate_2025";
+  return "https://lab-event.udn.com/bd_newyear2026";
 };
 
 const shareToLine = () => {

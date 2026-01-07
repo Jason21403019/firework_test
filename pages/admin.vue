@@ -55,7 +55,8 @@
           <option value="">全部</option>
           <option value="1">1次</option>
           <option value="2-4">2-4次</option>
-          <option value="5+">5次以上</option>
+          <option value="5-19">5-19次</option>
+          <option value="20+">20次以上</option>
         </select>
       </div>
       <div class="filter-group">
@@ -314,11 +315,11 @@ const config = useRuntimeConfig();
 function getApiUrl(endpoint) {
   const baseUrl = (() => {
     if (config.public.domain?.includes("lab-event")) {
-      return "https://lab-event.udn.com/bd_fate_2025/fate2025php";
+      return "https://lab-event.udn.com/bd_newyear2026/newyear2026php";
     } else if (config.public.domain?.includes("event.udn")) {
-      return "https://event.udn.com/bd_fate_2025/fate2025php";
+      return "https://event.udn.com/bd_newyear2026/newyear2026php";
     } else {
-      return "https://lab-event.udn.com/bd_fate_2025/fate2025php";
+      return "https://lab-event.udn.com/bd_newyear2026/newyear2026php";
     }
   })();
   return `${baseUrl}/${endpoint}`;
@@ -428,8 +429,11 @@ function applyFilters() {
         case "2-4":
           if (playTimes < 2 || playTimes > 4) return false;
           break;
-        case "5+":
-          if (playTimes < 5) return false;
+        case "5-19":
+          if (playTimes < 5 || playTimes > 19) return false;
+          break;
+        case "20+":
+          if (playTimes < 20) return false;
           break;
       }
     }
@@ -685,8 +689,8 @@ function formatDate(dateString) {
 }
 
 function getPlayCountClass(count) {
-  if (count >= 5) return "high";
-  if (count >= 2) return "medium";
+  if (count >= 20) return "high";
+  if (count >= 5) return "medium";
   return "low";
 }
 

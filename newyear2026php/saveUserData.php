@@ -14,51 +14,6 @@ $data = handleApiRequest(['POST'], true);
 $udnmember = isset($data['udnmember']) ? $data['udnmember'] : null;
 $um2 = isset($data['um2']) ? $data['um2'] : null;
 $turnstileToken = isset($data['turnstile_token']) ? $data['turnstile_token'] : null;
-$session_token = isset($data['flow_token']) ? $data['flow_token'] : null;
-$csrf_token = null;
-$action = 'save'; 
-
-// 1. 從 header 中獲取
-$csrf_header = isset($_SERVER['HTTP_X_CSRF_TOKEN']) ? $_SERVER['HTTP_X_CSRF_TOKEN'] : null;
-if ($csrf_header) {
-    $csrf_token = $csrf_header;
-}
-
-// 2. 從請求數據中獲取
-if (!$csrf_token && isset($data['csrf_token'])) {
-    $csrf_token = $data['csrf_token'];
-}
-
-// 3. 從 cookie 中獲取(此為備用方法，不推薦使用)
-if (!$csrf_token && isset($_COOKIE["fate2025_csrf_{$action}"])) {
-    $csrf_token = $_COOKIE["fate2025_csrf_{$action}"];
-}
-
-if ($csrf_token) {
-    if (!CSRFHandler::verify($csrf_token, $action)) {
-       JSONReturn('安全驗證失敗，請重新嘗試', 'error');
-    }
-} 
-
-// 驗證 session token
-if (empty($session_token)) {
-    echo filter_var(json_encode(['status' => 'error', 'message' => sanitizeOutput('安全驗證失敗，請重新開始占卜流程 (缺少會話令牌)')]));
-    exit;
-}
-
-if (!isset($_SESSION['fate2025_flow_token'])) {
-    if (!isset($_SESSION['auth_token'])) {
-        JSONReturn('安全驗證失敗，請重新開始占卜流程', 'error');
-    } else {
-        if ($_SESSION['auth_token'] !== $session_token) {
-             JSONReturn('安全驗證失敗，請重新開始占卜流程', 'error');
-        }
-    }
-} else {
-    if ($_SESSION['fate2025_flow_token'] !== $session_token) {
-        JSONReturn('安全驗證失敗，請重新開始占卜流程', 'error');
-    }
-}
 
 // 驗證 Turnstile token 
 if (!empty($turnstileToken)) {
@@ -121,8 +76,14 @@ try {
         }
     }
     
+    // 如果無法取得 email，使用預設格式
+    if (empty($email)) {
+        $email = $udnmember . '@example.com';
+        error_log("Warning: Could not fetch email for user {$udnmember}, using default: {$email}");
+    }
+    
     $ip = getIP();
-    $ipCheckStmt = $pdo->prepare("SELECT MAX(updated_at) AS last_attempt FROM act2025_bd_fate_2025 WHERE ip = :ip");
+    $ipCheckStmt = $pdo->prepare("SELECT MAX(updated_at) AS last_attempt FROM act2026_bd_newyear2026 WHERE ip = :ip");
     $ipCheckStmt->bindParam(':ip', $ip);
     $ipCheckStmt->execute();
     $ipResult = $ipCheckStmt->fetch(PDO::FETCH_ASSOC);
@@ -130,14 +91,14 @@ try {
     
     if ($lastAttempt) {
         $timeSinceLastAttempt = time() - strtotime($lastAttempt);
-        if ($timeSinceLastAttempt < 60) {
+        if ($timeSinceLastAttempt < 1) {
             JSONReturn('請稍後再試，系統限制短時間內不可重複占卜', 'error', ['wait_time' => 60 - $timeSinceLastAttempt]);
         }
     }
     
     
     $today = date('Y-m-d');
-    $stmt = $pdo->prepare("SELECT * FROM act2025_bd_fate_2025 WHERE email = :email");
+    $stmt = $pdo->prepare("SELECT * FROM act2026_bd_newyear2026 WHERE email = :email");
     $stmt->bindParam(':email', $email);
     $stmt->execute();
     
@@ -164,7 +125,7 @@ try {
         }
         
         $play_times_total = intval($row['play_times_total']) + 1;
-        $updateStmt = $pdo->prepare("UPDATE act2025_bd_fate_2025 SET 
+        $updateStmt = $pdo->prepare("UPDATE act2026_bd_newyear2026 SET 
             username = :username,
             play_times_total = :play_times_total,
             updated_at = NOW(),
@@ -176,7 +137,7 @@ try {
         $updateStmt->bindParam(':ip', $ip);
         $updateStmt->bindParam(':email', $email);
         $updateStmt->execute();
-        $fetchStmt = $pdo->prepare("SELECT * FROM act2025_bd_fate_2025 WHERE email = :email");
+        $fetchStmt = $pdo->prepare("SELECT * FROM act2026_bd_newyear2026 WHERE email = :email");
         $fetchStmt->bindParam(':email', $email);
         $fetchStmt->execute();
         $userData = $fetchStmt->fetch(PDO::FETCH_ASSOC);
@@ -194,7 +155,7 @@ try {
         ], 'success');
     } else {
         // 創建新用戶
-        $stmt = $pdo->prepare("INSERT INTO act2025_bd_fate_2025 
+        $stmt = $pdo->prepare("INSERT INTO act2026_bd_newyear2026 
             (email, username, ip, play_times_total, created_at, updated_at) 
             VALUES (:email, :username, :ip, 1, NOW(), NOW())");
         
@@ -205,7 +166,7 @@ try {
         
         // 獲取剛創建的用戶數據
         $newId = $pdo->lastInsertId();
-        $fetchStmt = $pdo->prepare("SELECT * FROM act2025_bd_fate_2025 WHERE id = :id");
+        $fetchStmt = $pdo->prepare("SELECT * FROM act2026_bd_newyear2026 WHERE id = :id");
         $fetchStmt->bindParam(':id', $newId);
         $fetchStmt->execute();
         $userData = $fetchStmt->fetch(PDO::FETCH_ASSOC);
@@ -223,7 +184,11 @@ try {
         ], 'success');
     }
 } catch(PDOException $e) {
-    JSONReturn(['message' => sanitizeOutput('資料庫錯誤，請稍後再試')], 'error');
+    error_log("Database error in saveUserData.php: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
+    JSONReturn(['message' => sanitizeOutput('資料庫錯誤，請稍後再試'), 'debug' => sanitizeOutput($e->getMessage())], 'error');
 } catch(Exception $e) {
-    JSONReturn(['message' => sanitizeOutput('系統錯誤，請稍後再試')], 'error');
+    error_log("General error in saveUserData.php: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
+    JSONReturn(['message' => sanitizeOutput('系統錯誤，請稍後再試'), 'debug' => sanitizeOutput($e->getMessage())], 'error');
 }

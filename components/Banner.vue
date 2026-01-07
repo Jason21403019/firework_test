@@ -8,6 +8,9 @@
     </div>
 
     <div class="banner__content">
+      <!-- 轉盤動畫層 -->
+      <div class="banner__wheel" :class="{ 'is-spinning': isSpinning }"></div>
+      
       <!-- ref="contentRef" -->
       <a
         ref="triggerLink"
@@ -23,9 +26,9 @@
 </template>
 
 <script setup>
-import { defineEmits, defineProps } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 
-const emit = defineEmits(["startDivination"]);
+const emit = defineEmits(["startDivination", "wheelSpinEnd"]);
 const props = defineProps({
   loginUrl: {
     type: String,
@@ -33,9 +36,40 @@ const props = defineProps({
   },
 });
 
+const isSpinning = ref(false);
+
 async function handleDivination(event) {
   await emit("startDivination");
 }
+
+// 開始轉盤動畫
+function startWheelSpin() {
+  isSpinning.value = true;
+  
+  // 3秒後結束動畫
+  setTimeout(() => {
+    isSpinning.value = false;
+    emit("wheelSpinEnd");
+  }, 3000);
+}
+
+// 監聽全域事件
+function handleWheelEvent(event) {
+  startWheelSpin();
+}
+
+onMounted(() => {
+  window.addEventListener("startWheel", handleWheelEvent);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("startWheel", handleWheelEvent);
+});
+
+// 暴露方法供父組件調用
+defineExpose({
+  startWheelSpin,
+});
 </script>
 <style lang="scss">
 .banner {
@@ -248,6 +282,35 @@ async function handleDivination(event) {
     z-index: 2;
   }
 
+  &__wheel {
+    position: absolute;
+    right: 18.4%;
+    top: 37.8%;
+    width: 30%;
+    max-width: 250px;
+    border-radius: 50%;
+    aspect-ratio: 1 / 1;
+    pointer-events: none;
+    transition: transform 0.1s ease-out;
+    
+    &.is-spinning {
+      animation: spinWheel 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+    
+    @media (max-width: 1535px) {
+      right: 17.7%;
+      top: 36%;
+      width: 15%;
+      min-width: 80px;
+    }
+    @media (max-width: 768px) {
+      top: 56.6%;
+      right: 35.4%;
+      width: 28%;
+      min-width: 60px;
+    }
+  }
+
   &__trigger-area {
     position: absolute;
     right: 18.4%;
@@ -269,6 +332,15 @@ async function handleDivination(event) {
       right: 35.4%;
       width: 28%;
       min-width: 60px;
+    }
+  }
+
+  @keyframes spinWheel {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(1080deg);
     }
   }
 }

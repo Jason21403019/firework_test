@@ -1,5 +1,6 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
+  modules: ["@pinia/nuxt"],
   plugins: ["~/plugins/global-components.js"],
   css: ["~/assets/css/reset.css", "~/assets/css/sweetalert.scss"],
 
@@ -7,33 +8,33 @@ export default defineNuxtConfig({
     baseURL: process.env.NUXT_PUBLIC_BASE || "/",
     buildAssetsDir: "/_nuxt/",
     head: {
-      title: "幸福花火 秋好運｜聯合新聞網",
+      title: "馬上有福・轉好運｜聯合新聞網",
       meta: [
         { name: "viewport", content: "width=device-width, initial-scale=1" },
         { charset: "utf-8" },
         {
           name: "description",
           content:
-            "幸福花火秋好運，每天來占卜，驚喜好禮LINE POINTS免費領，Dyson豪禮抱回家！",
+            "馬上有福轉好運，天天來轉紅包禮，新春好禮LINE POINTS免費領，iPhone  豪禮奔向你！",
         },
         {
           name: "keywords",
           content:
-            "占卜、秋天、花火、輪盤、轉好運、摩天輪、LINE POINTS 、免費領、Dyson清淨機、CITY CAFF券",
+            "馬年、輪盤、紅包禮、抽紅包、轉好運、免費領、加碼獎、LINE POINTS 、 iPhone 、濕拖機器人、CITY CAFF券、咖啡機、商品卡",
         },
         // Open Graph 標籤
         {
           property: "og:title",
-          content: "幸福花火 秋好運｜聯合新聞網",
+          content: "馬上有福・轉好運｜聯合新聞網",
         },
         {
           property: "og:description",
           content:
-            "幸福花火秋好運，每天來占卜，驚喜好禮LINE POINTS免費領，Dyson豪禮抱回家！",
+            "馬上有福轉好運，天天來轉紅包禮，新春好禮LINE POINTS免費領，iPhone  豪禮奔向你！",
         },
         {
           property: "og:url",
-          content: "https://event.udn.com/bd_fate_2025",
+          content: "https://event.udn.com/bd_newyear2026",
         },
         {
           property: "og:type",
@@ -45,13 +46,13 @@ export default defineNuxtConfig({
         },
         {
           property: "og:image",
-          content: "https://event.udn.com/bd_fate_2025/imgs/meta_img.png",
+          content: "https://event.udn.com/bd_newyear2026/imgs/meta_img.png",
         },
       ],
       link: [
         { rel: "icon", type: "image/x-icon" },
         { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
-        { rel: "canonical", href: "https://event.udn.com/bd_fate_2025" },
+        { rel: "canonical", href: "https://event.udn.com/bd_newyear2026" },
       ],
       script: [
         // comScore 追蹤代碼
@@ -148,6 +149,9 @@ export default defineNuxtConfig({
       domain: process.env.NUXT_PUBLIC_DOMAIN,
       base: process.env.NUXT_PUBLIC_BASE,
       turnstileSiteKey: process.env.NUXT_PUBLIC_TURNSTILE_SITE_KEY,
+      externalRedirectUrl:
+        process.env.NUXT_PUBLIC_EXTERNAL_REDIRECT_URL ||
+        "https://lab7-orange.udn.com/orange/issue/8887/2135",
     },
   },
 

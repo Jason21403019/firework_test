@@ -160,11 +160,11 @@ const getCurrentPageUrl = () => {
     // SSR 時使用環境變數
     const domain = config.public.domain;
     if (domain?.includes("lab-event")) {
-      return "https://lab-event.udn.com/bd_fate_2025";
+      return "https://lab-event.udn.com/bd_newyear2026";
     } else if (domain?.includes("event.udn")) {
-      return "https://event.udn.com/bd_fate_2025";
+      return "https://event.udn.com/bd_newyear2026";
     } else {
-      return "https://lab-event.udn.com/bd_fate_2025";
+      return "https://lab-event.udn.com/bd_newyear2026";
     }
   }
   // 瀏覽器端使用當前 URL

@@ -31,8 +31,6 @@
         class="play-count__milestone"
         :class="{
           'play-count__milestone--achieved': count >= milestone.count,
-          'play-count__milestone--hidden-mobile':
-            milestone.count === 2 || milestone.count === 4,
         }"
       >
         <div
@@ -60,10 +58,10 @@ const props = defineProps({
     type: Array,
     default: () => [
       { count: 1, prize: "LINE POINTS\n5 點" },
-      { count: 2, prize: "" },
-      { count: 3, prize: "CITY CAFÉ\n提貨券" },
-      { count: 4, prize: "" },
-      { count: 5, prize: "Dyson 三合一\n涼暖空氣清淨機" },
+      { count: 5, prize: "CITY CAFÉ\n提貨券" },
+      { count: 10, prize: "咖啡師\n蛋糕券" },
+      { count: 15, prize: "7-11\n禮券" },
+      { count: 20, prize: "Dyson 三合一\n涼暖空氣清淨機" },
     ],
   },
 });
@@ -296,7 +294,7 @@ watch(
     transition: all 0.4s ease;
     &--hidden-mobile {
       @media (max-width: 768px) {
-        display: none;
+        display: flex;
       }
     }
     @media (max-width: 768px) {

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>占卜卡片使用範例</title>
+  <style>
+    body {
+      font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      text-align: center;
+      color: #667eea;
+      margin-bottom: 30px;
+    }
+
+    .info {
+      background: #f5f5f5;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+    }
+
+    .info h2 {
+      color: #764ba2;
+      font-size: 18px;
+      margin-top: 0;
+    }
+
+    .info code {
+      background: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #d63384;
+    }
+
+    #divination-container {
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎴 占卜卡片使用範例</h1>
+    
+    <div class="info">
+      <h2>📌 當前參數：</h2>
+      <p>是否首次完成：<code id="param-first">-</code></p>
+      <p>占卜次數：<code id="param-count">-</code></p>
+      <p>是否重複遊玩：<code id="param-already">-</code></p>
+      <p>會員ID：<code id="param-member">-</code></p>
+    </div>
+
+    <div class="info">
+      <h2>💡 使用說明：</h2>
+      <p>1. 在您的網頁中引入 JS 檔案：</p>
+      <pre><code>&lt;script src="https://your-domain.com/divination-card.js"&gt;&lt;/script&gt;</code></pre>
+      
+      <p>2. 在 HTML 中加入容器元素：</p>
+      <pre><code>&lt;div id="divination-container"&gt;&lt;/div&gt;</code></pre>
+      
+      <p>3. 初始化占卜卡片：</p>
+      <pre><code>&lt;script&gt;
+  DivinationCard.init({
+    containerId: 'divination-container',
+    showFirstTimePopup: true
+  });
+&lt;/script&gt;</code></pre>
+      
+      <p>4. 從活動頁跳轉時會自動帶入以下參數：</p>
+      <ul>
+        <li><code>first</code> - 是否首次完成 (1/0)</li>
+        <li><code>count</code> - 累計占卜次數</li>
+        <li><code>already_played</code> - 是否重複遊玩 (1/0)</li>
+        <li><code>udnmember</code> - 會員ID</li>
+      </ul>
+    </div>
+
+    <!-- 占卜卡片容器 -->
+    <div id="divination-container"></div>
+  </div>
+
+  <!-- 引入占卜卡片 JS -->
+  <script src="./divination-card.js"></script>
+  
+  <script>
+    // 顯示當前參數
+    document.getElementById('param-first').textContent = 
+      DivinationCard.getUrlParam('first') || '無';
+    document.getElementById('param-count').textContent = 
+      DivinationCard.getUrlParam('count') || '無';
+    document.getElementById('param-already').textContent = 
+      DivinationCard.getUrlParam('already_played') || '無';
+    document.getElementById('param-member').textContent = 
+      DivinationCard.getUrlParam('udnmember') || '無';
+
+    // 初始化占卜卡片
+    const result = DivinationCard.init({
+      containerId: 'divination-container',
+      showFirstTimePopup: true
+    });
+
+    console.log('占卜卡片初始化完成:', result);
+  </script>
+</body>
+</html>
+

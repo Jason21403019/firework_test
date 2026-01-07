@@ -50,10 +50,10 @@ if (!filter_var($targetEmail, FILTER_VALIDATE_EMAIL)) {
 
 try {
     // 先檢查該 email 是否存在
-    $checkStmt = $pdo->prepare("SELECT id, username, email, created_at, updated_at FROM act2025_bd_fate_2025 WHERE email = :email");
+    $checkStmt = $pdo->prepare("SELECT id, username, email, created_at, updated_at FROM act2026_bd_newyear2026 WHERE email = :email");
     $checkStmt->bindParam(':email', $targetEmail);
     $checkStmt->execute();
-    
+
     if ($checkStmt->rowCount() === 0) {
         echo json_encode([
             'status' => 'warning', 
@@ -67,7 +67,7 @@ try {
     $recordInfo = $checkStmt->fetch(PDO::FETCH_ASSOC);
     
     // 刪除特定 email 的記錄
-    $deleteStmt = $pdo->prepare("DELETE FROM act2025_bd_fate_2025 WHERE email = :email");
+    $deleteStmt = $pdo->prepare("DELETE FROM act2026_bd_newyear2026 WHERE email = :email");
     $deleteStmt->bindParam(':email', $targetEmail);
     $deleteStmt->execute();
     
