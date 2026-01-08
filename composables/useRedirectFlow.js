@@ -13,12 +13,15 @@ export const useRedirectFlow = () => {
   });
 
   // 處理登入後的新年活動流程
-  const handleNewYearFlow = async (turnstileToken, startWheelSpinFn) => {
+  const handleNewYearFlow = async (
+    turnstileToken,
+    startWheelSpinFn,
+    csrfToken = null,
+  ) => {
     try {
       console.log("=== 開始新年活動流程 ===");
 
-      // 清除登入標記
-      localStorage.removeItem("fate2025_just_logged_in");
+      // 標記已經在 onMounted 或 watch 中被消費掉了，這裡不需要再清除
 
       // 步驟 1: 觸發轉盤動畫
       console.log("觸發轉盤動畫...");
@@ -34,7 +37,10 @@ export const useRedirectFlow = () => {
       console.log("獲取會員資料...");
 
       const turnstileTokenValue = turnstileToken || null;
-      const result = await divinationFlow.saveUserData(turnstileTokenValue);
+      const result = await divinationFlow.saveUserData(
+        turnstileTokenValue,
+        csrfToken,
+      );
 
       console.log("API 回應結果:", result);
 

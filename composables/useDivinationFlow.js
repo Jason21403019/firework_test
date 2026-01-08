@@ -98,10 +98,11 @@ export const useDivinationFlow = () => {
   };
 
   // 保存用戶數據到資料庫
-  const saveUserData = async (turnstileTokenValue) => {
+  const saveUserData = async (turnstileTokenValue, csrfToken = null) => {
     try {
       console.log("開始執行 saveUserData 函數");
       console.log("Turnstile Token 狀態:", !!turnstileTokenValue);
+      console.log("CSRF Token 狀態:", !!csrfToken);
 
       if (!turnstileTokenValue && !isDevelopment.value) {
         console.error("缺少 Turnstile Token");
@@ -117,7 +118,7 @@ export const useDivinationFlow = () => {
 
       console.log("準備發送的用戶數據:", userData);
 
-      return await apiService.saveUserData(userData);
+      return await apiService.saveUserData(userData, csrfToken);
     } catch (error) {
       console.error("保存用戶數據失敗:", error);
       return {

@@ -16,6 +16,55 @@ export const useAuth = () => {
     return null;
   };
 
+  // 設定 Cookie 值
+  const setCookieValue = (name, value, days = 1) => {
+    if (typeof document === "undefined") return;
+    const expires = new Date();
+    expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+    document.cookie = `${name}=${value}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
+  };
+
+  // 生成隨機 session token
+  const generateSessionToken = () => {
+    return (
+      Math.random().toString(36).substring(2, 15) +
+      Math.random().toString(36).substring(2, 15) +
+      Date.now().toString(36)
+    );
+  };
+
+  // 設定會員 session token（用戶進入頁面時）
+  const setMemberSessionToken = () => {
+    const existingToken = getCookieValue("fate2025_session");
+    if (!existingToken) {
+      const token = generateSessionToken();
+      setCookieValue("fate2025_session", token, 1);
+      console.log("已設定會員 session token:", token);
+      return token;
+    }
+    console.log("已存在 session token:", existingToken);
+    return existingToken;
+  };
+
+  // 驗證是否為同一位會員（登入後返回時檢查）
+  const verifySameMember = () => {
+    const sessionToken = getCookieValue("fate2025_session");
+    if (!sessionToken) {
+      console.warn("找不到 session token，可能不是同一位會員");
+      return false;
+    }
+    console.log("驗證通過：session token 存在，確認為同一位會員");
+    return true;
+  };
+
+  // 清除 session token
+  const clearSessionToken = () => {
+    if (typeof document === "undefined") return;
+    document.cookie =
+      "fate2025_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    console.log("已清除 session token");
+  };
+
   // 更新登入狀態
   const updateLoginStatus = () => {
     const udnmember = getCookieValue("udnmember");
@@ -60,6 +109,9 @@ export const useAuth = () => {
           });
         });
       });
+
+      // 清除 session token
+      clearSessionToken();
 
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -106,6 +158,9 @@ export const useAuth = () => {
           });
         });
       });
+
+      // 清除 session token
+      clearSessionToken();
 
       localStorage.clear();
       sessionStorage.clear();
@@ -174,10 +229,15 @@ export const useAuth = () => {
 
   return {
     getCookieValue,
+    setCookieValue,
     updateLoginStatus,
     logout,
     clearCookiesAfterDivination,
     isUrlSafe,
     sanitizeInput,
+    generateSessionToken,
+    setMemberSessionToken,
+    verifySameMember,
+    clearSessionToken,
   };
 };

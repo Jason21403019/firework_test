@@ -131,6 +131,7 @@ const loginFlow = useLoginFlow();
 const browserUtils = useBrowserUtils();
 const debugTools = useDebugTools();
 const redirectFlow = useRedirectFlow();
+const csrf = useCsrf();
 
 // ==================== 基本狀態管理 ====================
 const showDebugTools = ref(false);
@@ -186,12 +187,65 @@ watch(
       isLoggedIn && currentUser && currentUser !== lastLoggedInUser.value;
 
     if (isNewLogin) {
-      console.log("檢測到新的會員登入:", currentUser);
-      lastLoggedInUser.value = currentUser;
+      console.log(
+        "檢測到新的會員登入:",
+        currentUser,
+        "前一個會員:",
+        previousUser,
+      );
 
-      // 檢查是否是從登入頁面返回
-      const justLoggedIn =
-        localStorage.getItem("fate2025_just_logged_in") === "true";
+      // 檢查是否是從登入頁面返回（使用消費型標記）
+      const storedTabId = localStorage.getItem("fate2025_tab_id");
+      const justLoggedInFlag = localStorage.getItem("fate2025_just_logged_in");
+
+      // 檢查是否有登入標記
+      const hasLoginFlag = justLoggedInFlag === "true" && storedTabId;
+
+      // 檢查這是否為舊分頁（已經有 tab_id 的分頁）
+      const isOldTab = sessionStorage.getItem("fate2025_tab_id") !== null;
+
+      console.log("檢查登入狀態 (watch):", {
+        hasLoginFlag,
+        isOldTab,
+        previousUser,
+        currentUser,
+      });
+
+      // 如果是舊分頁，不處理登入標記（給新分頁機會）
+      if (isOldTab && hasLoginFlag) {
+        console.log("⚠️ 舊分頁檢測到登入標記，不執行流程（watch）");
+        // 不立即清除，讓新分頁有機會讀取
+        return;
+      }
+
+      // 新分頁且有登入標記，立即消費掉
+      let justLoggedIn = false;
+      if (!isOldTab && hasLoginFlag) {
+        console.log("🎯 新分頁檢測到登入標記（watch），立即消費", {
+          storedTabId,
+        });
+
+        // 立即清除標記
+        localStorage.removeItem("fate2025_just_logged_in");
+        localStorage.removeItem("fate2025_tab_id");
+
+        // 將 tab_id 存到 sessionStorage（本分頁專屬）
+        sessionStorage.setItem("fate2025_tab_id", storedTabId);
+
+        justLoggedIn = true;
+      } else if (!isOldTab && !hasLoginFlag) {
+        // 普通新分頁（不是登入返回的），初始化新的 tab_id
+        const newTabId = Date.now() + "_" + Math.random();
+        sessionStorage.setItem("fate2025_tab_id", newTabId);
+        console.log("初始化普通新分頁 ID (watch):", newTabId);
+      }
+
+      // 如果沒有登入標記，直接返回
+      if (!justLoggedIn) {
+        return;
+      }
+
+      lastLoggedInUser.value = currentUser;
 
       if (justLoggedIn && !verificationTriggered.value) {
         console.log("從登入頁面返回（watch 觸發），觸發新年活動流程");
@@ -396,6 +450,29 @@ async function proceedToNewYearFlow() {
   try {
     console.log("=== 開始執行新年活動流程 ===");
 
+    // 清除舊的 CSRF token，確保獲取新的（跨域返回後 session 可能改變）
+    csrf.clearCsrfToken();
+    console.log("已清除舊 CSRF token，準備獲取新的");
+
+    // 獲取安全驗證（在返回後獲取，確保 session 正確）
+    let csrfToken = null;
+    try {
+      // 等待一下確保 session 穩定
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      csrfToken = await csrf.getCsrfToken("divination");
+      console.log("安全驗證已準備（使用當前 session）");
+
+      // 再等待一小段時間確保驗證完全生效
+      if (csrfToken) {
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        console.log("驗證已就緒");
+      }
+    } catch (csrfError) {
+      console.error("安全驗證準備失敗:", csrfError);
+      throw new Error("安全驗證失敗，請重新操作");
+    }
+
     const startWheelSpin = () => {
       if (bannerRef.value && bannerRef.value.startWheelSpin) {
         bannerRef.value.startWheelSpin();
@@ -406,6 +483,7 @@ async function proceedToNewYearFlow() {
       turnstile?.turnstileToken?.value ||
         localStorage.getItem("temp_turnstile_token"),
       startWheelSpin,
+      csrfToken,
     );
   } catch (error) {
     console.error("新年活動流程錯誤:", error);
@@ -477,6 +555,9 @@ async function handleApiErrorUI(errorType) {
 
 // ==================== 生命週期 ====================
 onMounted(async () => {
+  // 設定會員 session token（用於驗證是否為同一位會員）
+  auth.setMemberSessionToken();
+
   // 瀏覽器檢測和跳轉
   browserUtils.checkAndRedirect(showUniversalDialog);
 
@@ -531,9 +612,58 @@ onMounted(async () => {
     console.log("用戶未登入，無法獲取累計次數");
   }
 
-  // 從登入頁返回的處理（優先檢查）
-  const justLoggedIn =
-    localStorage.getItem("fate2025_just_logged_in") === "true";
+  // 從登入頁返回的處理（使用消費型標記）
+  const storedTabId = localStorage.getItem("fate2025_tab_id");
+  const justLoggedInFlag = localStorage.getItem("fate2025_just_logged_in");
+
+  // 檢查是否有登入標記
+  const hasLoginFlag = justLoggedInFlag === "true" && storedTabId;
+
+  // 檢查這是否為舊分頁（之前已經初始化過 tab_id）
+  const existingTabId = sessionStorage.getItem("fate2025_tab_id");
+  const isOldTab = existingTabId !== null;
+
+  console.log("檢查登入狀態 (onMounted):", {
+    hasLoginFlag,
+    isOldTab,
+    existingTabId,
+    isLoggedIn: userStore.isLoggedIn,
+    verificationTriggered: verificationTriggered.value,
+  });
+
+  // 處理登入標記
+  let justLoggedIn = false;
+  if (isOldTab && hasLoginFlag) {
+    // 舊分頁檢測到登入標記，等待 2 秒後清除（給新分頁足夠時間消費）
+    console.log("⚠️ 舊分頁檢測到登入標記，等待新分頁消費（onMounted）");
+    setTimeout(() => {
+      // 如果 2 秒後標記還在，清除它
+      if (localStorage.getItem("fate2025_just_logged_in") === "true") {
+        console.log("清除未被消費的登入標記");
+        localStorage.removeItem("fate2025_just_logged_in");
+        localStorage.removeItem("fate2025_tab_id");
+      }
+    }, 2000);
+  } else if (!isOldTab && hasLoginFlag) {
+    // 新分頁且有登入標記，立即消費掉
+    console.log("🎯 新分頁檢測到登入標記（onMounted），立即消費", {
+      storedTabId,
+    });
+
+    // 立即清除標記，避免其他分頁也觸發
+    localStorage.removeItem("fate2025_just_logged_in");
+    localStorage.removeItem("fate2025_tab_id");
+
+    // 將 tab_id 存到 sessionStorage（本分頁專屬）
+    sessionStorage.setItem("fate2025_tab_id", storedTabId);
+
+    justLoggedIn = true;
+  } else if (!isOldTab) {
+    // 普通新分頁（不是登入返回的），初始化新的 tab_id
+    const newTabId = Date.now() + "_" + Math.random();
+    sessionStorage.setItem("fate2025_tab_id", newTabId);
+    console.log("初始化普通新分頁 ID:", newTabId);
+  }
 
   // 檢查占卜狀態
   try {

@@ -9,7 +9,7 @@ class CSRFHandler {
         
         $_SESSION["fate2025_csrf_{$action}"] = $token;
         
-        $_SESSION["fate2025_csrf_{$action}_expiry"] = time() + 300; // 5分鐘
+        $_SESSION["fate2025_csrf_{$action}_expiry"] = time() + 180; // 3分鐘
         
         return $token;
     }
@@ -18,19 +18,32 @@ class CSRFHandler {
         if (session_status() != PHP_SESSION_ACTIVE) {
             session_start();
         }
+        
+        // 檢查 token 是否存在
         if (!isset($_SESSION["fate2025_csrf_{$action}"])) {
+            error_log("[E001] 安全驗證失敗：驗證碼不存在");
             return false;
         }
+        
+        // 檢查是否過期
         if (isset($_SESSION["fate2025_csrf_{$action}_expiry"]) && 
             $_SESSION["fate2025_csrf_{$action}_expiry"] < time()) {
             self::clear($action);
+            error_log("[E002] 安全驗證失敗：驗證碼已過期（超過3分鐘）");
             return false;
         }
+        
+        // 驗證 token 是否匹配
         $stored_token = $_SESSION["fate2025_csrf_{$action}"];
         $valid = hash_equals($stored_token, $token);
+        
         if (!$valid) {
+            error_log("[E003] 安全驗證失敗：驗證碼不匹配");
         }
-        self::clear($action);
+        
+        // 方案2：不立即清除 token，讓它在3分鐘內可重複使用
+        // 這樣可以處理網路延遲或重試的情況
+        
         return $valid;
     }
     

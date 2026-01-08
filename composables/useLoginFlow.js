@@ -28,9 +28,17 @@ export const useLoginFlow = () => {
 
       localStorage.removeItem("login_checked");
 
-      // 3. 設置流程標記
+      // 3. 設置流程標記（加上分頁 ID 避免跨分頁干擾）
+      // 每次點擊都生成新的 tab_id，避免舊標記干擾
+      const tabId = Date.now() + "_" + Math.random();
+      sessionStorage.setItem("fate2025_tab_id", tabId);
+
+      // 同時存到 localStorage，這樣跨域跳轉後可以恢復
+      localStorage.setItem("fate2025_tab_id", tabId);
       localStorage.setItem("fate2025_just_logged_in", "true");
       localStorage.setItem("fate2025_normal_flow", "true");
+
+      console.log("設置新的流程標記，tab_id:", tabId);
 
       popupStore.closeLoadingPopup();
 
@@ -77,13 +85,31 @@ export const useLoginFlow = () => {
   ) => {
     console.log("檢測到從登入頁面返回");
 
+    const auth = useAuth();
+
+    // 檢查是否為同一位會員（前端 Cookie 驗證）
+    const isSameMember = auth.verifySameMember();
+
     // 檢查流程有效性
     const isNormalFlow =
       localStorage.getItem("fate2025_normal_flow") === "true";
 
     console.log("流程檢查結果:", {
       isNormalFlow,
+      isSameMember,
     });
+
+    // 如果不是同一位會員，顯示警告
+    if (!isSameMember) {
+      showUniversalDialogFn({
+        icon: "warning",
+        title: "會員驗證失敗",
+        text: "系統檢測到您可能不是從本頁面進行登入，\n請從活動首頁點擊「立即占卜」按鈕來完成占卜流程。",
+        confirmButtonText: "我知道了",
+        showCancelButton: false,
+      });
+      return;
+    }
 
     // 處理非正常流程
     if (!isNormalFlow) {

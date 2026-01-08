@@ -8,9 +8,7 @@ export const useBrowserUtils = () => {
     const ua = navigator.userAgent.toLowerCase();
     const isLineApp = /Line/i.test(ua);
     const isFbApp = /FBAV/i.test(ua) || /FBAN/i.test(ua);
-    const isExAppUrl = /[?&]openExternalBrowser=1\b/.test(
-      window.location.href,
-    );
+    const isExAppUrl = /[?&]openExternalBrowser=1\b/.test(window.location.href);
 
     if (isLineApp && !isExAppUrl) {
       const url = new URL(window.location.href);
@@ -39,11 +37,6 @@ export const useBrowserUtils = () => {
         if (data.totalCount) {
           divinationStore.setTotalPlayCount(data.totalCount);
         }
-
-        // 註釋：不在活動頁顯示已占卜過訊息，所有彈窗在外部網址顯示
-        // setTimeout(() => {
-        //   showAlreadyPlayedMessageFn();
-        // }, 1000);
       }
     });
   };
@@ -71,4 +64,3 @@ export const useBrowserUtils = () => {
     checkAutoLogout,
   };
 };
-

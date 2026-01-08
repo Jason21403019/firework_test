@@ -109,8 +109,8 @@ export const useApiService = () => {
     }
   };
 
-  // 保存用戶數據
-  const saveUserData = async (userData) => {
+  // 保存用戶數據（支援 CSRF Token）
+  const saveUserData = async (userData, csrfToken = null) => {
     try {
       console.log("開始執行 saveUserData 函數");
 
@@ -118,17 +118,47 @@ export const useApiService = () => {
       console.log("使用的 API 路徑:", apiUrl);
       console.log("準備發送的用戶數據:", userData);
 
+      // 準備請求標頭
+      const headers = {
+        "Content-Type": "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+      };
+
+      // 如果有 CSRF token，加入標頭
+      if (csrfToken) {
+        headers["X-CSRF-Token"] = csrfToken;
+        console.log("已加入 CSRF Token");
+      }
+
       console.log("開始發送 API 請求...");
       const response = await axios.post(apiUrl, userData, {
-        headers: {
-          "Content-Type": "application/json",
-          "X-Requested-With": "XMLHttpRequest",
-        },
+        headers,
         withCredentials: true,
         timeout: 30000,
       });
 
       console.log("API 回應成功:", response.data);
+
+      // 如果回應中包含 debug 資訊，顯示出來
+      if (response.data.debug) {
+        console.warn("🔍 後端調試資訊:", response.data.debug);
+      }
+
+      // 如果是錯誤且有 E003，顯示更多資訊
+      if (
+        response.data.status === "error" &&
+        response.data.message &&
+        response.data.message.includes("E003")
+      ) {
+        console.error("❌ CSRF 驗證失敗詳情:");
+        console.error("- 錯誤訊息:", response.data.message);
+        console.error("- 完整回應:", response.data);
+        console.error(
+          "- 使用的 CSRF Token:",
+          csrfToken ? csrfToken.substring(0, 15) + "..." : "無",
+        );
+      }
+
       return response.data;
     } catch (error) {
       console.error("保存用戶數據失敗:", error);

@@ -1,8 +1,11 @@
 <?php
 // 設置允許的請求來源
 require_once('./basic/base.php');
+require_once('./basic/session_config.php');
 setCorsHeaders('GET, OPTIONS', 'Content-Type');
 
+// 動態配置 Session Cookie（自動適應 HTTP/HTTPS 環境）
+configureSessionCookie();
 session_start();
 
 setCorsHeaders('POST, OPTIONS', 'Content-Type, X-CSRF-Token, X-Requested-With');
