@@ -19,36 +19,28 @@ export const useRedirectFlow = () => {
     csrfToken = null,
   ) => {
     try {
-      console.log("=== 開始新年活動流程 ===");
-
-      // 標記已經在 onMounted 或 watch 中被消費掉了，這裡不需要再清除
+      console.log("🎊 開始新年活動流程");
 
       // 步驟 1: 觸發轉盤動畫
-      console.log("觸發轉盤動畫...");
       if (startWheelSpinFn) {
         startWheelSpinFn();
       }
 
       // 步驟 2: 等待轉盤動畫 (3秒)
       await new Promise((resolve) => setTimeout(resolve, 3000));
-      console.log("轉盤動畫結束");
 
       // 步驟 3: 獲取會員資料
-      console.log("獲取會員資料...");
-
       const turnstileTokenValue = turnstileToken || null;
       const result = await divinationFlow.saveUserData(
         turnstileTokenValue,
         csrfToken,
       );
 
-      console.log("API 回應結果:", result);
-
       // 檢查 API 錯誤
       if (result.status === "error") {
         // 如果是已經占卜過，仍然要跳轉
         if (result.already_played === true) {
-          console.log("用戶今天已占卜過，繼續跳轉流程");
+          console.log("已占卜，繼續跳轉");
         } else {
           throw new Error(result.message || "API 錯誤");
         }
@@ -63,24 +55,15 @@ export const useRedirectFlow = () => {
       const playCount =
         result.db_info?.play_times_total || divinationStore.totalPlayCount;
 
-      console.log("會員資料:", {
-        isFirstTime,
-        playCount,
-        isAlreadyPlayed,
-        udnmember: userStore.udnmember,
-      });
-
       // 更新占卜次數並儲存占卜結果 ID
       let fortuneId = null;
       if (result.status === "success" && !isAlreadyPlayed) {
         // 第一次占卜成功
         const { fortuneData, resultMessage } =
           await divinationFlow.handleSuccessfulDivination(result);
-        console.log("占卜結果已生成:", fortuneData);
         fortuneId = fortuneData.id; // 儲存占卜結果 ID
       } else if (isAlreadyPlayed) {
         // 已經占卜過，更新狀態
-        console.log("用戶已占卜過，更新狀態並準備跳轉");
         divinationStore.setPlayedStatus(true);
         if (result.db_info && result.db_info.play_times_total !== undefined) {
           divinationStore.setTotalPlayCount(result.db_info.play_times_total);
@@ -88,7 +71,6 @@ export const useRedirectFlow = () => {
       }
 
       // 步驟 5: 顯示待跳轉彈窗
-      console.log("顯示待跳轉彈窗...");
       popupStore.openRedirectPopup({
         message: "準備進入新年活動",
         countdown: 4,
@@ -104,16 +86,11 @@ export const useRedirectFlow = () => {
         isAlreadyPlayed,
         fortuneId,
       );
-      console.log("準備跳轉到:", externalUrl, {
-        isFirstTime,
-        playCount,
-        isAlreadyPlayed,
-        fortuneId,
-      });
+      console.log("🚀 跳轉:", externalUrl);
 
       window.location.href = externalUrl;
     } catch (error) {
-      console.error("新年活動流程錯誤:", error);
+      console.error("❌ 活動流程錯誤:", error);
       popupStore.closeRedirectPopup();
 
       // 顯示錯誤訊息

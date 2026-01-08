@@ -47,10 +47,7 @@ export const useTurnstile = (onVerificationSuccess) => {
           sitekey: TURNSTILE_SITE_KEY,
           theme: "dark",
           callback: function (token) {
-            console.log(
-              "Turnstile 驗證成功，取得 token:",
-              token.substring(0, 10) + "...",
-            );
+            console.log("✅ Turnstile 驗證成功");
 
             turnstileToken.value = token;
             isTurnstileVerified.value = true;

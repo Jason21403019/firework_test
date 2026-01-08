@@ -187,12 +187,7 @@ watch(
       isLoggedIn && currentUser && currentUser !== lastLoggedInUser.value;
 
     if (isNewLogin) {
-      console.log(
-        "檢測到新的會員登入:",
-        currentUser,
-        "前一個會員:",
-        previousUser,
-      );
+      console.log("👤 會員登入:", currentUser);
 
       // 檢查是否是從登入頁面返回（使用消費型標記）
       const storedTabId = localStorage.getItem("fate2025_tab_id");
@@ -204,26 +199,16 @@ watch(
       // 檢查這是否為舊分頁（已經有 tab_id 的分頁）
       const isOldTab = sessionStorage.getItem("fate2025_tab_id") !== null;
 
-      console.log("檢查登入狀態 (watch):", {
-        hasLoginFlag,
-        isOldTab,
-        previousUser,
-        currentUser,
-      });
-
       // 如果是舊分頁，不處理登入標記（給新分頁機會）
       if (isOldTab && hasLoginFlag) {
-        console.log("⚠️ 舊分頁檢測到登入標記，不執行流程（watch）");
-        // 不立即清除，讓新分頁有機會讀取
+        console.log("📄 舊分頁，略過");
         return;
       }
 
       // 新分頁且有登入標記，立即消費掉
       let justLoggedIn = false;
       if (!isOldTab && hasLoginFlag) {
-        console.log("🎯 新分頁檢測到登入標記（watch），立即消費", {
-          storedTabId,
-        });
+        console.log("✨ 新分頁登入，開始流程");
 
         // 立即清除標記
         localStorage.removeItem("fate2025_just_logged_in");
@@ -237,7 +222,6 @@ watch(
         // 普通新分頁（不是登入返回的），初始化新的 tab_id
         const newTabId = Date.now() + "_" + Math.random();
         sessionStorage.setItem("fate2025_tab_id", newTabId);
-        console.log("初始化普通新分頁 ID (watch):", newTabId);
       }
 
       // 如果沒有登入標記，直接返回
@@ -248,7 +232,6 @@ watch(
       lastLoggedInUser.value = currentUser;
 
       if (justLoggedIn && !verificationTriggered.value) {
-        console.log("從登入頁面返回（watch 觸發），觸發新年活動流程");
         verificationTriggered.value = true;
 
         // 清除舊的檢查標記，確保流程可以執行
@@ -448,11 +431,10 @@ async function proceedToPerformDivination() {
 // 執行新年活動流程（驗證後）
 async function proceedToNewYearFlow() {
   try {
-    console.log("=== 開始執行新年活動流程 ===");
+    console.log("🎯 開始活動流程");
 
     // 清除舊的 CSRF token，確保獲取新的（跨域返回後 session 可能改變）
     csrf.clearCsrfToken();
-    console.log("已清除舊 CSRF token，準備獲取新的");
 
     // 獲取安全驗證（在返回後獲取，確保 session 正確）
     let csrfToken = null;
@@ -461,15 +443,13 @@ async function proceedToNewYearFlow() {
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       csrfToken = await csrf.getCsrfToken("divination");
-      console.log("安全驗證已準備（使用當前 session）");
 
       // 再等待一小段時間確保驗證完全生效
       if (csrfToken) {
         await new Promise((resolve) => setTimeout(resolve, 300));
-        console.log("驗證已就緒");
       }
     } catch (csrfError) {
-      console.error("安全驗證準備失敗:", csrfError);
+      console.error("❌ 安全驗證失敗:", csrfError);
       throw new Error("安全驗證失敗，請重新操作");
     }
 
@@ -486,7 +466,7 @@ async function proceedToNewYearFlow() {
       csrfToken,
     );
   } catch (error) {
-    console.error("新年活動流程錯誤:", error);
+    console.error("❌ 活動流程錯誤:", error);
     showUniversalDialog({
       icon: "error",
       title: "系統錯誤",
@@ -497,10 +477,7 @@ async function proceedToNewYearFlow() {
 
 // 初始化 Turnstile（在所有相關函數定義之後）
 turnstile = useTurnstile((token) => {
-  console.log("Turnstile 驗證成功回調被觸發");
   closeVerificationPopup();
-
-  console.log("執行新年活動流程");
   proceedToNewYearFlow();
 });
 
@@ -508,7 +485,6 @@ turnstile = useTurnstile((token) => {
 async function handleApiErrorUI(errorType) {
   // 所有彈窗都在結果頁顯示
   if (errorType.type === "already_played") {
-    console.log("用戶已玩過，但不在活動頁顯示彈窗");
     // 什麼都不做，讓流程繼續跳轉到結果頁
     return;
   }
@@ -581,7 +557,6 @@ onMounted(async () => {
   // 監聽頁面可見性變化 - 當頁面重新可見時立即檢查登入狀態
   const handleVisibilityChange = () => {
     if (!document.hidden) {
-      console.log("頁面重新可見，立即檢查登入狀態");
       auth.updateLoginStatus();
     }
   };
@@ -589,7 +564,6 @@ onMounted(async () => {
 
   // 監聽視窗獲得焦點 - 當用戶切換回這個頁籤時立即檢查
   const handleFocus = () => {
-    console.log("視窗獲得焦點，立即檢查登入狀態");
     auth.updateLoginStatus();
   };
   window.addEventListener("focus", handleFocus);
@@ -623,32 +597,20 @@ onMounted(async () => {
   const existingTabId = sessionStorage.getItem("fate2025_tab_id");
   const isOldTab = existingTabId !== null;
 
-  console.log("檢查登入狀態 (onMounted):", {
-    hasLoginFlag,
-    isOldTab,
-    existingTabId,
-    isLoggedIn: userStore.isLoggedIn,
-    verificationTriggered: verificationTriggered.value,
-  });
-
   // 處理登入標記
   let justLoggedIn = false;
   if (isOldTab && hasLoginFlag) {
     // 舊分頁檢測到登入標記，等待 2 秒後清除（給新分頁足夠時間消費）
-    console.log("⚠️ 舊分頁檢測到登入標記，等待新分頁消費（onMounted）");
     setTimeout(() => {
       // 如果 2 秒後標記還在，清除它
       if (localStorage.getItem("fate2025_just_logged_in") === "true") {
-        console.log("清除未被消費的登入標記");
         localStorage.removeItem("fate2025_just_logged_in");
         localStorage.removeItem("fate2025_tab_id");
       }
     }, 2000);
   } else if (!isOldTab && hasLoginFlag) {
     // 新分頁且有登入標記，立即消費掉
-    console.log("🎯 新分頁檢測到登入標記（onMounted），立即消費", {
-      storedTabId,
-    });
+    console.log("✨ 新分頁，開始流程");
 
     // 立即清除標記，避免其他分頁也觸發
     localStorage.removeItem("fate2025_just_logged_in");
@@ -662,7 +624,6 @@ onMounted(async () => {
     // 普通新分頁（不是登入返回的），初始化新的 tab_id
     const newTabId = Date.now() + "_" + Math.random();
     sessionStorage.setItem("fate2025_tab_id", newTabId);
-    console.log("初始化普通新分頁 ID:", newTabId);
   }
 
   // 檢查占卜狀態
@@ -677,7 +638,6 @@ onMounted(async () => {
 
   if (justLoggedIn && userStore.isLoggedIn && !verificationTriggered.value) {
     // 新年活動流程：先驗證 -> 轉盤動畫 -> 待跳轉彈窗 -> 跳轉到外部網頁
-    console.log("檢測到從登入頁面返回（onMounted），準備開始新年活動流程");
     verificationTriggered.value = true;
 
     // 清除檢查標記，避免顯示非正常流程警告

@@ -34,11 +34,9 @@ export const useCsrf = () => {
     try {
       // 如果有有效的 token，直接返回
       if (csrfToken.value && !isTokenExpired()) {
-        console.log("使用現有的 CSRF token");
         return csrfToken.value;
       }
 
-      console.log("獲取新的 CSRF token...");
       const apiUrl = getApiUrl("getCsrfToken.php");
 
       const response = await axios.post(
@@ -57,13 +55,13 @@ export const useCsrf = () => {
         csrfToken.value = response.data.csrf_token;
         // 設定過期時間（比伺服器早 30 秒過期，確保安全）
         csrfExpiry.value = Date.now() + (response.data.expires_in - 30) * 1000;
-        console.log("✅ 安全驗證已準備");
+        console.log("🔐 安全驗證就緒");
         return csrfToken.value;
       } else {
         throw new Error("安全驗證準備失敗");
       }
     } catch (error) {
-      console.error("安全驗證準備失敗:", error);
+      console.error("❌ 安全驗證失敗:", error);
       throw error;
     }
   };
@@ -72,7 +70,6 @@ export const useCsrf = () => {
   const clearCsrfToken = () => {
     csrfToken.value = null;
     csrfExpiry.value = null;
-    console.log("已清除 CSRF token");
   };
 
   // 刷新 CSRF Token

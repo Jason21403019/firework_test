@@ -38,8 +38,6 @@ export const useLoginFlow = () => {
       localStorage.setItem("fate2025_just_logged_in", "true");
       localStorage.setItem("fate2025_normal_flow", "true");
 
-      console.log("設置新的流程標記，tab_id:", tabId);
-
       popupStore.closeLoadingPopup();
 
       return true;
@@ -65,8 +63,6 @@ export const useLoginFlow = () => {
 
     // 如果沒有通過正確流程但已經登入，顯示提示
     if (!isNormalFlow) {
-      console.log("檢測到用戶不是從正常流程登入");
-
       showUniversalDialogFn({
         icon: "warning",
         title: "請使用正確的占卜流程",
@@ -83,8 +79,6 @@ export const useLoginFlow = () => {
     showPostLoginVerificationDialogFn,
     showUniversalDialogFn,
   ) => {
-    console.log("檢測到從登入頁面返回");
-
     const auth = useAuth();
 
     // 檢查是否為同一位會員（前端 Cookie 驗證）
@@ -93,11 +87,6 @@ export const useLoginFlow = () => {
     // 檢查流程有效性
     const isNormalFlow =
       localStorage.getItem("fate2025_normal_flow") === "true";
-
-    console.log("流程檢查結果:", {
-      isNormalFlow,
-      isSameMember,
-    });
 
     // 如果不是同一位會員，顯示警告
     if (!isSameMember) {

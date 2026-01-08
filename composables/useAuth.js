@@ -39,22 +39,15 @@ export const useAuth = () => {
     if (!existingToken) {
       const token = generateSessionToken();
       setCookieValue("fate2025_session", token, 1);
-      console.log("已設定會員 session token:", token);
       return token;
     }
-    console.log("已存在 session token:", existingToken);
     return existingToken;
   };
 
   // 驗證是否為同一位會員（登入後返回時檢查）
   const verifySameMember = () => {
     const sessionToken = getCookieValue("fate2025_session");
-    if (!sessionToken) {
-      console.warn("找不到 session token，可能不是同一位會員");
-      return false;
-    }
-    console.log("驗證通過：session token 存在，確認為同一位會員");
-    return true;
+    return !!sessionToken;
   };
 
   // 清除 session token

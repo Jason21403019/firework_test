@@ -52,14 +52,11 @@ export const useApiService = () => {
     if (typeof window === "undefined") return false;
 
     if (!udnmember || !um2) {
-      console.log("用戶未登入，無法檢查占卜狀態");
       return false;
     }
 
     try {
       const apiUrl = getApiUrl("checkPlayStatus.php");
-      console.log("從資料庫檢查占卜狀態...");
-
       const requestData = { udnmember, um2 };
 
       const response = await axios.post(apiUrl, requestData, {
@@ -71,14 +68,14 @@ export const useApiService = () => {
         response.data.status === "success" &&
         response.data.played_today === true
       ) {
-        console.log("資料庫確認：用戶今天已占卜過");
+        console.log("✅ 已占卜");
         return true;
       }
 
-      console.log("資料庫確認：用戶今天尚未占卜");
+      console.log("📝 尚未占卜");
       return false;
     } catch (error) {
-      console.error("檢查占卜狀態時發生錯誤:", error);
+      console.error("❌ 檢查占卜狀態錯誤:", error);
       return false;
     }
   };
@@ -86,11 +83,7 @@ export const useApiService = () => {
   // 獲取用戶占卜數據
   const fetchUserPlayData = async (udnmember, um2) => {
     try {
-      console.log("開始獲取累計占卜次數...");
       const apiUrl = getApiUrl("checkPlayStatus.php");
-
-      console.log("API路徑:", apiUrl);
-      console.log("用戶ID:", udnmember);
 
       const response = await axios.post(
         apiUrl,
@@ -101,10 +94,9 @@ export const useApiService = () => {
         },
       );
 
-      console.log("完整API回應:", response.data);
       return response.data;
     } catch (error) {
-      console.error("❌ 獲取累計占卜次數錯誤:", error);
+      console.error("❌ 獲取占卜數據錯誤:", error);
       throw error;
     }
   };
@@ -112,11 +104,7 @@ export const useApiService = () => {
   // 保存用戶數據（支援 CSRF Token）
   const saveUserData = async (userData, csrfToken = null) => {
     try {
-      console.log("開始執行 saveUserData 函數");
-
       const apiUrl = getApiUrl("saveUserData.php");
-      console.log("使用的 API 路徑:", apiUrl);
-      console.log("準備發送的用戶數據:", userData);
 
       // 準備請求標頭
       const headers = {
@@ -127,21 +115,17 @@ export const useApiService = () => {
       // 如果有 CSRF token，加入標頭
       if (csrfToken) {
         headers["X-CSRF-Token"] = csrfToken;
-        console.log("已加入 CSRF Token");
       }
 
-      console.log("開始發送 API 請求...");
       const response = await axios.post(apiUrl, userData, {
         headers,
         withCredentials: true,
         timeout: 30000,
       });
 
-      console.log("API 回應成功:", response.data);
-
       // 如果回應中包含 debug 資訊，顯示出來
       if (response.data.debug) {
-        console.warn("🔍 後端調試資訊:", response.data.debug);
+        console.warn("🔍 後端調試:", response.data.debug);
       }
 
       // 如果是錯誤且有 E003，顯示更多資訊
@@ -150,13 +134,7 @@ export const useApiService = () => {
         response.data.message &&
         response.data.message.includes("E003")
       ) {
-        console.error("❌ CSRF 驗證失敗詳情:");
-        console.error("- 錯誤訊息:", response.data.message);
-        console.error("- 完整回應:", response.data);
-        console.error(
-          "- 使用的 CSRF Token:",
-          csrfToken ? csrfToken.substring(0, 15) + "..." : "無",
-        );
+        console.error("❌ CSRF 驗證失敗:", response.data.message);
       }
 
       return response.data;

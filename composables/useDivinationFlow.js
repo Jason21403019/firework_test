@@ -53,7 +53,7 @@ export const useDivinationFlow = () => {
 
   // 處理成功占卜的輔助函數
   const handleSuccessfulDivination = async (result) => {
-    console.log("=== 處理成功的占卜結果 ===");
+    console.log("🎉 處理占卜結果");
 
     localStorage.removeItem("temp_turnstile_token");
 
@@ -61,15 +61,12 @@ export const useDivinationFlow = () => {
     const oldCount = divinationStore.totalPlayCount;
     if (result.db_info && result.db_info.play_times_total !== undefined) {
       divinationStore.setTotalPlayCount(result.db_info.play_times_total);
-      console.log("累計占卜次數更新為:", divinationStore.totalPlayCount);
     } else {
       divinationStore.incrementPlayCount();
-      console.log("本地更新累計占卜次數為:", divinationStore.totalPlayCount);
     }
 
     const isFirstTime =
       result.message && result.message.includes("首次占卜成功");
-    console.log("是否首次占卜:", isFirstTime);
 
     divinationStore.checkMilestoneAchievement(
       divinationStore.totalPlayCount,
@@ -80,19 +77,15 @@ export const useDivinationFlow = () => {
     divinationStore.recordPlayToday();
 
     const fortuneData = divinationStore.generateFortuneResult();
-
-    console.log("占卜結果:", fortuneData);
+    console.log("🔮 占卜結果:", fortuneData.title);
 
     // 根據占卜次數生成對應訊息
     let resultMessage = generateResultMessage(divinationStore.totalPlayCount);
-    console.log("生成的結果訊息:", resultMessage);
 
     notifyOtherTabs();
 
     // 更新狀態
     await updatePlayedStatus();
-
-    console.log("=== 占卜流程完成 ===");
 
     return { fortuneData, resultMessage };
   };
@@ -100,12 +93,7 @@ export const useDivinationFlow = () => {
   // 保存用戶數據到資料庫
   const saveUserData = async (turnstileTokenValue, csrfToken = null) => {
     try {
-      console.log("開始執行 saveUserData 函數");
-      console.log("Turnstile Token 狀態:", !!turnstileTokenValue);
-      console.log("CSRF Token 狀態:", !!csrfToken);
-
       if (!turnstileTokenValue && !isDevelopment.value) {
-        console.error("缺少 Turnstile Token");
         throw new Error("機器人驗證資料不完整，請重新驗證");
       }
 
@@ -116,11 +104,9 @@ export const useDivinationFlow = () => {
         turnstile_token: turnstileTokenValue || null,
       };
 
-      console.log("準備發送的用戶數據:", userData);
-
       return await apiService.saveUserData(userData, csrfToken);
     } catch (error) {
-      console.error("保存用戶數據失敗:", error);
+      console.error("❌ 保存數據失敗:", error);
       return {
         status: "error",
         error: error.message,
@@ -176,21 +162,16 @@ export const useDivinationFlow = () => {
   // 獲取用戶占卜數據
   const fetchUserPlayData = async () => {
     try {
-      console.log("開始獲取累計占卜次數...");
       const response = await apiService.fetchUserPlayData(
         userStore.udnmember,
         userStore.um2,
       );
 
-      console.log("完整API回應:", response);
-
       // 處理累計次數資訊
       if (response.status === "success") {
         if (response.play_times_total !== undefined) {
           divinationStore.setTotalPlayCount(response.play_times_total);
-          console.log("✅ 已獲取累計占卜次數:", divinationStore.totalPlayCount);
-        } else {
-          console.log("⚠️ API回應中沒有找到 play_times_total 欄位");
+          console.log("📊 占卜次數:", divinationStore.totalPlayCount);
         }
       }
 
@@ -202,7 +183,7 @@ export const useDivinationFlow = () => {
       // 初始化已完成的最高里程碑
       divinationStore.initializeAchievedMilestone();
     } catch (error) {
-      console.error("❌ 獲取累計占卜次數錯誤:", error);
+      console.error("❌ 獲取占卜數據錯誤:", error);
     }
   };
 
