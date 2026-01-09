@@ -62,6 +62,7 @@ const props = defineProps({
       { count: 10, prize: "咖啡師\n蛋糕券" },
       { count: 15, prize: "7-11\n禮券" },
       { count: 20, prize: "Dyson 三合一\n涼暖空氣清淨機" },
+      { count: 25, prize: "iPhone 17\n超級大獎" },
     ],
   },
 });

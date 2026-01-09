@@ -52,25 +52,31 @@ export const useLoginFlow = () => {
     }
   };
 
-  // 處理非正常流程登入
-  const handleNonNormalLogin = async (showUniversalDialogFn) => {
+  // 顯示非正常流程警告（移除重複的 isNormalFlow 檢查）
+  const showNonNormalFlowWarning = (showUniversalDialogFn) => {
     // 標記已經檢查過登入狀態
     localStorage.setItem("login_checked", "true");
 
-    // 檢查是否通過正常流程登入
+    showUniversalDialogFn({
+      icon: "warning",
+      title: "請使用正確的占卜流程",
+      text: "請從活動首頁點擊「立即占卜」按鈕來完成占卜流程，\n直接使用登入網址將無法取得占卜結果。",
+      confirmButtonText: "我知道了",
+      showCancelButton: false,
+    });
+  };
+
+  // 檢查並處理非正常流程登入
+  const checkAndHandleNonNormalFlow = async (showUniversalDialogFn) => {
     const isNormalFlow =
       localStorage.getItem("fate2025_normal_flow") === "true";
 
-    // 如果沒有通過正確流程但已經登入，顯示提示
     if (!isNormalFlow) {
-      showUniversalDialogFn({
-        icon: "warning",
-        title: "請使用正確的占卜流程",
-        text: "請從活動首頁點擊「立即占卜」按鈕來完成占卜流程，\n直接使用登入網址將無法取得占卜結果。",
-        confirmButtonText: "我知道了",
-        showCancelButton: false,
-      });
+      showNonNormalFlowWarning(showUniversalDialogFn);
+      return false; // 返回 false 表示流程無效
     }
+
+    return true; // 返回 true 表示流程有效
   };
 
   // 處理登入後返回的流程
@@ -84,10 +90,6 @@ export const useLoginFlow = () => {
     // 檢查是否為同一位會員（前端 Cookie 驗證）
     const isSameMember = auth.verifySameMember();
 
-    // 檢查流程有效性
-    const isNormalFlow =
-      localStorage.getItem("fate2025_normal_flow") === "true";
-
     // 如果不是同一位會員，顯示警告
     if (!isSameMember) {
       showUniversalDialogFn({
@@ -100,9 +102,11 @@ export const useLoginFlow = () => {
       return;
     }
 
-    // 處理非正常流程
-    if (!isNormalFlow) {
-      await handleNonNormalLogin(showUniversalDialogFn);
+    // 檢查並處理非正常流程（統一的流程檢查）
+    const isValidFlow = await checkAndHandleNonNormalFlow(
+      showUniversalDialogFn,
+    );
+    if (!isValidFlow) {
       return;
     }
 
@@ -134,7 +138,8 @@ export const useLoginFlow = () => {
 
   return {
     startDivination,
-    handleNonNormalLogin,
+    checkAndHandleNonNormalFlow,
+    showNonNormalFlowWarning,
     handlePostLoginProcess,
   };
 };

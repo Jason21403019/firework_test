@@ -2,10 +2,7 @@
 require_once('./basic/base.php');
 require_once('./basic/connetDB.php');
 require_once('./basic/csrf_handler.php');
-require_once('./basic/session_config.php');
 
-// 動態配置 Session Cookie（自動適應 HTTP/HTTPS 環境）
-configureSessionCookie();
 session_start();
 
 date_default_timezone_set('Asia/Taipei');
@@ -150,7 +147,7 @@ try {
     
     if ($lastAttempt) {
         $timeSinceLastAttempt = time() - strtotime($lastAttempt);
-        if ($timeSinceLastAttempt < 1) {
+        if ($timeSinceLastAttempt < 60) {
             error_log("[LIMIT] 操作過於頻繁 - IP: {$ip}");
             JSONReturn('操作過於頻繁，請稍後再試', 'error', ['wait_time' => 60 - $timeSinceLastAttempt]);
         }

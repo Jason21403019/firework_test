@@ -140,13 +140,13 @@
       message =
         "獲得 LINEPOINTS 5點 抽獎資格(送完為止)兌換序號將於活動後寄送。";
       reminder = "小提醒 每天都能玩轉盤抽紅包 iPhone 17 大獎要送你！";
-    } else if (playCount >= 2 && playCount <= 19) {
+    } else if (playCount >= 2 && playCount <= 24) {
       message = "今日轉運已完成！明天再來小試身手!";
       reminder = "小提醒 每天都能玩轉盤抽紅包 iPhone 17 大獎要送你！";
-    } else if (playCount >= 20) {
-      message = "恭喜完成！你已轉出一整年的好運！";
+    } else if (playCount >= 25) {
+      message = "恭喜達成終極里程碑！你已集滿所有好運！";
       reminder =
-        "你已累積滿滿的紅包獎勵，也獲得 iPhone 17 抽獎資格，將於 3/17 公告中獎，敬請期待！";
+        "你已完成全部挑戰，獲得最高級 iPhone 17 抽獎資格，將於 3/17 公告中獎，敬請期待！";
     }
 
     const card = document.createElement("div");

@@ -647,7 +647,7 @@ onMounted(async () => {
     showPostLoginVerificationDialog();
   } else if (userStore.isLoggedIn && isFirstTimeCheck) {
     // 處理非正常流程登入的情況（直接訪問頁面但已登入）
-    await loginFlow.handleNonNormalLogin(showUniversalDialog);
+    await loginFlow.checkAndHandleNonNormalFlow(showUniversalDialog);
   }
 
   // 開發環境測試函數

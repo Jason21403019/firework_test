@@ -2,11 +2,6 @@
 // filepath: c:\Users\1\Documents\fate2025\fate2025php\checkPlayStatus.php
 require_once('./basic/base.php');
 require_once('./basic/connetDB.php');
-require_once('./basic/session_config.php');
-
-// 動態配置 Session Cookie（自動適應 HTTP/HTTPS 環境）
-configureSessionCookie();
-session_start();
 
 setCorsHeaders('POST, OPTIONS', 'Content-Type, X-CSRF-Token, X-Requested-With');
 
@@ -74,18 +69,6 @@ if (isset($data['admin_mode']) && $data['admin_mode'] === true) {
 // 以下是原有的一般模式邏輯
 $udnmember = isset($data['udnmember']) ? $data['udnmember'] : null;
 $um2 = isset($data['um2']) ? $data['um2'] : null;
-$csrf_token = isset($data['csrf_token']) ? $data['csrf_token'] : null;
-
-// 添加 CSRF 檢查 (如果存在)
-if (!empty($csrf_token)) {
-    $csrf_header = isset($_SERVER['HTTP_X_CSRF_TOKEN']) ? $_SERVER['HTTP_X_CSRF_TOKEN'] : '';
-    $csrf_to_check = !empty($csrf_header) ? $csrf_header : $csrf_token;
-    if (isset($_SESSION['fate2025_csrf_check']) && $_SESSION['fate2025_csrf_check'] !== $csrf_to_check) {
-    } 
-    if (isset($_SESSION['fate2025_csrf_check'])) {
-        unset($_SESSION['fate2025_csrf_check']);
-    }
-}
 
 // 驗證必要參數
 if (empty($udnmember)) {
