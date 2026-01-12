@@ -79,6 +79,13 @@ export const useRedirectFlow = () => {
       // 步驟 6: 等待彈窗倒數 (4秒)
       await new Promise((resolve) => setTimeout(resolve, 4000));
 
+      // 在跳轉前啟動重新整理提醒計時器
+      const reminderTime = Date.now() + 4 * 60 * 1000;
+      localStorage.setItem(
+        "fate2025_refresh_reminder_time",
+        String(reminderTime),
+      );
+
       // 步驟 7: 跳轉到外部網頁
       const externalUrl = buildRedirectUrl(
         isFirstTime,

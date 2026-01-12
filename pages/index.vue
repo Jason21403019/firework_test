@@ -537,8 +537,8 @@ onMounted(async () => {
   // 瀏覽器檢測和跳轉
   browserUtils.checkAndRedirect(showUniversalDialog);
 
-  // 檢查是否應該自動登出
-  browserUtils.checkAutoLogout();
+  // 檢查是否應該顯示重新整理提醒（取代原本的自動登出檢查）
+  browserUtils.checkRefreshReminder(showUniversalDialog);
 
   // 初始化跨分頁同步
   browserUtils.initSimpleSync(showAlreadyPlayedMessage);

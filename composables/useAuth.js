@@ -26,11 +26,9 @@ export const useAuth = () => {
 
   // 生成隨機 session token
   const generateSessionToken = () => {
-    return (
-      Math.random().toString(36).substring(2, 15) +
-      Math.random().toString(36).substring(2, 15) +
-      Date.now().toString(36)
-    );
+    const bytes = new Uint8Array(32);
+    crypto.getRandomValues(bytes);
+    return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
   };
 
   // 設定會員 session token（用戶進入頁面時）

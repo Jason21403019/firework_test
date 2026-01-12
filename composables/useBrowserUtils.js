@@ -41,26 +41,39 @@ export const useBrowserUtils = () => {
     });
   };
 
-  // 檢查是否應該自動登出
-  const checkAutoLogout = () => {
+  // 檢查是否應該顯示重新整理提醒
+  const checkRefreshReminder = (showUniversalDialogFn) => {
     if (typeof window === "undefined") return;
 
-    const logoutTime = localStorage.getItem("fate2025_logout_time");
-    if (!logoutTime) return;
+    const reminderTime = localStorage.getItem("fate2025_refresh_reminder_time");
+    if (!reminderTime) return;
 
     const now = Date.now();
-    const shouldLogout = parseInt(logoutTime);
+    const shouldRemind = parseInt(reminderTime);
 
-    if (now >= shouldLogout) {
-      console.log("自動登出時間已到，清除登入狀態");
-      localStorage.removeItem("fate2025_logout_time");
-      auth.clearCookiesAfterDivination();
+    if (now >= shouldRemind) {
+      console.log("停留時間過長，顯示重新整理提醒");
+      localStorage.removeItem("fate2025_refresh_reminder_time");
+
+      // 顯示提醒彈窗
+      showUniversalDialogFn({
+        icon: "info",
+        title: "頁面停留過久",
+        text: "您已在此頁面停留超過 4 分鐘，建議重新整理頁面以獲得最新狀態",
+        confirmButtonText: "立即重新整理",
+        showCancelButton: true,
+        cancelButtonText: "稍後再說",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.reload();
+        }
+      });
     }
   };
 
   return {
     checkAndRedirect,
     initSimpleSync,
-    checkAutoLogout,
+    checkRefreshReminder,
   };
 };
