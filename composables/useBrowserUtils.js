@@ -66,19 +66,32 @@ export const useBrowserUtils = () => {
       }).then((result) => {
         if (result.isConfirmed) {
           window.location.reload();
+        } else {
+          // 如果使用者選擇「稍後再說」，設定下次提醒時間（比如 4 分鐘後）
+          const nextReminderTime = Date.now() + 4 * 60 * 1000;
+          localStorage.setItem(
+            "fate2025_refresh_reminder_time",
+            String(nextReminderTime),
+          );
         }
       });
-    } else {
-      const tenMinutes = 10 * 60 * 1000;
-      if (now - shouldRemind > tenMinutes) {
-        localStorage.removeItem("fate2025_refresh_reminder_time");
-      }
     }
+  };
+  const initVisibilityListener = (showUniversalDialogFn) => {
+    if (typeof document === "undefined") return;
+
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) {
+        // 當使用者切回分頁時，檢查是否需要顯示提醒
+        checkRefreshReminder(showUniversalDialogFn);
+      }
+    });
   };
 
   return {
     checkAndRedirect,
     initSimpleSync,
     checkRefreshReminder,
+    initVisibilityListener,
   };
 };

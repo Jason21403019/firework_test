@@ -540,6 +540,9 @@ onMounted(async () => {
   // 初始化跨分頁同步
   browserUtils.initSimpleSync(showAlreadyPlayedMessage);
 
+  // 監聽頁面可見性變化 - 當頁面重新可見時立即檢查登入狀態
+  browserUtils.initVisibilityListener(showUniversalDialog);
+
   // 基本初始化設置
   const handleKeyDown = (event) => {
     if (event.shiftKey && event.key === "D") {
