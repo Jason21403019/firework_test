@@ -4,7 +4,6 @@ export const useLoginFlow = () => {
   const divinationStore = useDivinationStore();
   const popupStore = usePopupStore();
   const apiService = useApiService();
-  const { securityManager } = useSecurityManager();
 
   // 1. 占卜流程啟動函數
   const startDivination = async (

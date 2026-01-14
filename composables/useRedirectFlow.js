@@ -3,7 +3,6 @@ export const useRedirectFlow = () => {
   const userStore = useUserStore();
   const divinationStore = useDivinationStore();
   const popupStore = usePopupStore();
-  const { securityManager } = useSecurityManager();
   const divinationFlow = useDivinationFlow();
   const config = useRuntimeConfig();
 

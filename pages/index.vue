@@ -121,11 +121,9 @@ import { usePopupStore } from "~/stores/popup";
 const userStore = useUserStore();
 const divinationStore = useDivinationStore();
 const popupStore = usePopupStore();
-
-const config = useRuntimeConfig();
+// const config = useRuntimeConfig();
 const auth = useAuth();
 const apiService = useApiService();
-const { securityManager } = useSecurityManager();
 const divinationFlow = useDivinationFlow();
 const loginFlow = useLoginFlow();
 const browserUtils = useBrowserUtils();
@@ -138,7 +136,6 @@ const showDebugTools = ref(false);
 const bannerRef = ref(null);
 const loginUrl = computed(() => apiService.getLoginUrl());
 const lastLoggedInUser = ref(null); // 追蹤上一個登入的會員ID
-const alreadyShownPopup = ref(false); // 標記是否已顯示過「已完成」彈窗
 const verificationTriggered = ref(false); // 標記是否已觸發驗證流程
 
 // 判斷是否為開發環境
@@ -175,7 +172,7 @@ const handleRedirectCountdownEnd = () => {
 // 監聽登入狀態和會員變化，處理會員切換的情況
 watch(
   () => [userStore.isLoggedIn, userStore.udnmember],
-  async ([isLoggedIn, currentUser], [wasLoggedIn, previousUser]) => {
+  async ([isLoggedIn, currentUser]) => {
     // 只處理從未登入變為已登入，或者換了不同的會員
     if (!isLoggedIn) {
       lastLoggedInUser.value = null;

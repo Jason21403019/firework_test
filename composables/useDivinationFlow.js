@@ -5,7 +5,6 @@ export const useDivinationFlow = () => {
   const popupStore = usePopupStore();
   const apiService = useApiService();
   const auth = useAuth();
-  const { securityManager } = useSecurityManager();
 
   // 判斷是否為開發環境
   const isDevelopment = computed(() => {
