@@ -1,26 +1,40 @@
 <template>
   <div class="banner">
-    <!-- 煙火特效元素 -->
-    <div class="fireworks">
-      <div class="firework firework-2"></div>
-      <div class="firework firework-3"></div>
-      <div class="firework firework-4"></div>
-    </div>
-
     <div class="banner__content">
-      <!-- 轉盤動畫層 -->
-      <div class="banner__wheel" :class="{ 'is-spinning': isSpinning }"></div>
-      
-      <!-- ref="contentRef" -->
-      <a
-        ref="triggerLink"
-        class="banner__trigger-area"
-        :href="loginUrl"
-        target="_blank"
-        rel="noopener noreferrer"
-        data-action="submit"
-        @click="handleDivination"
-      ></a>
+      <!-- 標題 -->
+      <div class="banner__title"></div>
+
+      <!-- 左邊 ubaby -->
+      <div class="banner__left-ubaby"></div>
+
+      <!-- 右邊 ubaby -->
+      <div class="banner__right-ubaby"></div>
+
+      <!-- 轉盤組 -->
+      <div class="banner__wheel-group">
+        <!-- 外圈 -->
+        <div class="banner__wheel-out"></div>
+
+        <!-- 箭頭 -->
+        <div class="banner__wheel-arrow"></div>
+
+        <!-- 內圈 (會旋轉) -->
+        <div
+          class="banner__wheel-inner"
+          :class="{ 'is-spinning': isSpinning }"
+        ></div>
+
+        <!-- 按鈕 (點擊區域) -->
+        <a
+          ref="triggerLink"
+          class="banner__wheel-btn"
+          :href="loginUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-action="submit"
+          @click="handleDivination"
+        ></a>
+      </div>
     </div>
   </div>
 </template>
@@ -45,7 +59,7 @@ async function handleDivination(event) {
 // 開始轉盤動畫
 function startWheelSpin() {
   isSpinning.value = true;
-  
+
   // 3秒後結束動畫
   setTimeout(() => {
     isSpinning.value = false;
@@ -74,204 +88,14 @@ defineExpose({
 <style lang="scss">
 .banner {
   width: 100%;
-  background-image: url("/imgs/banner.png");
+  background-image: url("/imgs/banner_bg.png");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center top;
   position: relative;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-
-  .fireworks {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  .firework {
-    position: absolute;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    opacity: 0;
-    aspect-ratio: 16 / 9;
-    width: 30%;
-    filter: blur(0px);
-  }
-
-  .firework-2 {
-    top: -16%;
-    left: 27%;
-    background-image: url("/imgs/fireworks2.png");
-    animation: flashSoft 7s infinite 1.5s;
-  }
-
-  .firework-3 {
-    top: 10%;
-    right: 40%;
-    width: 15%;
-    background-image: url("/imgs/fireworks3.png");
-    animation: flashSoft 6.5s infinite 2s;
-  }
-
-  .firework-4 {
-    top: 11%;
-    right: -12%;
-    background-image: url("/imgs/fireworks4.png");
-    animation: flashSoft 5.5s infinite 1s;
-  }
-
-  @keyframes flashSoft {
-    0% {
-      opacity: 0;
-      transform: scale(0.7);
-      filter: blur(5px);
-    }
-    3% {
-      opacity: 0.03;
-      transform: scale(0.73);
-      filter: blur(4.5px);
-    }
-    5% {
-      opacity: 0.05;
-      transform: scale(0.75);
-      filter: blur(4px);
-    }
-    7% {
-      opacity: 0.12;
-      transform: scale(0.78);
-      filter: blur(3.5px);
-    }
-    8% {
-      opacity: 0.2;
-      transform: scale(0.8);
-      filter: blur(3px);
-    }
-    10% {
-      opacity: 0.4;
-      transform: scale(0.825);
-      filter: blur(2.2px);
-    }
-    12% {
-      opacity: 0.6;
-      transform: scale(0.85);
-      filter: blur(1.5px);
-    }
-    14% {
-      opacity: 0.85;
-      transform: scale(0.88);
-      filter: blur(0.5px);
-    }
-    15% {
-      opacity: 1;
-      transform: scale(0.9);
-      filter: blur(0px);
-    }
-    17% {
-      opacity: 0.98;
-      transform: scale(0.92);
-      filter: blur(0px);
-    }
-    20% {
-      opacity: 0.95;
-      transform: scale(0.96);
-      filter: blur(0px);
-    }
-    22% {
-      opacity: 0.9;
-      transform: scale(1.01);
-      filter: blur(0px);
-    }
-    25% {
-      opacity: 0.85;
-      transform: scale(1.015);
-      filter: blur(0.25px);
-    }
-    28% {
-      opacity: 0.8;
-      transform: scale(1.02);
-      filter: blur(0.5px);
-    }
-    30% {
-      opacity: 0.75;
-      transform: scale(1.025);
-      filter: blur(0.75px);
-    }
-    35% {
-      opacity: 0.7;
-      transform: scale(1.03);
-      filter: blur(1px);
-    }
-    37% {
-      opacity: 0.55;
-      transform: scale(1.035);
-      filter: blur(1.25px);
-    }
-    40% {
-      opacity: 0.4;
-      transform: scale(1.04);
-      filter: blur(1.5px);
-    }
-    43% {
-      opacity: 0.3;
-      transform: scale(1.045);
-      filter: blur(1.75px);
-    }
-    45% {
-      opacity: 0.2;
-      transform: scale(1.05);
-      filter: blur(2px);
-    }
-    48% {
-      opacity: 0.18;
-      transform: scale(1.058);
-      filter: blur(2.25px);
-    }
-    50% {
-      opacity: 0.15;
-      transform: scale(1.065);
-      filter: blur(2.5px);
-    }
-    52% {
-      opacity: 0.13;
-      transform: scale(1.07);
-      filter: blur(2.75px);
-    }
-    55% {
-      opacity: 0.1;
-      transform: scale(1.08);
-      filter: blur(3px);
-    }
-    60% {
-      opacity: 0.08;
-      transform: scale(1.03);
-      filter: blur(3.5px);
-    }
-    65% {
-      opacity: 0.07;
-      transform: scale(0.98);
-      filter: blur(3.8px);
-    }
-    70% {
-      opacity: 0.05;
-      transform: scale(0.9);
-      filter: blur(4px);
-    }
-    80% {
-      opacity: 0.03;
-      transform: scale(0.8);
-      filter: blur(4.5px);
-    }
-    100% {
-      opacity: 0;
-      transform: scale(0.7);
-      filter: blur(5px);
-    }
-  }
+  container-type: inline-size;
 
   &__content {
     position: absolute;
@@ -282,124 +106,120 @@ defineExpose({
     z-index: 2;
   }
 
-  &__wheel {
+  &__title {
     position: absolute;
-    right: 18.4%;
-    top: 37.8%;
-    width: 30%;
-    max-width: 250px;
-    border-radius: 50%;
+    top: 6cqw;
+    left: 33.3%;
+    transform: translateX(-50%);
+    width: 32cqw;
+    aspect-ratio: 630 / 460;
+    background-image: url("/imgs/banner_title.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  &__left-ubaby {
+    position: absolute;
+    bottom: 6cqw;
+    left: 18cqw;
+    width: 14cqw;
+    aspect-ratio: 285 / 360;
+    background-image: url("/imgs/left_ubaby.gif");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  &__right-ubaby {
+    position: absolute;
+    bottom: 5cqw;
+    left: 33cqw;
+    width: 14.5cqw;
+    aspect-ratio: 295 / 390;
+    background-image: url("/imgs/right_ubaby.gif");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  &__wheel-group {
+    position: absolute;
+    right: 18.2cqw;
+    bottom: 17cqw;
+    width: 31cqw;
     aspect-ratio: 1 / 1;
+  }
+
+  &__wheel-out {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("/imgs/wheel_out.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    pointer-events: none;
+  }
+
+  &__wheel-arrow {
+    position: absolute;
+    top: 2.5cqw;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8%;
+    aspect-ratio: 1 / 1;
+    background-image: url("/imgs/wheel_arrow.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  &__wheel-inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    height: 81.8%;
+    background-image: url("/imgs/wheel_inner.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
     pointer-events: none;
     transition: transform 0.1s ease-out;
-    
+
     &.is-spinning {
       animation: spinWheel 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
     }
-    
-    @media (max-width: 1535px) {
-      right: 17.7%;
-      top: 36%;
-      width: 15%;
-      min-width: 80px;
-    }
-    @media (max-width: 768px) {
-      top: 56.6%;
-      right: 35.4%;
-      width: 28%;
-      min-width: 60px;
-    }
   }
 
-  &__trigger-area {
+  &__wheel-btn {
     position: absolute;
-    right: 18.4%;
-    top: 37.8%;
-    width: 30%;
-    max-width: 250px;
-    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 28%;
     aspect-ratio: 1 / 1;
+    background-image: url("/imgs/wheel_btn.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
     cursor: pointer;
-    // border: 2px solid rgb(255, 255, 255);
-    @media (max-width: 1535px) {
-      right: 17.7%;
-      top: 36%;
-      width: 15%;
-      min-width: 80px;
-    }
-    @media (max-width: 768px) {
-      top: 56.6%;
-      right: 35.4%;
-      width: 28%;
-      min-width: 60px;
-    }
+    border-radius: 50%;
   }
 
   @keyframes spinWheel {
     0% {
-      transform: rotate(0deg);
+      transform: translate(-50%, -50%) rotate(0deg);
     }
     100% {
-      transform: rotate(1080deg);
+      transform: translate(-50%, -50%) rotate(1080deg);
     }
   }
 }
-
-@media (max-width: 768px) {
-  .banner {
-    background-image: url("/imgs/m_banner.png");
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center top;
-    position: relative;
-    aspect-ratio: 640 / 1076;
-
-    .firework-2 {
-      width: 300px;
-      height: 200px;
-      top: -8%;
-      right: -4%;
-      left: unset;
-      @media (max-width: 430px) {
-        width: 200px;
-        height: 100px;
-        top: -8%;
-        right: -4%;
-        left: unset;
-      }
-    }
-
-    .firework-3 {
-      width: 200px;
-      height: 300px;
-      top: 30%;
-      right: unset;
-      left: -9%;
-    }
-    .firework-4 {
-      width: 300px;
-      height: 200px;
-      top: 8%;
-      right: -15%;
-      left: unset;
-      @media (max-width: 430px) {
-        width: 300px;
-        height: 100px;
-        top: 8%;
-        right: -15%;
-        left: unset;
-      }
-    }
-  }
-}
-// @media (max-width: 640px) {
-//   .banner {
-//     background-image: url("/imgs/m_banner.png");
-//     background-size: cover;
-//     background-repeat: no-repeat;
-//     background-position: center top;
-//     position: relative;
-//     aspect-ratio: 640 / 1076;
-//   }
-// }
 </style>
