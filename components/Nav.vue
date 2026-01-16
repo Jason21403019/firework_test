@@ -206,6 +206,10 @@ const lineShareUrl = computed(() => {
     align-items: center;
     width: 100%;
     border-radius: 8px;
+    @media (max-width: 992px) {
+      position: relative;
+      z-index: 102;
+    }
   }
 
   &__logo {
@@ -218,21 +222,46 @@ const lineShareUrl = computed(() => {
     background-color: transparent;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+    @media (max-width: 992px) {
+      position: relative;
+      z-index: 1000;
+    }
+    @media (max-width: 640px) {
+      width: auto;
+      max-width: 90vw;
+      gap: clamp(10px, 4vw, 30px);
+    }
     @media (max-width: 480px) {
-      width: 130px;
-      gap: 10px;
+      max-width: 85vw;
+      gap: clamp(8px, 3vw, 15px);
     }
 
     > :first-child img {
       width: 177px;
       height: 35px;
       display: block;
+      @media (max-width: 640px) {
+        width: clamp(120px, 25vw, 177px);
+        height: auto;
+        aspect-ratio: 177/35;
+      }
+      @media (max-width: 480px) {
+        width: clamp(90px, 20vw, 130px);
+      }
     }
 
     > :last-child img {
       width: 115px;
       height: 40px;
       display: block;
+      @media (max-width: 640px) {
+        width: clamp(80px, 16vw, 115px);
+        height: auto;
+        aspect-ratio: 115/40;
+      }
+      @media (max-width: 480px) {
+        width: clamp(60px, 13vw, 85px);
+      }
     }
   }
 
@@ -245,6 +274,11 @@ const lineShareUrl = computed(() => {
     background-color: transparent;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+    @media (max-width: 992px) {
+      gap: 1rem;
+      position: relative;
+      z-index: 102;
+    }
     @media (max-width: 480px) {
       gap: 0.5rem;
     }
@@ -253,6 +287,35 @@ const lineShareUrl = computed(() => {
   &__links {
     display: flex;
     align-items: center;
+    @media (max-width: 992px) {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: auto;
+      min-height: 40vh;
+      background: rgba(#ffa238, 0.9);
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
+      padding: 60px 20px 40px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 2rem;
+      z-index: 101;
+      box-sizing: border-box;
+      margin: 0;
+      transform: translateY(-100%);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+      &--active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+    }
   }
 
   &__link {
@@ -280,6 +343,26 @@ const lineShareUrl = computed(() => {
       transform: translateY(-50%);
       color: #fff;
     }
+
+    @media (max-width: 992px) {
+      color: rgba(255, 255, 255, 0.95);
+      font-size: 24px;
+      font-weight: 400;
+      padding: 16px 20px;
+      text-align: center;
+      width: auto;
+      border: none;
+
+      &:hover {
+        color: #fff;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+      }
+
+      &:not(:last-child)::after {
+        display: none;
+      }
+    }
+
     &--button {
       font-family: inherit;
 
@@ -336,6 +419,11 @@ const lineShareUrl = computed(() => {
     cursor: pointer;
     z-index: 110;
     position: relative;
+    @media (max-width: 992px) {
+      display: flex;
+      position: relative;
+      z-index: 103;
+    }
     @media (max-width: 480px) {
       width: 25px;
       height: 25px;
@@ -395,87 +483,6 @@ const lineShareUrl = computed(() => {
   }
   to {
     opacity: 1;
-  }
-}
-
-@media (max-width: 768px) {
-  .navbar {
-    &__content {
-      position: relative;
-      z-index: 102;
-    }
-
-    &__logo {
-      position: relative;
-      z-index: 1000;
-    }
-
-    &__right {
-      gap: 1rem;
-      position: relative;
-      z-index: 102;
-    }
-
-    &__hamburger {
-      display: flex;
-      position: relative;
-      z-index: 103;
-    }
-
-    &__links {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: auto;
-      min-height: 40vh;
-      background: linear-gradient(
-        135deg,
-        rgba(27, 3, 62, 0.85),
-        rgba(109, 39, 234, 0.75)
-      );
-      backdrop-filter: blur(15px) saturate(100%);
-      -webkit-backdrop-filter: blur(15px) saturate(100%);
-      border-radius: 10px;
-      padding: 60px 20px 40px;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 2rem;
-      box-shadow: 0 8px 32px rgba(27, 3, 62, 0.4);
-      z-index: 101;
-      box-sizing: border-box;
-      margin: 0;
-      transform: translateY(-100%);
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-
-      &--active {
-        transform: translateY(0);
-        opacity: 1;
-        visibility: visible;
-      }
-    }
-
-    &__link {
-      color: rgba(255, 255, 255, 0.95);
-      font-size: 24px;
-      font-weight: 400;
-      padding: 16px 20px;
-      text-align: center;
-      width: auto;
-      border: none;
-
-      &:hover {
-        color: #fff;
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-      }
-
-      &:not(:last-child)::after {
-        display: none;
-      }
-    }
   }
 }
 </style>
