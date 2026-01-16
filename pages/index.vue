@@ -60,38 +60,65 @@
     <!-- 開發工具區域 - 按 Shift+D 顯示 -->
     <div v-if="showDebugTools" class="debug-tools">
       <h3>開發測試工具</h3>
-      <div class="debug-actions">
-        <button @click="debugTools.clearPlayRecord" class="debug-btn">
-          清除占卜記錄
-        </button>
-        <button @click="debugTools.resetDatabase" class="debug-btn danger">
-          重置資料庫
-        </button>
-        <button @click="auth.logout" class="debug-btn logout">登出</button>
+
+      <!-- 彈窗測試區 -->
+      <div class="debug-section">
+        <h4>🎨 彈窗測試</h4>
+        <div class="debug-actions">
+          <button @click="testFortunePopup" class="debug-btn">
+            測試占卜結果彈窗
+          </button>
+          <button @click="testAlreadyPlayedPopup" class="debug-btn">
+            測試重複遊玩彈窗
+          </button>
+        </div>
       </div>
-      <div class="debug-info">
-        <p>登入狀態: {{ userStore.isLoggedIn ? "已登入" : "未登入" }}</p>
-        <p>
-          會員ID:
-          {{
-            userStore.isLoggedIn
-              ? auth.getCookieValue("udnmember") || "無"
-              : "無"
-          }}
-        </p>
-        <p>今日已占卜: {{ divinationStore.hasPlayed ? "是" : "否" }}</p>
-        <p>
-          驗證狀態:
-          {{ turnstile?.isTurnstileVerified?.value ? "已驗證" : "未驗證" }}
-        </p>
-        <p>
-          本地儲存鍵:
-          {{ `fate2025_last_played_${auth.getCookieValue("udnmember") || ""}` }}
-        </p>
-        <button @click="debugTools.debugCheckDatabase" class="debug-btn">
-          檢查資料庫狀態
-        </button>
+
+      <!-- 資料操作區 -->
+      <div class="debug-section">
+        <h4>🗄️ 資料操作</h4>
+        <div class="debug-actions">
+          <button @click="debugTools.clearPlayRecord" class="debug-btn">
+            清除占卜記錄
+          </button>
+          <button @click="debugTools.resetDatabase" class="debug-btn danger">
+            重置資料庫
+          </button>
+          <button @click="auth.logout" class="debug-btn logout">登出</button>
+        </div>
       </div>
+
+      <!-- 狀態資訊區 -->
+      <div class="debug-section">
+        <h4>📊 狀態資訊</h4>
+        <div class="debug-info">
+          <p>登入狀態: {{ userStore.isLoggedIn ? "已登入" : "未登入" }}</p>
+          <p>
+            會員ID:
+            {{
+              userStore.isLoggedIn
+                ? auth.getCookieValue("udnmember") || "無"
+                : "無"
+            }}
+          </p>
+          <p>今日已占卜: {{ divinationStore.hasPlayed ? "是" : "否" }}</p>
+          <p>總占卜次數: {{ divinationStore.totalPlayCount }}</p>
+          <p>
+            驗證狀態:
+            {{ turnstile?.isTurnstileVerified?.value ? "已驗證" : "未驗證" }}
+          </p>
+          <p>
+            本地儲存鍵:
+            {{
+              `fate2025_last_played_${auth.getCookieValue("udnmember") || ""}`
+            }}
+          </p>
+          <button @click="debugTools.debugCheckDatabase" class="debug-btn">
+            檢查資料庫狀態
+          </button>
+        </div>
+      </div>
+
       <div class="shortcut-info">
         <p>按下 Shift+D 可隱藏此工具</p>
       </div>
@@ -351,6 +378,37 @@ function toggleDebugTools() {
   showDebugTools.value = !showDebugTools.value;
 }
 
+// ==================== 測試彈窗函數 ====================
+// 測試占卜結果彈窗（使用正式內容）
+function testFortunePopup() {
+  // 生成隨機占卜結果
+  const fortuneData = divinationStore.generateFortuneResult();
+
+  // 生成訊息（與正式流程一致）
+  const playCount = divinationStore.totalPlayCount;
+  let customResultMessage = "";
+
+  if (playCount === 1) {
+    customResultMessage =
+      "<div class='glowing-message'><span class='glowing-message-title'>恭喜完成!</span><br>恭喜完成第 1 次占卜，獲得 5 points！</div>";
+  } else if (playCount === 20) {
+    customResultMessage =
+      "<div class='glowing-message'><span class='glowing-message-title'>恭喜達成!</span><br>已完成 20 次占卜，獲得 Dyson 大獎抽獎資格！</div>";
+  } else {
+    customResultMessage =
+      "<div class='glowing-message'><span class='glowing-message-title'>占卜完成!</span><br>明天繼續來占卜，累積好運！</div>";
+  }
+
+  showFortuneResult(fortuneData, customResultMessage);
+  console.log("🎨 測試占卜結果彈窗");
+}
+
+// 測試重複遊玩彈窗（使用正式內容）
+function testAlreadyPlayedPopup() {
+  showAlreadyPlayedMessage();
+  console.log("🎨 測試重複遊玩彈窗");
+}
+
 // ==================== 占卜流程主函數 ====================
 // 1. 占卜流程啟動函數
 async function startDivination() {
@@ -533,6 +591,8 @@ onMounted(async () => {
 
   // 瀏覽器檢測和跳轉
   browserUtils.checkAndRedirect(showUniversalDialog);
+
+  sessionStorage.setItem("fate2025_page_enter_time", String(Date.now()));
 
   // 檢查是否應該顯示重新整理提醒（取代原本的自動登出檢查）
   browserUtils.checkRefreshReminder(showUniversalDialog);
@@ -804,7 +864,7 @@ onMounted(async () => {
 /* 開發工具樣式 */
 .debug-tools {
   margin-top: 50px;
-  padding: 15px;
+  padding: 20px;
   border: 2px dashed #d9d9d9;
   border-radius: 8px;
   background-color: #f5f5f5;
@@ -812,8 +872,24 @@ onMounted(async () => {
 
   h3 {
     margin-top: 0;
+    color: #333;
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  h4 {
+    margin: 15px 0 10px 0;
     color: #666;
-    font-size: 18px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .debug-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: white;
+    border-radius: 6px;
+    border: 1px solid #e8e8e8;
   }
 
   .danger {
@@ -826,9 +902,10 @@ onMounted(async () => {
   }
 
   .debug-actions {
-    margin: 15px 0;
+    margin: 10px 0;
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
   }
 
   .debug-btn {
@@ -838,6 +915,8 @@ onMounted(async () => {
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
 
     &.logout {
       background-color: #ff4d4f;
@@ -845,6 +924,8 @@ onMounted(async () => {
 
     &:hover {
       opacity: 0.9;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
     }
   }
 
@@ -855,6 +936,7 @@ onMounted(async () => {
 
     p {
       margin: 5px 0;
+      line-height: 1.6;
     }
   }
 
@@ -862,6 +944,9 @@ onMounted(async () => {
     font-size: 12px;
     color: #999;
     font-style: italic;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #d9d9d9;
   }
 }
 

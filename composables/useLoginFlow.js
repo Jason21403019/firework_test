@@ -51,7 +51,7 @@ export const useLoginFlow = () => {
     }
   };
 
-  // 顯示非正常流程警告（移除重複的 isNormalFlow 檢查）
+  // 顯示非正常流程警告
   const showNonNormalFlowWarning = (showUniversalDialogFn) => {
     // 標記已經檢查過登入狀態
     localStorage.setItem("login_checked", "true");

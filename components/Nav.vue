@@ -10,6 +10,13 @@
               class="navbar__logo-image"
             />
           </NuxtLink>
+          <NuxtLink to="https://udn.com/news/index" target="_blank">
+            <img
+              src="/imgs/og_logo.png"
+              alt="og_logo_udn_Logo"
+              class="navbar__logo-image navbar__logo-image--og"
+            />
+          </NuxtLink>
         </div>
 
         <div class="navbar__right">
@@ -27,7 +34,7 @@
               to="#prizes"
               class="navbar__link"
               @click="isMobileMenuOpen = false"
-              >獎品一覽</NuxtLink
+              >馬上開運小秘招</NuxtLink
             >
             <NuxtLink
               to="/"
@@ -204,8 +211,8 @@ const lineShareUrl = computed(() => {
   &__logo {
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: 160px;
+    width: 322px; // 177 + 30 + 115
+    gap: 30px;
     padding: 4px 8px;
     transition: all 0.3s ease;
     background-color: transparent;
@@ -213,10 +220,19 @@ const lineShareUrl = computed(() => {
     -webkit-backdrop-filter: none;
     @media (max-width: 480px) {
       width: 130px;
+      gap: 10px;
     }
-    &-image {
+
+    > :first-child img {
+      width: 177px;
+      height: 35px;
       display: block;
-      width: 100%;
+    }
+
+    > :last-child img {
+      width: 115px;
+      height: 40px;
+      display: block;
     }
   }
 
