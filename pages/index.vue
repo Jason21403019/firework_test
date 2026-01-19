@@ -11,7 +11,7 @@
     />
     <Act_area />
     <Notice_popup />
-    <ToTop />
+    <!-- <ToTop /> -->
 
     <!-- 占卜結果彈窗 -->
     <Fortune_result_popup

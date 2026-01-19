@@ -1,30 +1,21 @@
 <template>
   <div class="play-count">
-    <!-- 旗幟背景區塊 -->
+    <!-- 轉盤抽紅包好禮背景區塊 -->
     <div class="play-count__banner">
-      <!-- :style="{ backgroundImage: 'url(/imgs/flag.png)' }" -->
       <div class="play-count__banner-content">
         <div class="play-count__banner-left">
-          <img
-            src="/imgs/fatetogifts.png"
-            alt="占卜次數"
-            class="play-count__title-img"
-          />
+          <h1 class="play-count__banner-title">轉盤抽紅包好禮</h1>
         </div>
         <div class="play-count__banner-right">
           <p class="play-count__text">
-            您已累計占卜
+            您已累計轉盤
             <span class="play-count__number">{{ count }}</span> 次
           </p>
         </div>
       </div>
     </div>
-
-    <!-- 旗幟下方說明文字 -->
-    <p class="play-count__description">會員粉絲來占卜， 集滿好運抽大獎！</p>
-
-    <!-- 里程碑數字顯示 -->
-    <div class="play-count__milestones">
+    <!-- 轉盤抽紅包好禮里程碑數字顯示 - 桌機版 -->
+    <div class="play-count__milestones play-count__milestones--desktop">
       <div
         v-for="(milestone, index) in milestones"
         :key="milestone.count"
@@ -35,9 +26,38 @@
       >
         <div
           class="play-count__milestone-number"
-          :style="{ backgroundImage: 'url(./imgs/leaf.png)' }"
+          :style="{
+            backgroundImage:
+              count >= milestone.count
+                ? 'url(./imgs/open_envelope.png)'
+                : 'url(./imgs/close_envelope.png)',
+          }"
         >
-          <span>{{ milestone.count }}</span>
+          <span class="play-count__milestone-count">{{ milestone.count }}</span>
+          <div class="play-count__milestone-prize">{{ milestone.prize }}</div>
+        </div>
+      </div>
+    </div>
+    <!-- 轉盤抽紅包好禮里程碑數字顯示 - 手機版 -->
+    <div class="play-count__milestones play-count__milestones--mobile">
+      <div
+        v-for="(milestone, index) in milestones"
+        :key="milestone.count"
+        class="play-count__milestone"
+        :class="{
+          'play-count__milestone--achieved': count >= milestone.count,
+        }"
+      >
+        <div
+          class="play-count__milestone-number"
+          :style="{
+            backgroundImage:
+              count >= milestone.count
+                ? 'url(./imgs/open_envelope_m.png)'
+                : 'url(./imgs/close_envelope_m.png)',
+          }"
+        >
+          <span class="play-count__milestone-count">{{ milestone.count }}</span>
         </div>
         <div class="play-count__milestone-prize">{{ milestone.prize }}</div>
       </div>
@@ -58,11 +78,11 @@ const props = defineProps({
     type: Array,
     default: () => [
       { count: 1, prize: "LINE POINTS\n5 點" },
-      { count: 5, prize: "CITY CAFÉ\n提貨券" },
-      { count: 10, prize: "咖啡師\n蛋糕券" },
-      { count: 15, prize: "7-11\n禮券" },
-      { count: 20, prize: "Dyson 三合一\n涼暖空氣清淨機" },
-      { count: 25, prize: "iPhone 17\n超級大獎" },
+      { count: 5, prize: "熟齡英文開聊\n線上課" },
+      { count: 10, prize: "百歲料理課\n線上課" },
+      { count: 15, prize: "生活收納課\n線上課" },
+      { count: 20, prize: "7-11 虛擬\n商品卡200元" },
+      { count: 25, prize: "iPhone 17 Pro\n" },
     ],
   },
 });
@@ -95,72 +115,37 @@ watch(
   flex-direction: column;
   align-items: center;
   margin-bottom: 120px;
-  background: url("/imgs/count_bg.png");
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  padding-top: 150px;
-  margin-top: -8%;
-  @media (max-width: 1024px) {
-    padding-top: 100px;
-  }
+  padding: 0px 12px 0 12px;
+
   @media (max-width: 768px) {
-    padding: 100px 12px 0 12px;
     background-position: center -60px;
   }
   @media (max-width: 480px) {
     margin-bottom: 60px;
-    padding: 50px 12px 0 12px;
     background-position: center -100px;
   }
 
   &__banner {
-    position: relative;
-    background-image: url("/imgs/flag.png");
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: center;
-    max-width: 950px;
+    max-width: 1000px;
+
     width: 100%;
-    height: 162px;
+    height: 120px;
     margin: 0 auto;
+    background: linear-gradient(to bottom, #faebb5, #e7c170);
+    border-radius: 100px;
     margin-bottom: 45px;
     display: flex;
     align-items: center;
     justify-content: center;
-    &::before {
-      content: "";
-      position: absolute;
-      top: 40%;
-      left: -27%;
-      width: 55%;
-      height: 100%;
-      background-image: url("/imgs/flag_leave.png");
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
-      z-index: 1;
-      @media (max-width: 768px) {
-        width: 70%;
-        left: -25%;
-        top: 42%;
-      }
-      @media (max-width: 360px) {
-        width: 80%;
-        left: -35%;
-        top: 40%;
-      }
-    }
+
     @media (max-width: 1024px) {
-      width: 80%;
       height: 100px;
       margin-bottom: 25px;
     }
     @media (max-width: 768px) {
-      background-image: url("/imgs/m_flag.png");
-      background-size: contain;
-      width: 100%;
+      max-width: 600px;
       height: 200px;
+      border-radius: 20px;
     }
     @media (max-width: 480px) {
       height: 150px;
@@ -173,6 +158,7 @@ watch(
       justify-content: center;
       @media (max-width: 768px) {
         flex-direction: column;
+        gap: 10px;
       }
     }
 
@@ -185,30 +171,25 @@ watch(
     }
   }
 
-  &__title-img {
-    display: block;
-    width: 100%;
-    max-width: 290px;
-    height: auto;
+  &__banner-title {
+    font-size: 50px;
+    font-weight: 600;
+    color: #80552b;
     @media (max-width: 1024px) {
-      max-width: 200px;
+      font-size: 40px;
     }
     @media (max-width: 768px) {
-      max-width: 300px;
-      margin-bottom: 10px;
+      font-size: 50px;
     }
     @media (max-width: 480px) {
-      max-width: 200px;
-    }
-    @media (max-width: 360px) {
-      max-width: 140px;
+      font-size: 30px;
     }
   }
 
   &__text {
     width: auto;
     max-width: 540px;
-    background: rgba(207, 65, 55, 1);
+    background: #ba934e;
     color: #f5f5f5;
     font-size: 40px;
     font-weight: 500;
@@ -217,6 +198,7 @@ watch(
     border-radius: 100px;
     box-sizing: border-box;
     @media (max-width: 1024px) {
+      margin-left: 20px;
       font-size: 24px;
     }
     @media (max-width: 768px) {
@@ -248,31 +230,6 @@ watch(
     }
   }
 
-  &__description {
-    font-size: 36px;
-    font-weight: 500;
-    color: #f5f5f5;
-    margin: 0 auto;
-    text-align: center;
-    max-width: 100%;
-    line-height: 1.5;
-    margin-bottom: 50px;
-    text-shadow: 0 3px 5px rgba(0, 0, 0, 0.5);
-    @media (max-width: 1024px) {
-      font-size: 24px;
-      margin-bottom: 0px;
-    }
-    @media (max-width: 768px) {
-      font-size: 28px;
-    }
-    @media (max-width: 480px) {
-      font-size: 20px;
-    }
-    @media (max-width: 360px) {
-      font-size: 16px;
-    }
-  }
-
   &__milestones {
     display: flex;
     justify-content: center;
@@ -280,9 +237,20 @@ watch(
     margin-top: 25px;
     gap: 50px;
     flex-wrap: wrap;
-    @media (max-width: 768px) {
-      gap: 0px;
-      flex-direction: column;
+
+    &--desktop {
+      @media (max-width: 768px) {
+        display: none;
+      }
+    }
+
+    &--mobile {
+      display: none;
+      @media (max-width: 768px) {
+        display: flex;
+        gap: 30px;
+        flex-direction: column;
+      }
     }
   }
 
@@ -293,66 +261,99 @@ watch(
     justify-content: center;
     max-width: 100%;
     transition: all 0.4s ease;
-    &--hidden-mobile {
+
+    .play-count__milestones--mobile & {
       @media (max-width: 768px) {
-        display: flex;
+        flex-direction: row;
+        align-items: center;
       }
-    }
-    @media (max-width: 768px) {
-      flex-direction: row;
     }
 
     &--achieved {
-      .play-count__milestone-number {
-        filter: brightness(1.2) drop-shadow(0 0 10px rgba(109, 39, 234, 0.7));
+      .play-count__milestone-count {
+        color: #faebb5;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
       }
 
       .play-count__milestone-prize {
         color: #ffffff;
         font-weight: 500;
       }
+
+      .play-count__milestones--mobile & {
+        .play-count__milestone-count {
+          @media (max-width: 768px) {
+            color: #faebb5;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+          }
+        }
+
+        .play-count__milestone-prize {
+          @media (max-width: 768px) {
+            color: #ffffff;
+          }
+        }
+      }
     }
+
     &-number {
-      width: 166px;
-      height: 155px;
+      width: 180px;
+      height: 300px;
       background-repeat: no-repeat;
       background-size: contain;
       background-position: center;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
-      font-size: 60px;
-      color: #fff;
       transition: all 0.3s ease;
       position: relative;
-      filter: brightness(0.7);
       @media (max-width: 1024px) {
         width: 130px;
-        height: 130px;
-        font-size: 40px;
-      }
-      @media (max-width: 768px) {
-        width: 100px;
-        height: 100px;
-        font-size: 30px;
-      }
-      @media (max-width: 480px) {
-        width: 80px;
-        height: 120px;
-        font-size: 28px;
-      }
-      @media (max-width: 360px) {
-        width: 60px;
-        height: 100px;
-        font-size: 24px;
+        height: 217px;
       }
 
-      & > span {
-        position: absolute;
-        top: 55%;
-        left: 49%;
-        transform: translate(-50%, -50%);
+      .play-count__milestones--mobile & {
+        @media (max-width: 768px) {
+          width: 72px;
+          height: 120px;
+        }
+        @media (max-width: 480px) {
+          width: 60px;
+          height: 100px;
+        }
+        @media (max-width: 360px) {
+          width: 50px;
+          height: 83px;
+        }
+      }
+    }
+
+    &-count {
+      font-weight: bold;
+      font-size: 70px;
+      color: #9d1c05;
+      margin-top: 100px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      @media (max-width: 1024px) {
+        font-size: 40px;
+        margin-top: 70px;
+      }
+
+      .play-count__milestones--mobile & {
+        @media (max-width: 768px) {
+          margin-top: 0;
+          position: absolute;
+          top: 60%;
+          left: 49%;
+          transform: translate(-50%, -50%);
+          font-size: 40px;
+          color: #9d1c05;
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        @media (max-width: 480px) {
+          font-size: 30px;
+        }
       }
     }
 
@@ -361,24 +362,34 @@ watch(
       font-size: 22px;
       line-height: 1.5;
       font-weight: 500;
-      color: rgba(0, 0, 0, 0.5);
+      color: #9d1c05;
       text-align: center;
       transition: all 0.3s ease;
       white-space: pre-line;
+      min-height: 66px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       @media (max-width: 1024px) {
         font-size: 18px;
+        min-height: 54px;
       }
-      @media (max-width: 768px) {
-        font-size: 28px;
-        margin-left: 10px;
-        text-align: left;
-        white-space: nowrap;
-      }
-      @media (max-width: 480px) {
-        font-size: 20px;
-      }
-      @media (max-width: 360px) {
-        font-size: 18px;
+
+      .play-count__milestones--mobile & {
+        @media (max-width: 768px) {
+          font-size: 40px;
+          margin-top: 0;
+          margin-left: 10px;
+          text-align: left;
+          white-space: nowrap;
+          color: #ee772b;
+        }
+        @media (max-width: 480px) {
+          font-size: 30px;
+        }
+        @media (max-width: 360px) {
+          font-size: 20px;
+        }
       }
     }
   }

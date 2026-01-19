@@ -83,41 +83,6 @@ const prizes = ref([
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow:
-      inset 0 0 50px 20px rgba(#8d46d6, 0.4),
-      0 10px 25px rgba(#8d46d6, 0.2);
-    border-color: #c4b3ff;
-
-    .prize-image img {
-      transform: scale(1.05);
-    }
-  }
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(
-      45deg,
-      transparent,
-      rgba(255, 255, 255, 0.1),
-      transparent
-    );
-    transform: rotate(45deg);
-    transition: all 0.6s;
-    opacity: 0;
-  }
-
-  &:hover::before {
-    opacity: 1;
-    animation: shimmer 1.2s ease-in-out;
-  }
 }
 
 .prize-image {
