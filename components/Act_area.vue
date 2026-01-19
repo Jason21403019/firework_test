@@ -6,20 +6,24 @@
     <Act_container>
       <div class="act-area__rules">
         <h3>活動時間：</h3>
-        <h4>2025 / 09 / 22 ( 一 ) 10:00 ~ 2025 / 10 / 14 ( 二 ) 10:00為止</h4>
+        <h4>即日起至 2026 / 03 / 10 ( 二 ) 10:00為止。</h4>
         <h3>中獎公布：</h3>
-        <h4>2025 / 10 / 23 ( 四 )</h4>
+        <h4>2026 / 03 / 17 ( 二 )。</h4>
         <p>活動說明：</p>
         <ul>
-          <li>活動限會員身分參加，需登 ( 加 ) 入會員。</li>
+          <li>活動限會員身分參加，皆需登 ( 加 ) 入會員。</li>
           <li>
-            點擊摩天輪上的
-            「立即占卜」，即可開始預測；占卜預測完成，即可獲得抽獎資格。
+            活動期間，每一會員帳號每日皆可玩一次轉盤（每日 00:00
+            起算），累計完成占卜次數，則可抽取指定獎項。
           </li>
           <li>
-            活動期間，每個會員不限占卜次數，每天皆可占卜（每日從00:00起算），累計完成占卜次數，則可抽取指定獎項。
+            參加會員需填 e-mail 和手機號碼等個人資料，以便後續領取 LINE Points
+            點數好禮（限量 8,000 組，送完為止）。
           </li>
         </ul>
+        <div class="act-area__rules-flow">
+          <img src="/imgs/act_container_flowimg.png" alt="活動規則" />
+        </div>
       </div>
     </Act_container>
     <h1 class="act-area__title">
@@ -29,28 +33,22 @@
       <div class="act-area__info">
         <ul class="act-area__info-list">
           <li class="act-area__info-list-items">
-            LINE Points 5 點將於 2025/10/27 起兩周內，以隨機方式透過 e-mail
-            或簡訊方式陸續派發兌換序號。請參加者於 2025/10/24
-            前，至會員中心填妥您的 e-mail
-            和手機號碼等領獎資料。若逾期未填或兩者缺一，聯合線上得取消其得獎資格。
+            請參加者於 2026/3/10（二）活動截止前，至會員中心完整填寫 e-mail
+            和手機號碼等個人資料，作為聯繫及領獎依據；若逾期未填寫，或填寫不完整，聯合線上得取消其獲（抽）獎資格。
           </li>
           <li class="act-area__info-list-items">
-            各獎項（獎品圖示僅供參考）將於活動結束後，由主辦單位以系統隨機抽出，並以
+            各獎項（獎品圖示僅供參考）將於活動結束後，由系統隨機抽出，並以
             e-mail
-            或簡訊方式通知領取，請務必確認填寫資訊的真實性與正確性皆無誤。
+            或簡訊方式通知中獎者。請務必確認填寫資訊的真實性與正確性皆無誤，以免影響領獎權益。
           </li>
           <li class="act-area__info-list-items">
-            主辦單位保留隨時修正、暫停、終止或解釋本活動之最終權利。
+            「LINE Points 5 點兌換序號」將於 2026/3/30 起兩周內，隨機以 e-mail
+            或簡訊方式陸續派發。請再次登入會員帳號進行領取 (派發前封鎖 udn LINE
+            官方帳號則取消獲獎資格)，並請妥善保管兌換序號，領取期限至
+            2025/04/17，逾期未領，聯合線上不再重新發送序號。
           </li>
           <li class="act-area__info-list-items">
-            若發現人為操作、使用網頁機器人程式或一次性信箱等參與活動，聯合線上得取消其參加或得獎資格。
-          </li>
-          <li class="act-area__info-list-items">
-            本活動獲獎資格不得重複，每人僅限一次領獎機會（依個人資料為準），均不得重複領獎。
-          </li>
-          <li class="act-area__info-list-items">
-            若經查核發現，得獎者於活動開獎日前一年內，參與聯合線上活動累計中獎獎項價值超過新台幣
-            1,000 元（含）以上，將取消本活動之獲獎資格。
+            每位參加者只要完成活動指定任務，即可獲得該獎項抽獎資格乙次；本活動獲獎資格不得重複，每人僅限一次領獎機會（依個人資料為準），均不得重複領獎。
           </li>
           <li class="act-area__info-list-items">
             若使用 Gmail
@@ -59,13 +57,27 @@
             等變體信箱。
           </li>
           <li class="act-area__info-list-items">
+            若經查核發現，得獎者於活動開獎日前一年內，參與聯合線上活動累計中獎獎項價值超過新台幣
+            1,000 元（含）以上，將取消本活動之獲獎資格。
+          </li>
+          <li class="act-area__info-list-items">
+            若發現人為操作、利用外掛程式、網頁機器人、一次性信箱或其他不正當方式參與活動，聯合線上有權取消其獲（抽）獎資格。
+          </li>
+          <li class="act-area__info-list-items">
+            主辦單位保留隨時修正、暫停、終止或解釋本活動之最終權利（包括但不限於更換活動、提前終止或延長活動時間之最終決定權等事項），並以本活動網站公告為準。
+          </li>
+          <li class="act-area__info-list-items">
             參與本次活動即代表您已充分了解並同意接受個資聲明與注意事項。
           </li>
         </ul>
       </div>
     </Act_container>
-
-    <Prize />
+    <h1 class="act-area__title">
+      <img src="/imgs/prize_title.png" alt="活動標題" />
+    </h1>
+    <Act_container>
+      <Prize />
+    </Act_container>
   </section>
 </template>
 
@@ -124,12 +136,18 @@ onMounted(() => {
   .act-area__rules {
     // border: 1px solid yellow;
     width: 100%;
-    margin-bottom: 140px;
-    @media (max-width: 1024px) {
-      margin-bottom: 80px;
-    }
-    @media (max-width: 480px) {
-      margin-bottom: 40px;
+    &-flow {
+      max-width: 910px;
+      margin: 0 auto;
+      @media (max-width: 480px) {
+        max-width: 520px;
+      }
+      img {
+        width: 100%;
+        @media (max-width: 480px) {
+          content: url("./imgs/act_container_flowimg_m.png");
+        }
+      }
     }
     h3,
     h4,
@@ -164,8 +182,10 @@ onMounted(() => {
     ul {
       list-style-type: disc;
       padding-left: 50px;
+      margin-bottom: 40px;
       @media (max-width: 480px) {
         padding-left: 20px;
+        margin-bottom: 20px;
       }
       li {
         color: #fff;
@@ -182,17 +202,12 @@ onMounted(() => {
   .act-area__info {
     // border: 1px solid blue;
     width: 100%;
-    margin-bottom: 140px;
-    @media (max-width: 1024px) {
-      margin-bottom: 80px;
-    }
-    @media (max-width: 480px) {
-      margin-bottom: 40px;
-    }
     ul {
-      list-style-type: number;
+      list-style: none;
       padding-left: 20px;
       li {
+        position: relative;
+        padding-left: 35px;
         color: #fff;
         font-size: 18px;
         margin-bottom: 10px;
@@ -200,6 +215,20 @@ onMounted(() => {
         text-align: justify;
         @media (max-width: 480px) {
           font-size: 16px;
+          padding-left: 30px;
+        }
+
+        &::before {
+          content: "";
+          position: absolute;
+          left: 0;
+          top: 4px;
+          width: 18px;
+          height: 18px;
+          background-image: url("/imgs/li_coin.png");
+          background-size: contain;
+          background-repeat: no-repeat;
+          background-position: center;
         }
       }
     }
