@@ -96,6 +96,10 @@ defineExpose({
   aspect-ratio: 16 / 9;
   overflow: hidden;
   container-type: inline-size;
+  @media (max-width: 640px) {
+    background-image: url("/imgs/banner_bg_m.png");
+    aspect-ratio: 640 / 1080;
+  }
 
   &__content {
     position: absolute;
@@ -117,6 +121,13 @@ defineExpose({
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
+    @media (max-width: 640px) {
+      aspect-ratio: 550 / 404;
+      width: 85cqw;
+      top: 11cqw;
+      left: 50%;
+      transform: translateX(-50%);
+    }
   }
 
   &__left-ubaby {
@@ -129,6 +140,13 @@ defineExpose({
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
+    z-index: 10;
+    @media (max-width: 640px) {
+      bottom: 5cqw;
+      left: 5cqw;
+      width: 32cqw;
+      aspect-ratio: 570 / 720;
+    }
   }
 
   &__right-ubaby {
@@ -141,6 +159,13 @@ defineExpose({
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
+    z-index: 10;
+    @media (max-width: 640px) {
+      bottom: 9cqw;
+      left: 62cqw;
+      width: 29cqw;
+      aspect-ratio: 590 / 780;
+    }
   }
 
   &__wheel-group {
@@ -149,6 +174,11 @@ defineExpose({
     bottom: 17cqw;
     width: 31cqw;
     aspect-ratio: 1 / 1;
+    @media (max-width: 640px) {
+      right: 18cqw;
+      bottom: 30cqw;
+      width: 64cqw;
+    }
   }
 
   &__wheel-out {
@@ -177,6 +207,10 @@ defineExpose({
     background-position: center;
     pointer-events: none;
     z-index: 10;
+    @media (max-width: 640px) {
+      width: 6cqw;
+      top: 5cqw;
+    }
   }
 
   &__wheel-inner {
@@ -195,6 +229,10 @@ defineExpose({
 
     &.is-spinning {
       animation: spinWheel 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+    @media (max-width: 640px) {
+      width: 90%;
+      height: 82.6%;
     }
   }
 

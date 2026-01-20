@@ -124,6 +124,7 @@
       </div>
     </div>
   </div>
+  <Footer />
 </template>
 
 <script setup>
@@ -139,7 +140,7 @@ import Loading_popup from "../components/Loading_popup.vue";
 import Verification_popup from "../components/Verification_popup.vue";
 import Universal_popup from "../components/Universal_popup.vue";
 import Redirect_popup from "../components/Redirect_popup.vue";
-
+import Footer from "../components/Footer.vue";
 // ==================== 引入 Stores 和 Composables ====================
 import { useUserStore } from "~/stores/user";
 import { useDivinationStore } from "~/stores/divination";

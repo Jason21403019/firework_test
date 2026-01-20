@@ -134,67 +134,15 @@ const closeModal = () => {
 
 <style lang="scss" scoped>
 .notice {
-  padding: 40px 20px 600px 20px;
+  padding: 0px 12px 0px 12px;
   max-width: 100%;
   margin: 0 auto;
-  background: url("/imgs/footer_bg.png") no-repeat center 40px;
   position: relative;
-  @media (max-width: 768px) {
-    background: url("/imgs/m_footer_bg.png") no-repeat center / cover;
-    padding: 40px 20px 670px 20px;
-  }
-  @media (max-width: 640px) {
-    background-size: auto;
-    padding: 40px 0px 580px 0px;
-  }
-  @media (max-width: 550px) {
-    background-size: contain;
-    padding: 40px 12px 530px 12px;
-  }
+  margin-bottom: 120px;
   @media (max-width: 480px) {
-    background-size: cover;
-    padding: 40px 12px 400px 12px;
-  }
-  @media (max-width: 410px) {
-    background-size: cover;
-    padding: 40px 12px 300px 12px;
-  }
-  @media (max-width: 360px) {
-    background-size: cover;
-    padding: 40px 12px 300px 12px;
+    margin-bottom: 100px;
   }
 
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    right: 120px;
-    width: 670px;
-    height: 475px;
-    background-image: url("/imgs/u_baby.png");
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center bottom;
-    z-index: 1;
-    @media (max-width: 1480px) {
-      right: 60px;
-      width: 500px;
-      height: 350px;
-    }
-    @media (max-width: 1180px) {
-      right: 30px;
-      width: 400px;
-      height: 300px;
-    }
-    @media (max-width: 992px) {
-      right: 20px;
-      width: 300px;
-      height: 250px;
-    }
-    @media (max-width: 768px) {
-      background-image: none;
-    }
-  }
   &__buttons {
     display: flex;
     gap: 40px;
