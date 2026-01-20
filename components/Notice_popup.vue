@@ -22,21 +22,18 @@
         class="notice__popup"
         :class="{ 'notice__popup--closing': isClosing }"
       >
-        <div class="notice__popup-inner">
           <button class="notice__close-btn" @click="closeModal">
             <svg
-              width="24"
-              height="24"
+              width="60"
+              height="60"
               viewBox="0 0 24 24"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                d="M18 6L6 18M6 6L18 18"
+                d="M20 20L4 4M4 20L20 4"
                 stroke="currentColor"
-                stroke-width="3"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                stroke-width="4"
               />
             </svg>
           </button>
@@ -58,7 +55,6 @@
               </li>
             </ul>
           </div>
-        </div>
       </div>
     </div>
   </div>
@@ -105,7 +101,7 @@ const contentData = {
       "個人資料利用之地區：本公司營運範圍，僅限於台灣、金門、澎湖、馬祖等地區利用，且不會移轉至其他境外地區利用。",
       "個人資料利用之對象及方式：由本公司該業務承辦人員於辦理該活動之特定目的必要範圍內，依通常作業所必要之方式利用此個人資料。本活動網站公開之資料，公眾將可透過網際網路瀏覽參與活動所公開之資料或中獎資訊。本公司對於中獎資訊之公布，將採取隱匿部分個人資訊之方式處理，以確保個人資料之安全。",
       "依個人資料保護法第三條規定得行使之權利及方式：台端得向本公司承辦該項業務單位「聯合線上股份有限公司」提出申請，以查詢、閱覽、製給複製本；或補充／更正、請求停止蒐集、處理、利用或刪除個人資料內容之一部或全部。（註：參加人申請查詢、閱覽、製給複製本時，將酌收必要成本費用。）",
-      "台端填寫個人資料後，以任何方式遞送至本公司收執時，均視為台端已同意其所填寫之個人資料，供本公司於辦理『幸福花火秋好運』活動之特定目的必要範圍內處理及利用；此外，台端可自行決定是否填寫相關之個人資料欄位，若台端選擇不願填寫，將無法參加本次活動所提供之相關服務或遭取消中獎資格。",
+      "台端填寫個人資料後，以任何方式遞送至本公司收執時，均視為台端已同意其所填寫之個人資料，供本公司於辦理『馬上有福轉好運』活動之特定目的必要範圍內處理及利用；此外，台端可自行決定是否填寫相關之個人資料欄位，若台端選擇不願填寫，將無法參加本次活動所提供之相關服務或遭取消中獎資格。",
       "個人資料安全措施：本公司將依據相關法令之規定建構完善措施，保障台端個人資料之安全。",
     ],
   },
@@ -212,56 +208,19 @@ const closeModal = () => {
   }
 
   &__btn {
-    max-width: 280px;
-    padding: 16px 70px;
+    max-width: 250px;
+    padding: 8px 40px;
     border-radius: 50px;
-    background: linear-gradient(to bottom, #9c0191, #fe2d58);
-    color: #fff;
-    font-size: 32px;
-    font-weight: 400;
+    background: linear-gradient(to bottom, #faebb5, #e7c170);
+    color: #80552B;
+    font-size: clamp(20px, 4cqw, 40px);
+    font-weight: 600;
     cursor: pointer;
     border: none;
-    transition: all 0.3s ease;
     position: relative;
-    @media (max-width: 992px) {
-      padding: 12px 60px;
-      font-size: 28px;
-    }
-    @media (max-width: 640px) {
-      padding: 12px 40px;
-      font-size: 24px;
-    }
-    @media (max-width: 420px) {
-      padding: 10px 30px;
-      font-size: 20px;
-    }
-
-    &::before {
-      content: "";
-      position: absolute;
-      top: 14px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80%;
-      height: 8px;
-      background: linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0.2) 10%,
-        rgba(255, 255, 255, 0.3) 50%,
-        rgba(255, 255, 255, 0.2) 90%
-      );
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-      border-radius: 25px;
-      opacity: 0.8;
-    }
-
-    &:hover {
-      background: linear-gradient(to bottom, #b801a8, #ff4570);
-      border-color: #c4b3ff;
-      transform: translateY(-3px);
-      box-shadow:
-        inset 0 0 20px 5px rgba(156, 1, 145, 0.2),
-        0 8px 20px rgba(156, 1, 145, 0.3);
+    @media (max-width: 450px) {
+      max-width: 280px;
+      padding: 8px 30px;
     }
   }
 
@@ -286,89 +245,51 @@ const closeModal = () => {
   }
 
   &__popup {
-    background: linear-gradient(to bottom, #05026a, #4a46fc);
-    border: 3px solid #d8ceff;
+    background: #D83307;
     border-radius: 25px;
     max-width: 1060px;
     max-height: 700px;
     position: relative;
     animation: modalBounceIn 0.3s ease-out;
-    padding: 20px;
+    padding: 60px;
+    border: 10px solid #E05C39;
 
     &--closing {
       animation: modalBounceOut 0.25s ease-in;
     }
+    @media (max-width: 768px) {
+      padding: 40px;
+    }
     @media (max-width: 480px) {
+      padding: 30px;
       border: none;
     }
-    @media (max-width: 360px) {
-      padding: 10px;
-    }
-    &::before {
-      content: "";
-      position: absolute;
-      width: 80%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      background: rgba($color: #fff, $alpha: 0.05);
-    }
-  }
 
-  &__popup-inner {
-    position: relative;
-    padding: 60px 50px;
-    border-radius: 20px;
-    border: 2px solid #577cff;
-    z-index: 0;
-    @media (max-width: 768px) {
-      padding: 40px 30px;
-    }
-    @media (max-width: 480px) {
-      padding: 30px 20px;
-      border: 2px solid #06056a;
-    }
-    @media (max-width: 360px) {
-      padding: 20px 10px;
-    }
   }
 
   &__close-btn {
     position: absolute;
-    top: -12px;
-    right: -12px;
+    top: -22px;
+    right: -22px;
     width: 40px;
     height: 40px;
     border: none;
-    background: linear-gradient(to bottom, #fe88f6, #fe32d9);
+    background: #E7C170;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    color: white;
+    color: #80552B;
     z-index: 10;
-    @media (max-width: 480px) {
-      top: -32px;
-      right: -32px;
-    }
-    @media (max-width: 360px) {
-      top: -24px;
-      right: -24px;
-    }
-
-    &:hover {
-      transform: scale(1.1);
-      box-shadow: 0 4px 12px rgba(254, 50, 217, 0.4);
-    }
   }
 
   &__title {
     margin-bottom: 20px;
     font-size: 30px;
     font-weight: bold;
-    color: #fbcf47;
+    color: #FAEBB5;
     text-align: left;
     @media (max-width: 480px) {
       font-size: 24px;
@@ -402,17 +323,13 @@ const closeModal = () => {
     }
 
     &::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.1);
+      background: #E05C39;
       border-radius: 4px;
     }
 
     &::-webkit-scrollbar-thumb {
-      background: linear-gradient(to bottom, #577cff, #06056a);
+      background: #fff;
       border-radius: 4px;
-    }
-
-    &::-webkit-scrollbar-thumb:hover {
-      background: linear-gradient(to bottom, #7a9aff, #0a0a8a);
     }
   }
 
