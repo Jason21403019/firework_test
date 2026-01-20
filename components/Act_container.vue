@@ -33,7 +33,7 @@ defineProps({
       position: relative;
       margin-top: -6.3cqw;
       margin-left: -0.6cqw;
-      width: 101.3cqw;
+      width: 101.35cqw;
       height: auto;
       display: block;
     }
@@ -44,16 +44,16 @@ defineProps({
     position: relative;
     img {
       position: relative;
-      margin-left: -0.5cqw;
+      margin-left: -0.4cqw;
       margin-bottom: -6.1cqw;
-      width: 101cqw;
+      width: 100.9cqw;
       height: auto;
       display: block;
     }
   }
 
   @media (max-width: 1024px) {
-    margin-bottom: 80px;
+    margin-bottom: 120px;
     border-right: 5px solid #faebb4;
     border-left: 5px solid #faebb4;
   }
@@ -66,7 +66,7 @@ defineProps({
     border-left: 3px solid #faebb4;
   }
   @media (max-width: 480px) {
-    margin-bottom: 40px;
+    margin-bottom: 100px;
     border-right: 2px solid #faebb4;
     border-left: 2px solid #faebb4;
   }

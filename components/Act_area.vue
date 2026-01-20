@@ -124,6 +124,7 @@ onMounted(() => {
     @media (max-width: 768px) {
       max-width: 520px;
       max-height: 60px;
+      margin-bottom: 60px;
     }
     img {
       width: 100%;

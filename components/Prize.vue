@@ -1,17 +1,23 @@
 <template>
-  <div class="prize-container">
     <div class="prize-grid">
-      <div v-for="(prize, index) in prizes" :key="index" class="prize-card">
+      <component 
+        v-for="(prize, index) in prizes" 
+        :key="index" 
+        :is="prize.link ? 'a' : 'div'"
+        :href="prize.link"
+        :target="prize.link ? '_blank' : undefined"
+        :rel="prize.link ? 'noopener noreferrer' : undefined"
+        class="prize-card"
+      >
         <div class="prize-image">
-          <img :src="prize.image" :alt="prize.title" />
+          <img :src="prize.image" :alt="prize.title" :style="{ '--img-width': getImageWidth(prize.id) }" />
         </div>
         <div class="prize-content">
           <h3 class="prize-title">{{ prize.title }}</h3>
           <p class="prize-subtitle">{{ prize.subtitle }}</p>
         </div>
-      </div>
+      </component>
     </div>
-  </div>
 </template>
 
 <script setup>
@@ -21,51 +27,68 @@ import { ref } from "vue";
 const prizes = ref([
   {
     id: 1,
-    image: "./imgs/dyson1.png",
-    title: "幸福閃耀獎",
-    subtitle: "Dyson 三合一涼暖空氣清淨機 | 1 名",
+    image: "./imgs/iphone.png",
+    title: "馬到成功旗艦獎",
+    subtitle: "iPhone 17 Pro | 1 名",
   },
   {
     id: 2,
-    image: "./imgs/citycoffee.png",
-    title: "啡常幸運獎",
-    subtitle: "CITY CAFÉ 提貨券 | 100 名",
+    image: "./imgs/course.png",
+    title: "行遍天下好運獎",
+    subtitle: "熟齡英文開聊線上課 | 5 名",
+    link: "https://learning.udn.com/orange/courses/laienglish",
   },
   {
     id: 3,
-    image: "./imgs/linepoints5.png",
-    title: "星點好運獎",
-    subtitle: "LINE POINTS 5 點 | 8 千組送完為止  ",
+    image: "./imgs/cooking.png",
+    title: "新春料理美味獎",
+    subtitle: "百歲料理課線上課 | 5 名",
+    link: "https://learning.udn.com/orange/courses/achingandwanpin",
+  },
+  {
+    id: 4,
+    image: "./imgs/clean.png",
+    title: "除舊佈新納福獎",
+    subtitle: "生活收納課線上課 | 5 名",
+    link: "https://learning.udn.com/orange/courses/tidyman2022",
+  },
+  {
+    id: 5,
+    image: "./imgs/711.png",
+    title: "開春好禮補給獎",
+    subtitle: "7-11 虛擬商品卡200元 | 10 名",
+  },
+  {
+    id: 6,
+    image: "./imgs/points.png",
+    title: "馬上好運加點獎",
+    subtitle: "LINE POINTS 5 點\n8,000組 (送完為止)",
   },
 ]);
+
+// 根據獎品ID設定圖片寬度
+const getImageWidth = (prizeId) => {
+  const widthMap = {
+    1: '75%',  // iPhone (150*190)
+    2: '80%', // 課程 (225*150)
+    3: '80%', // 料理 (225*150)
+    4: '80%', // 收納 (225*150)
+    5: '60%',  // 711 (160*175)
+    6: '85%'   // Points (180*93)
+  };
+  return widthMap[prizeId] || '100%';
+};
 </script>
 
 <style lang="scss" scoped>
-.prize-container {
-  padding: 0px 0px 120px 0px;
-  max-width: 1200px;
-  margin: 0 auto;
-  @media (max-width: 1024px) {
-    padding-bottom: 80px;
-  }
-  @media (max-width: 480px) {
-    padding-bottom: 40px;
-  }
-}
 
 .prize-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(1, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 25px;
   @media (max-width: 1180px) {
     gap: 20px;
-  }
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  @media (max-width: 480px) {
-    grid-template-columns: repeat(1, 1fr);
   }
   @media (max-width: 360px) {
     gap: 12px;
@@ -73,29 +96,59 @@ const prizes = ref([
 }
 
 .prize-card {
-  max-width: 100%;
-  border: 3px solid #d8ceff;
-  box-shadow: inset 0 0 50px 20px rgba(#8d46d6, 0.3);
-  background-color: rgba(#8d46d6, 0.2);
+  flex: 0 1 300px;
+  max-width: 300px;
+  min-width: 280px;
   border-radius: 10px;
-  padding: 10px 10px 20px 10px;
   text-align: center;
   transition: all 0.3s ease;
   position: relative;
-  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  
+  @media (max-width: 768px) {
+    flex: 0 1 calc(50% - 10px);
+  }
+  
+  @media (max-width: 480px) {
+    flex: 0 1 100%;
+  }
+  
+  // 為 a 標籤添加 hover 效果
+  &:hover {
+    transform: translateY(-5px);
+    
+    .prize-image img {
+      transform: scale(1.05);
+    }
+  }
+  
+  // 確保 a 標籤樣式一致
+  &[href] {
+    cursor: pointer;
+  }
 }
 
 .prize-image {
-  max-width: 100%;
-  margin-bottom: 10px;
+  width: 288px;
+  height: 288px;
+  margin: 0 auto 10px auto;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border-radius: 10px;
+  border-radius: 50%;
+  background-color: #fff;
+  border: 6px solid #EED48C;
+  
+  @media (max-width: 768px) {
+    width: 245px;
+    height: 245px;
+  }
 
   img {
-    width: 100%;
+    max-width: var(--img-width, 100%);
+    max-height: 80%;
     object-fit: contain;
     transition: transform 0.3s ease;
   }
@@ -103,9 +156,9 @@ const prizes = ref([
 
 .prize-content {
   .prize-title {
-    font-size: 40px;
-    font-weight: 400;
-    color: #fbcf47;
+    font-size: clamp(20px, 4cqw, 36px);
+    font-weight: 600;
+    color: #fff;
     margin: 0 0 10px 0;
     line-height: 1.2;
     letter-spacing: 4px;
@@ -133,10 +186,11 @@ const prizes = ref([
 
   .prize-subtitle {
     font-size: 18px;
-    color: #fff;
+    color: #FAEBB5;
     margin: 0 auto;
     line-height: 1.5;
     display: inline-block;
+    white-space: pre-line;
     @media (max-width: 480px) {
       font-size: 16px;
     }
