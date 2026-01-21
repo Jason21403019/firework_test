@@ -11,22 +11,20 @@
     >
       <div class="already-played__popup-inner">
         <button class="already-played__close-btn" @click="closeModal">
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M18 6L6 18M6 6L18 18"
-              stroke="currentColor"
-              stroke-width="3"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </button>
+            <svg
+              width="60"
+              height="60"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20 20L4 4M4 20L20 4"
+                stroke="currentColor"
+                stroke-width="4"
+              />
+            </svg>
+          </button>
 
         <div class="already-played__title">
           <img
@@ -208,36 +206,20 @@ const closeModal = () => {
 
   &__close-btn {
     position: absolute;
-    top: -26px;
-    right: -32px;
+    top: -22px;
+    right: -22px;
     width: 40px;
     height: 40px;
     border: none;
-    background: linear-gradient(to bottom, #fe88f6, #fe32d9);
+    background: #E7C170;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    color: white;
+    color: #80552B;
     z-index: 10;
-
-    @media (max-width: 480px) {
-      top: -20px;
-      right: -20px;
-    }
-    @media (max-width: 410px) {
-      width: 36px;
-      height: 36px;
-      top: -25px;
-      right: -30px;
-    }
-
-    &:hover {
-      transform: scale(1.1);
-      box-shadow: 0 4px 12px rgba(254, 50, 217, 0.4);
-    }
   }
 
   &__title {

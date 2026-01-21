@@ -19,7 +19,7 @@
   const FORTUNE_RESULTS = [
     {
       id: "fortune_1",
-      title: "心型煙火 | 幸運指數:91%",
+      title:"",
       description:
         "今日你愛情能量報表!特別適合告白、約會，\n你的魅力讓你閃閃發光。",
       image_url: "https://event.udn.com/bd_newyear2026/imgs/heart.png",
@@ -27,7 +27,7 @@
     },
     {
       id: "fortune_2",
-      title: "金浪煙火 | 幸運指數:88%",
+      title: "",
       description:
         "財務上有不錯的直覺和機會，適合投資、\n做小額理財規劃。也有機會獲得意外之財或小獎喔!",
       image_url: "https://event.udn.com/bd_newyear2026/imgs/goldwave.png",
@@ -35,7 +35,7 @@
     },
     {
       id: "fortune_3",
-      title: "療癒煙火 | 幸運指數:75%",
+      title: "",
       description:
         "今天適合慢下腳步，讓身心放鬆，\n多親近自然或早點休息，補充滿滿能量!",
       image_url: "https://event.udn.com/bd_newyear2026/imgs/healing.png",
@@ -43,7 +43,7 @@
     },
     {
       id: "fortune_4",
-      title: "金光煙火 | 幸運指數:80%",
+      title: "",
       description:
         "你的工作運極佳，有重要會議或報告時表現亮眼，\n適合發展實力的好日子。",
       image_url: "https://event.udn.com/bd_newyear2026/imgs/goldlight.png",
@@ -162,11 +162,6 @@
             <p class="fortune-result__description">${fortuneData.description.replace(/\n/g, "<br>")}</p>
             ${message ? `<p class="fortune-result__description">${message}</p>` : ""}
             ${reminder ? `<p class="fortune-result__description">${reminder}</p>` : ""}
-            <div class="fortune-result__share-buttons">
-              <button class="fortune-result__line-button" onclick="window.shareFortune()">
-                Line 分享占卜結果
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -298,38 +293,6 @@
         line-height: 1.6;
         margin-bottom: 20px;
         white-space: pre-line;
-      }
-
-      .fortune-result__share-buttons {
-        margin-top: 25px;
-        display: flex;
-        justify-content: center;
-        margin-bottom: -60px;
-      }
-
-      .fortune-result__line-button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        background: linear-gradient(to right, #f7c439, #f69c2e);
-        color: white;
-        border: none;
-        border-radius: 50px;
-        font-weight: 600;
-        max-width: 480px;
-        padding: 16px 60px;
-        font-size: 20px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        white-space: nowrap;
-        box-sizing: border-box;
-      }
-
-      .fortune-result__line-button:hover {
-        background: linear-gradient(to right, #f69c2e, #f7c439);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(247, 196, 57, 0.4);
       }
 
       @keyframes popupIn {

@@ -9,7 +9,7 @@ export const useDivinationStore = defineStore("divination", {
     fortuneResults: [
       {
         id: "fortune_1",
-        title: "心型煙火 | 幸運指數:91%",
+        title: "",
         description:
           "今日你愛情能量報表!特別適合告白、約會，\n你的魅力讓你閃閃發光。",
         image_url: "./imgs/heart.png",
@@ -17,7 +17,7 @@ export const useDivinationStore = defineStore("divination", {
       },
       {
         id: "fortune_2",
-        title: "金浪煙火 | 幸運指數:88%",
+        title: "",
         description:
           "財務上有不錯的直覺和機會，適合投資、\n做小額理財規劃。也有機會獲得意外之財或小獎喔!",
         image_url: "./imgs/goldwave.png",
@@ -25,7 +25,7 @@ export const useDivinationStore = defineStore("divination", {
       },
       {
         id: "fortune_3",
-        title: "療癒煙火 | 幸運指數:75%",
+        title: "",
         description:
           "今天適合慢下腳步，讓身心放鬆，\n多親近自然或早點休息，補充滿滿能量!",
         image_url: "./imgs/healing.png",
@@ -33,7 +33,7 @@ export const useDivinationStore = defineStore("divination", {
       },
       {
         id: "fortune_4",
-        title: "金光煙火 | 幸運指數:80%",
+        title: "",
         description:
           "你的工作運極佳，有重要會議或報告時表現亮眼，\n適合發展實力的好日子。",
         image_url: "./imgs/goldlight.png",

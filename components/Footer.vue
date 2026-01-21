@@ -11,10 +11,10 @@
 .footer {
   width: 100%;
   height: 340px;
-  background: url("/imgs/footer_bg.png") no-repeat center bottom;
+  background: url("/imgs/footerbg.png") no-repeat center bottom;
   background-size: cover;
   @media (max-width: 640px) {
-    background: url("/imgs/footer_bg_m.png") no-repeat center bottom;
+    background: url("/imgs/footerbg_m.png") no-repeat center bottom;
     background-size: cover;
     height: 232px;
   }

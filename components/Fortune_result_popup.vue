@@ -9,24 +9,21 @@
       class="fortune-result__popup"
       :class="{ 'fortune-result__popup--closing': isClosing }"
     >
-      <div class="fortune-result__popup-inner">
         <button class="fortune-result__close-btn" @click="closeModal">
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M18 6L6 18M6 6L18 18"
-              stroke="currentColor"
-              stroke-width="3"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </button>
+            <svg
+              width="60"
+              height="60"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20 20L4 4M4 20L20 4"
+                stroke="currentColor"
+                stroke-width="4"
+              />
+            </svg>
+          </button>
         <div
           class="fortune-result__image-container"
           v-if="fortuneData.image_url"
@@ -51,13 +48,7 @@
             v-html="customMessage"
             class="fortune-result__custom-message"
           ></div>
-          <div class="fortune-result__share-buttons">
-            <button @click="shareToLine" class="fortune-result__line-button">
-              Line 分享占卜結果
-            </button>
-          </div>
         </div>
-      </div>
     </div>
   </div>
 </template>
@@ -154,82 +145,25 @@ const shareToLine = () => {
       max-width: 90vw;
       padding: 10px;
     }
-
-    &::before {
-      content: "";
-      position: absolute;
-      width: 80%;
-      height: 100%;
-      border-top-left-radius: 10px;
-      border-bottom-left-radius: 10px;
-      top: 0;
-      left: 0;
-      background: rgba(255, 255, 255, 0.05);
-    }
   }
 
-  &__popup-inner {
-    position: relative;
-    padding: 10px 10px;
-    border-radius: 10px;
-    z-index: 1;
-    border: 2px solid #577bff52;
-    &::before {
-      content: url("../imgs/left_circle.png");
-      position: absolute;
-      top: 370px;
-      left: -40px;
-      @media (max-width: 410px) {
-        left: -30px;
-      }
-      @media (max-width: 380px) {
-        top: 300px;
-      }
-    }
-
-    @media (max-width: 768px) {
-      padding: 30px 20px;
-    }
-    @media (max-width: 480px) {
-      padding: 25px 15px;
-    }
-    @media (max-width: 410px) {
-      padding: 20px 10px;
-    }
-  }
 
   &__close-btn {
     position: absolute;
-    top: -26px;
-    right: -32px;
+    top: -22px;
+    right: -22px;
     width: 40px;
     height: 40px;
     border: none;
-    background: linear-gradient(to bottom, #fe88f6, #fe32d9);
+    background: #E7C170;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    color: white;
+    color: #80552B;
     z-index: 10;
-
-    @media (max-width: 480px) {
-      top: -20px;
-      right: -20px;
-    }
-    @media (max-width: 410px) {
-      width: 36px;
-      height: 36px;
-      top: -25px;
-      right: -30px;
-    }
-
-    &:hover {
-      transform: scale(1.1);
-      box-shadow: 0 4px 12px rgba(254, 50, 217, 0.4);
-    }
   }
 
   &__title {
@@ -251,28 +185,6 @@ const shareToLine = () => {
   &__image-container {
     text-align: center;
     margin-bottom: 20px;
-    &::before {
-      content: url("../imgs/left_ribbons.png");
-      position: absolute;
-      top: 160px;
-      left: -35px;
-      @media (max-width: 410px) {
-        left: -30px;
-      }
-    }
-    &::after {
-      content: url("../imgs/right_ribbons.png");
-      position: absolute;
-      top: 240px;
-      right: -50px;
-      @media (max-width: 410px) {
-        right: -30px;
-      }
-      @media (max-width: 380px) {
-        right: -35px;
-        top: 180px;
-      }
-    }
   }
 
   &__image {
@@ -332,15 +244,6 @@ const shareToLine = () => {
         }
       }
 
-      &::after {
-        content: url("../imgs/right_circle.png");
-        position: absolute;
-        bottom: 0px;
-        right: -10px;
-        @media (max-width: 380px) {
-          bottom: -10px;
-        }
-      }
       @media (max-width: 640px) {
         font-size: 16px;
       }
@@ -352,55 +255,6 @@ const shareToLine = () => {
       @media (max-width: 380px) {
         font-size: 12px;
       }
-    }
-  }
-
-  &__share-buttons {
-    margin-top: 25px;
-    display: flex;
-    justify-content: center;
-    margin-bottom: -60px;
-  }
-
-  &__line-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background: linear-gradient(to right, #f7c439, #f69c2e); // 您指定的漸層色
-    color: white;
-    border: none;
-    border-radius: 50px;
-    font-weight: 600;
-    max-width: 480px;
-    padding: 16px 60px;
-    font-size: 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    white-space: nowrap; // 防止文字換行
-    box-sizing: border-box;
-
-    &:hover {
-      background: linear-gradient(
-        to right,
-        #f69c2e,
-        #f7c439
-      ); // hover 時反轉漸層
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(247, 196, 57, 0.4);
-    }
-
-    img {
-      margin-right: 4px;
-      flex-shrink: 0; // 防止圖片被壓縮
-    }
-    @media (max-width: 640px) {
-      padding: 12px 24px;
-      font-size: 18px;
-    }
-
-    @media (max-width: 480px) {
-      padding: 10px 16px;
     }
   }
 }
