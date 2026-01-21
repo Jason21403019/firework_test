@@ -12,32 +12,32 @@ export const useDivinationStore = defineStore("divination", {
         title: "",
         description:
           "今日你愛情能量報表!特別適合告白、約會，\n你的魅力讓你閃閃發光。",
-        image_url: "./imgs/heart.png",
-        weight: 20,
+        image_url: "./imgs/daji.png",
+        weight: 40,
       },
       {
         id: "fortune_2",
         title: "",
         description:
           "財務上有不錯的直覺和機會，適合投資、\n做小額理財規劃。也有機會獲得意外之財或小獎喔!",
-        image_url: "./imgs/goldwave.png",
-        weight: 20,
+        image_url: "./imgs/zhongji.png",
+        weight: 30,
       },
       {
         id: "fortune_3",
         title: "",
         description:
           "今天適合慢下腳步，讓身心放鬆，\n多親近自然或早點休息，補充滿滿能量!",
-        image_url: "./imgs/healing.png",
-        weight: 40,
+        image_url: "./imgs/xiaoji.png",
+        weight: 20,
       },
       {
         id: "fortune_4",
         title: "",
         description:
           "你的工作運極佳，有重要會議或報告時表現亮眼，\n適合發展實力的好日子。",
-        image_url: "./imgs/goldlight.png",
-        weight: 20,
+        image_url: "./imgs/ping.png",
+        weight: 10,
       },
     ],
   }),

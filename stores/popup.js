@@ -6,6 +6,7 @@ export const usePopupStore = defineStore("popup", {
     showFortuneResultPopup: false,
     fortuneResultData: {},
     fortuneCustomMessage: "",
+    fortuneResultType: "normal", // 'first' | 'normal' | 'final'
 
     // 已占卜過彈窗
     showAlreadyPlayedPopup: false,
@@ -29,10 +30,11 @@ export const usePopupStore = defineStore("popup", {
 
   actions: {
     // 占卜結果彈窗
-    openFortuneResultPopup(fortuneData, customMessage = "") {
+    openFortuneResultPopup(fortuneData, customMessage = "", resultType = "normal") {
       this.fortuneResultData = fortuneData;
       this.fortuneCustomMessage =
         customMessage || "<div class='glowing-message'>占卜已完成！</div>";
+      this.fortuneResultType = resultType;
       this.showFortuneResultPopup = true;
     },
 

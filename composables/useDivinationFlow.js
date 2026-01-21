@@ -28,7 +28,7 @@ export const useDivinationFlow = () => {
   const generateResultMessage = (playCount) => {
     if (playCount === 1) {
       // 第一次：特別文案，獲得 5 points
-      return "<div class='glowing-message'><span class='glowing-message-title'>恭喜完成!</span><br>恭喜完成第 1 次占卜，獲得 5 points！</div>";
+      return "小提醒：每天都能玩轉盤抽紅包<br>iPhone 17 Pro 大獎要送你！</div>";
     } else if (playCount === 20) {
       // 第二十次：恭喜達成
       return "<div class='glowing-message'><span class='glowing-message-title'>恭喜達成!</span><br>已完成 20 次占卜，獲得 Dyson 大獎抽獎資格！</div>";

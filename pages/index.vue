@@ -18,6 +18,7 @@
       :is-visible="popupStore.showFortuneResultPopup"
       :fortune-data="popupStore.fortuneResultData"
       :custom-message="popupStore.fortuneCustomMessage"
+      :result-type="popupStore.fortuneResultType"
       @close="closeFortune"
     />
     <!-- 已經占卜過的彈窗 -->
@@ -65,8 +66,14 @@
       <div class="debug-section">
         <h4>🎨 彈窗測試</h4>
         <div class="debug-actions">
-          <button @click="testFortunePopup" class="debug-btn">
-            測試占卜結果彈窗
+          <button @click="testFirstComplete" class="debug-btn">
+            第一次完成
+          </button>
+          <button @click="testNormalComplete" class="debug-btn">
+            第二次之後完成
+          </button>
+          <button @click="testFinalComplete" class="debug-btn">
+            第25次完成
           </button>
           <button @click="testAlreadyPlayedPopup" class="debug-btn">
             測試重複遊玩彈窗
@@ -333,8 +340,8 @@ function showAlreadyPlayedMessage() {
 }
 
 // 顯示占卜結果
-function showFortuneResult(fortuneData, customResultMessage) {
-  popupStore.openFortuneResultPopup(fortuneData, customResultMessage);
+function showFortuneResult(fortuneData, customResultMessage, resultType = "normal") {
+  popupStore.openFortuneResultPopup(fortuneData, customResultMessage, resultType);
 }
 
 // 關閉占卜結果彈窗
@@ -380,28 +387,34 @@ function toggleDebugTools() {
 }
 
 // ==================== 測試彈窗函數 ====================
-// 測試占卜結果彈窗（使用正式內容）
-function testFortunePopup() {
-  // 生成隨機占卜結果
+// 測試第一次完成
+function testFirstComplete() {
   const fortuneData = divinationStore.generateFortuneResult();
+  const customResultMessage =
+    "<span class='custom-result-message-coin'><img src='/imgs/li_coin.png' alt='li_coin' /></span>小提醒：每天都能玩轉盤抽紅包<br>iPhone 17 Pro 大獎要送你！";
+  
+  popupStore.openFortuneResultPopup(fortuneData, customResultMessage, "first");
+  console.log("🎨 測試第一次完成彈窗");
+}
 
-  // 生成訊息（與正式流程一致）
-  const playCount = divinationStore.totalPlayCount;
-  let customResultMessage = "";
+// 測試第二次之後完成
+function testNormalComplete() {
+  const fortuneData = divinationStore.generateFortuneResult();
+  const customResultMessage =
+    "<div class='glowing-message'><span class='glowing-message-title'>占卜完成!</span><br>明天繼續來占卜，累積好運！</div>";
+  
+  popupStore.openFortuneResultPopup(fortuneData, customResultMessage, "normal");
+  console.log("🎨 測試第二次之後完成彈窗");
+}
 
-  if (playCount === 1) {
-    customResultMessage =
-      "<div class='glowing-message'><span class='glowing-message-title'>恭喜完成!</span><br>恭喜完成第 1 次占卜，獲得 5 points！</div>";
-  } else if (playCount === 20) {
-    customResultMessage =
-      "<div class='glowing-message'><span class='glowing-message-title'>恭喜達成!</span><br>已完成 20 次占卜，獲得 Dyson 大獎抽獎資格！</div>";
-  } else {
-    customResultMessage =
-      "<div class='glowing-message'><span class='glowing-message-title'>占卜完成!</span><br>明天繼續來占卜，累積好運！</div>";
-  }
-
-  showFortuneResult(fortuneData, customResultMessage);
-  console.log("🎨 測試占卜結果彈窗");
+// 測試第25次（最後一次）完成
+function testFinalComplete() {
+  const fortuneData = divinationStore.generateFortuneResult();
+  const customResultMessage =
+    "<div class='glowing-message'><span class='glowing-message-title'>恭喜達成!</span><br>已完成 25 次占卜，獲得 Dyson 大獎抽獎資格！</div>";
+  
+  popupStore.openFortuneResultPopup(fortuneData, customResultMessage, "final");
+  console.log("🎨 測試第25次完成彈窗");
 }
 
 // 測試重複遊玩彈窗（使用正式內容）
