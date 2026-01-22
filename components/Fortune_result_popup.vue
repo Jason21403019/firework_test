@@ -162,12 +162,7 @@ const closeModal = () => {
     z-index: 1000;
     padding: 12px;
     animation: overlayFadeIn 0.3s ease-out;
-    @media (max-width: 640px) {
-      padding: 32px;
-    }
-    @media (max-width: 380px) {
-      padding: 22px;
-    }
+    container-type: inline-size;
 
     &--closing {
       animation: overlayFadeOut 0.3s ease-out;
@@ -179,11 +174,13 @@ const closeModal = () => {
     border-bottom-left-radius: 50px;
     border-bottom-right-radius: 50px;
     width: 490px;
-    height: 60vh;
+    // height: 545px;
+    min-height: 545px;
     position: relative;
     animation: modalBounceIn 0.3s ease-out;
     padding: 30px;
     container-type: inline-size;
+    margin-top: 15vh;
     &::before {
       content: "";
       position: absolute;
@@ -197,7 +194,7 @@ const closeModal = () => {
     &::after {
       content: "";
       position: absolute;
-      bottom: 115px;
+      bottom: 105px;
       left: 50%;
       transform: translateX(-50%);
       width: 100%;
@@ -207,15 +204,6 @@ const closeModal = () => {
 
     &--closing {
       animation: modalBounceOut 0.25s ease-in;
-    }
-
-    @media (max-width: 640px) {
-      border: none;
-      max-width: 95vw;
-    }
-    @media (max-width: 410px) {
-      max-width: 90vw;
-      padding: 10px;
     }
   }
 
@@ -234,15 +222,6 @@ const closeModal = () => {
       height: auto;
     }
     
-    @media (max-width: 640px) {
-      top: -25px;
-      max-width: 95%;
-    }
-    
-    @media (max-width: 410px) {
-      top: -20px;
-      max-width: 90%;
-    }
   }
 
   &__close-btn {
@@ -272,7 +251,7 @@ const closeModal = () => {
     font-weight: bold;
     color: #FAEBB5;
     text-align: center;
-    margin-bottom: 5.45cqw; // 30px
+    margin-bottom: 30px;
     margin-top: -7%;
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
     
@@ -289,40 +268,23 @@ const closeModal = () => {
         padding-right: 10px;
       }
     }
-    
-
-
-    @media (max-width: 640px) {
-      font-size: 24px;
-    }
-    @media (max-width: 410px) {
-      font-size: 20px;
-    }
 
     // normal 版本的 title 獨立樣式
     &--normal {
-      margin-bottom: 2.73cqw; // 15px
+      margin-bottom: 15px;
     }
 
     // final 版本的 title 獨立樣式
     &--final {
-      margin-bottom: 2.73cqw; // 15px
+      margin-bottom: 15px;
       font-size: clamp(26px, 5.82cqw, 32px);
       color: #ff69b4;
       text-shadow: 0 0 10px rgba(255, 105, 180, 0.8);
-
-      @media (max-width: 640px) {
-        font-size: 26px;
-      }
-      @media (max-width: 410px) {
-        font-size: 22px;
-      }
     }
   }
 
   &__image-container {
-    width: 45.45cqw; // 250px
-    height: 45.45cqw; // 250px
+    max-width: 250px;
     margin: 0 auto;
     margin-top: 40px;
     margin-bottom: 40px;
@@ -333,7 +295,6 @@ const closeModal = () => {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 10px;
   }
 
   &__content {
@@ -346,10 +307,6 @@ const closeModal = () => {
       padding: 20px;
       border-radius: 40px;
       border: 2px dashed #ffd700;
-      @media (max-width: 480px) {
-        padding: 15px;
-      }
-
       // first 版本的 title 在 content 內部
       .fortune-result__title {
         margin-bottom: 15px;
@@ -358,7 +315,7 @@ const closeModal = () => {
   }
 
   &__description {
-    width: 89.09cqw;
+    max-width: 400px;
     margin: 0 auto; 
     font-size: 20px;
     line-height: 1.3;
@@ -369,22 +326,10 @@ const closeModal = () => {
       color: #FAEBB5;
       font-weight: bold;
     }
-    
-    @media (max-width: 640px) {
-      font-size: 18px;
-    }
-
-    @media (max-width: 480px) {
-      font-size: 14px;
-    }
-    @media (max-width: 380px) {
-      font-size: 12px;
-    }
   }
 
   &__custom-message {
-    width: 70cqw; 
-    min-height: 10.18cqw;
+    max-width: 400px; 
     margin: 0 auto; 
     position: relative;
     display: flex;
