@@ -197,8 +197,9 @@ const closeModal = () => {
 
   &__bag-mouth {
     position: absolute;
-    top: -150px;
+    // top: -150px;
     left: 50%;
+    bottom: 99.7%;
     transform: translateX(-50%);
     width: 100%;
     max-width: 550px;
@@ -208,7 +209,6 @@ const closeModal = () => {
       width: 100%;
       height: auto;
     }
-    
   }
 
   &__close-btn {
@@ -228,6 +228,11 @@ const closeModal = () => {
     transition: all 0.2s ease;
     color: #80552B;
     z-index: 10;
+    @media (max-width: 480px) {
+      top: -55px;
+      width: 40px;
+      height: 40px;
+    }
   }
 
   &__title {
@@ -258,8 +263,8 @@ const closeModal = () => {
     }
 
     // normal 版本的 title 獨立樣式
-    &--normal {
-    }
+    // &--normal {
+    // }
 
     // final 版本的 title 獨立樣式
     &--final {
@@ -276,6 +281,9 @@ const closeModal = () => {
     margin-top: 40px;
     margin-bottom: 40px;
     text-align: center;
+    @media (max-width: 480px) {
+      max-width: 200px;
+    }
   }
 
   &__image {
@@ -289,7 +297,7 @@ const closeModal = () => {
     margin: 0 auto;
     color: #fff;
     margin-bottom: 35px;
-
+ 
     // 第一次完成樣式（title 在 content 裡面）
     &--first {
       width: 90%;
