@@ -161,7 +161,6 @@ const closeModal = () => {
     z-index: 1000;
     padding: 12px;
     animation: overlayFadeIn 0.3s ease-out;
-    container-type: inline-size;
 
     &--closing {
       animation: overlayFadeOut 0.3s ease-out;
@@ -170,22 +169,26 @@ const closeModal = () => {
 
   &__popup {
     background:#D83307;
-    border-bottom-left-radius: 50px;
-    border-bottom-right-radius: 50px;
-    width: 550px;
-    min-height: 630px;
+    border-bottom-left-radius: min(9.09cqw, 50px);
+    border-bottom-right-radius: min(9.09cqw, 50px);
+    width: 100%;
+    max-width: 550px;
+    max-height: 630px;
     position: relative;
     animation: modalBounceIn 0.3s ease-out;
     container-type: inline-size;
+    padding-bottom: min(3.64cqw, 20px);
+    aspect-ratio: 550 / 600;
+    overflow: visible;
     margin-top: 15vh;
     &::before {
       content: "";
       position: absolute;
-      top: 0px;
+      top: 0;
       left: 50%;
       transform: translateX(-50%);
       width: 100%;
-      height: 15px;
+      height: min(2.73cqw, 15px);
       background-color: #E05C39;
     }
 
@@ -194,15 +197,12 @@ const closeModal = () => {
     }
   }
 
-
   &__bag-mouth {
     position: absolute;
-    // top: -150px;
     left: 50%;
     bottom: 99.7%;
     transform: translateX(-50%);
     width: 100%;
-    max-width: 550px;
     z-index: 1;
     
     svg {
@@ -237,53 +237,46 @@ const closeModal = () => {
 
   &__title {
     width: 100%;
-    max-width: 350px;
+    max-width: min(63.64cqw, 350px);
     margin: 0 auto;
     background-color: #D83307;
-    font-size: 30px;
+    font-size: min(5.45cqw, 30px);
     font-weight: bold;
     color: #FAEBB5;
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: min(5.45cqw, 30px);
     
-    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+    text-shadow: min(0.18cqw, 1px) min(0.18cqw, 1px) min(0.73cqw, 4px) rgba(0, 0, 0, 0.5);
     
     &-coin {
-      width: 25px; 
-      height: 25px;
+      width: min(4.55cqw, 25px);
+      height: min(4.55cqw, 25px);
       display: inline-block;
       &:first-child {
-        margin-right: 15px;
-        padding-left: 10px;
+        margin-right: min(2.73cqw, 15px);
+        padding-left: min(1.82cqw, 10px);
       }
       &:last-child {
-        margin-left: 5px;
-        padding-right: 10px;
+        margin-left: min(0.91cqw, 5px);
+        padding-right: min(1.82cqw, 10px);
       }
     }
 
-    // normal 版本的 title 獨立樣式
-    // &--normal {
-    // }
-
     // final 版本的 title 獨立樣式
     &--final {
-      font-size: clamp(26px, 5.82cqw, 32px);
+      font-size: min(5.82cqw, 32px);
       color: #ff69b4;
-      text-shadow: 0 0 10px rgba(255, 105, 180, 0.8);
+      text-shadow: 0 0 min(1.82cqw, 10px) rgba(255, 105, 180, 0.8);
     }
   }
 
   &__image-container {
     width: 100%;
-    max-width: 250px;
+    max-width: min(45.45cqw, 250px);
     margin: 0 auto;
-    margin-top: 40px;
-    margin-bottom: 40px;
+    margin-top: min(7.27cqw, 40px);
+    margin-bottom: min(7.27cqw, 40px);
     text-align: center;
-    @media (max-width: 480px) {
-      max-width: 200px;
-    }
   }
 
   &__image {
@@ -296,14 +289,14 @@ const closeModal = () => {
     text-align: center;
     margin: 0 auto;
     color: #fff;
-    margin-bottom: 35px;
+    margin-bottom: min(6.36cqw, 35px);
  
     // 第一次完成樣式（title 在 content 裡面）
     &--first {
       width: 90%;
-      max-width: 486px;
-      border-radius: 40px;
-      min-height: 132px;
+      max-width: min(88.36cqw, 486px);
+      border-radius: min(7.27cqw, 40px);
+      min-height: min(24cqw, 132px);
       border: 2px dashed #FAEBB5;
       // first 版本的 title 在 content 內部
       .fortune-result__title {
@@ -315,10 +308,9 @@ const closeModal = () => {
 
   &__description {
     width: 100%;
-    max-width: 400px;
-    
+    max-width: min(72.73cqw, 400px);
     margin: 0 auto; 
-    font-size: 20px;
+    font-size: min(3.64cqw, 20px);
     line-height: 1.3;
     white-space: pre-line;
     color: #fff;
@@ -332,21 +324,21 @@ const closeModal = () => {
   &__custom-message {
     width: 100%;
     margin: 0 auto; 
-    border-top: 15px solid #E05C39;
-    padding-top: 20px;
+    border-top: min(2.73cqw, 15px) solid #E05C39;
+    padding-top: min(3.64cqw, 20px);
     position: relative;
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    font-size: 20px;
+    font-size: min(3.64cqw, 20px);
     color: #fff;
     line-height: 1.3;
 
     :deep(.custom-result-message-coin) {
-      width: 20px;
-      height: 20px;
-      margin-right: 10px;
-      padding-top: 4px;
+      width: min(3.64cqw, 20px);
+      height: min(3.64cqw, 20px);
+      margin-right: min(1.82cqw, 10px);
+      padding-top: min(0.73cqw, 4px);
       img {
         width: 100%;
         height: 100%;
