@@ -74,13 +74,12 @@
             <p class="fortune-result__description">
               獲得<span class="fortune-result__description-highlight"> LINE POINTS 5點 </span>抽獎資格<br>兌換序號將於活動後寄送。
             </p>
-       
           </div>
           <div
-              v-if="customMessage"
-              v-html="customMessage"
-              class="fortune-result__custom-message"
-             ></div>
+            v-if="customMessage"
+            v-html="customMessage"
+            class="fortune-result__custom-message"
+            ></div>
         </template>
 
         <!-- normal 和 final：只有 title，沒有 content -->
@@ -173,28 +172,16 @@ const closeModal = () => {
     background:#D83307;
     border-bottom-left-radius: 50px;
     border-bottom-right-radius: 50px;
-    width: 490px;
-    // height: 545px;
-    min-height: 545px;
+    width: 550px;
+    min-height: 630px;
     position: relative;
     animation: modalBounceIn 0.3s ease-out;
-    padding: 30px;
     container-type: inline-size;
     margin-top: 15vh;
     &::before {
       content: "";
       position: absolute;
       top: 0px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      height: 15px;
-      background-color: #E05C39;
-    }
-    &::after {
-      content: "";
-      position: absolute;
-      bottom: 105px;
       left: 50%;
       transform: translateX(-50%);
       width: 100%;
@@ -244,7 +231,8 @@ const closeModal = () => {
   }
 
   &__title {
-    width: 350px;
+    width: 100%;
+    max-width: 350px;
     margin: 0 auto;
     background-color: #D83307;
     font-size: 30px;
@@ -252,7 +240,7 @@ const closeModal = () => {
     color: #FAEBB5;
     text-align: center;
     margin-bottom: 30px;
-    margin-top: -7%;
+    
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
     
     &-coin {
@@ -271,12 +259,10 @@ const closeModal = () => {
 
     // normal 版本的 title 獨立樣式
     &--normal {
-      margin-bottom: 15px;
     }
 
     // final 版本的 title 獨立樣式
     &--final {
-      margin-bottom: 15px;
       font-size: clamp(26px, 5.82cqw, 32px);
       color: #ff69b4;
       text-shadow: 0 0 10px rgba(255, 105, 180, 0.8);
@@ -284,6 +270,7 @@ const closeModal = () => {
   }
 
   &__image-container {
+    width: 100%;
     max-width: 250px;
     margin: 0 auto;
     margin-top: 40px;
@@ -299,23 +286,29 @@ const closeModal = () => {
 
   &__content {
     text-align: center;
+    margin: 0 auto;
     color: #fff;
-    margin-bottom: 70px;
+    margin-bottom: 35px;
 
     // 第一次完成樣式（title 在 content 裡面）
     &--first {
-      padding: 20px;
+      width: 90%;
+      max-width: 486px;
       border-radius: 40px;
-      border: 2px dashed #ffd700;
+      min-height: 132px;
+      border: 2px dashed #FAEBB5;
       // first 版本的 title 在 content 內部
       .fortune-result__title {
-        margin-bottom: 15px;
+        margin-top: -3%;
+        margin-bottom: 30px;
       }
     }
   }
 
   &__description {
+    width: 100%;
     max-width: 400px;
+    
     margin: 0 auto; 
     font-size: 20px;
     line-height: 1.3;
@@ -329,8 +322,10 @@ const closeModal = () => {
   }
 
   &__custom-message {
-    max-width: 400px; 
+    width: 100%;
     margin: 0 auto; 
+    border-top: 15px solid #E05C39;
+    padding-top: 20px;
     position: relative;
     display: flex;
     align-items: flex-start;
