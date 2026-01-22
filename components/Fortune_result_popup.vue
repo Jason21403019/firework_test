@@ -9,6 +9,30 @@
       class="fortune-result__popup"
       :class="{ 'fortune-result__popup--closing': isClosing }"
     >
+        <!-- 紅包袋口裝飾 -->
+        <div class="fortune-result__bag-mouth">
+          <svg xmlns="http://www.w3.org/2000/svg" width="550" height="150" viewBox="0 0 550 150">
+            <g id="Group_249" data-name="Group 249" transform="translate(-685 -111)">
+              <path id="袋口" d="M521.93,91.761l-145.15-71.9a276.343,276.343,0,0,0-203.96-.289L28.35,91.093a49.864,49.864,0,0,0-28.21,44.6L0,150.208H550V136.426a49.852,49.852,0,0,0-28.07-44.675Z" transform="translate(685 110.792)" fill="#bf2900"/>
+              <g id="Group_175" data-name="Group 175" transform="translate(-5 -64.5)">
+                <g id="Group_174" data-name="Group 174" transform="translate(84 -382)">
+                  <text id="紅包運勢" transform="translate(798 673)" fill="#faebb5" font-size="40" font-family="SourceHanSansTC-Bold, Source Han Sans TC" font-weight="700" letter-spacing="0.05em"><tspan x="0" y="0">紅包運勢</tspan></text>
+                </g>
+                <g id="Group_170" data-name="Group 170" transform="translate(81 -385)">
+                  <circle id="Ellipse_5" data-name="Ellipse 5" cx="3" cy="3" r="3" transform="translate(747 656)" fill="#faebb5"/>
+                  <circle id="Ellipse_6" data-name="Ellipse 6" cx="3" cy="3" r="3" transform="translate(761 656)" fill="#faebb5"/>
+                  <circle id="Ellipse_7" data-name="Ellipse 7" cx="3" cy="3" r="3" transform="translate(775 656)" fill="#faebb5"/>
+                </g>
+                <g id="Group_171" data-name="Group 171" transform="translate(349 -385)">
+                  <circle id="Ellipse_5-2" data-name="Ellipse 5" cx="3" cy="3" r="3" transform="translate(747 656)" fill="#faebb5"/>
+                  <circle id="Ellipse_8" data-name="Ellipse 8" cx="3" cy="3" r="3" transform="translate(733 656)" fill="#faebb5"/>
+                  <circle id="Ellipse_9" data-name="Ellipse 9" cx="3" cy="3" r="3" transform="translate(719 656)" fill="#faebb5"/>
+                </g>
+              </g>
+            </g>
+          </svg>
+        </div>
+
         <button class="fortune-result__close-btn" @click="closeModal">
             <svg
               width="60"
@@ -152,13 +176,34 @@ const closeModal = () => {
 
   &__popup {
     background:#D83307;
-    border-radius: 10px;
+    border-bottom-left-radius: 50px;
+    border-bottom-right-radius: 50px;
     width: 490px;
     height: 60vh;
     position: relative;
     animation: modalBounceIn 0.3s ease-out;
     padding: 30px;
     container-type: inline-size;
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      height: 15px;
+      background-color: #E05C39;
+    }
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 115px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      height: 15px;
+      background-color: #E05C39;
+    }
 
     &--closing {
       animation: modalBounceOut 0.25s ease-in;
@@ -175,14 +220,40 @@ const closeModal = () => {
   }
 
 
+  &__bag-mouth {
+    position: absolute;
+    top: -150px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 550px;
+    z-index: 1;
+    
+    svg {
+      width: 100%;
+      height: auto;
+    }
+    
+    @media (max-width: 640px) {
+      top: -25px;
+      max-width: 95%;
+    }
+    
+    @media (max-width: 410px) {
+      top: -20px;
+      max-width: 90%;
+    }
+  }
+
   &__close-btn {
     position: absolute;
-    top: -22px;
-    right: -22px;
-    width: 40px;
-    height: 40px;
+    top: -75px;
+    right: 0px;
+    width: 50px;
+    height: 50px;
     border: none;
     background: #E7C170;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -290,7 +361,7 @@ const closeModal = () => {
     width: 89.09cqw;
     margin: 0 auto; 
     font-size: 20px;
-    line-height: 1.6;
+    line-height: 1.3;
     white-space: pre-line;
     color: #fff;
     
@@ -317,15 +388,17 @@ const closeModal = () => {
     margin: 0 auto; 
     position: relative;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     font-size: 20px;
     color: #fff;
-    padding-bottom: 10px;
+    line-height: 1.3;
+
     :deep(.custom-result-message-coin) {
       width: 20px;
       height: 20px;
       margin-right: 10px;
+      padding-top: 4px;
       img {
         width: 100%;
         height: 100%;
