@@ -240,33 +240,47 @@ const closeModal = () => {
     max-width: min(63.64cqw, 350px);
     margin: 0 auto;
     background-color: #D83307;
-    font-size: min(5.45cqw, 30px);
+    font-size: clamp(18px, 5.45cqw, 30px);
     font-weight: bold;
     color: #FAEBB5;
     text-align: center;
-    margin-bottom: min(5.45cqw, 30px);
+    margin-bottom: clamp(15px, 5.45cqw, 30px);
     
     text-shadow: min(0.18cqw, 1px) min(0.18cqw, 1px) min(0.73cqw, 4px) rgba(0, 0, 0, 0.5);
     
+    @media (max-width: 360px) {
+      font-size: 16px;
+    }
+    
     &-coin {
-      width: min(4.55cqw, 25px);
-      height: min(4.55cqw, 25px);
+      width: clamp(15px, 4.55cqw, 25px);
+      height: clamp(15px, 4.55cqw, 25px);
       display: inline-block;
       &:first-child {
-        margin-right: min(2.73cqw, 15px);
-        padding-left: min(1.82cqw, 10px);
+        margin-right: clamp(8px, 2.73cqw, 15px);
+        padding-left: clamp(5px, 1.82cqw, 10px);
       }
       &:last-child {
-        margin-left: min(0.91cqw, 5px);
-        padding-right: min(1.82cqw, 10px);
+        margin-left: clamp(3px, 0.91cqw, 5px);
+        padding-right: clamp(5px, 1.82cqw, 10px);
+      }
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
       }
     }
 
     // final 版本的 title 獨立樣式
     &--final {
-      font-size: min(5.82cqw, 32px);
+      font-size: clamp(18px, 5.82cqw, 32px);
       color: #ff69b4;
       text-shadow: 0 0 min(1.82cqw, 10px) rgba(255, 105, 180, 0.8);
+      
+      @media (max-width: 360px) {
+        font-size: 16px;
+      }
     }
   }
 
@@ -301,7 +315,7 @@ const closeModal = () => {
       // first 版本的 title 在 content 內部
       .fortune-result__title {
         margin-top: -3%;
-        margin-bottom: 30px;
+        margin-bottom: clamp(15px, 5.45cqw, 30px);
       }
     }
   }
@@ -310,10 +324,14 @@ const closeModal = () => {
     width: 100%;
     max-width: min(72.73cqw, 400px);
     margin: 0 auto; 
-    font-size: min(3.64cqw, 20px);
+    font-size: clamp(16px, 3.64cqw, 20px);
     line-height: 1.3;
     white-space: pre-line;
     color: #fff;
+    
+    @media (max-width: 360px) {
+      font-size: 14px;
+    }
     
     &-highlight {
       color: #FAEBB5;
@@ -330,15 +348,19 @@ const closeModal = () => {
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    font-size: min(3.64cqw, 20px);
+    font-size: clamp(16px, 3.64cqw, 20px);
     color: #fff;
     line-height: 1.3;
 
+    @media (max-width: 360px) {
+      font-size: 14px;
+    }
+
     :deep(.custom-result-message-coin) {
-      width: min(3.64cqw, 20px);
-      height: min(3.64cqw, 20px);
-      margin-right: min(1.82cqw, 10px);
-      padding-top: min(0.73cqw, 4px);
+      width: clamp(16px, 3.64cqw, 20px);
+      height: clamp(16px, 3.64cqw, 20px);
+      margin-right: clamp(8px, 1.82cqw, 10px);
+      padding-top: clamp(3px, 0.73cqw, 4px);
       img {
         width: 100%;
         height: 100%;
