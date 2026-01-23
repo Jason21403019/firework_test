@@ -95,7 +95,7 @@
         <div class="custom-result-message-coin">
           <img src="https://event.udn.com/bd_newyear2026/imgs/li_coin.png" alt="coin" />
         </div>
-        <div>小提醒<br>每天都能玩轉盤抽紅包<br>iPhone 17 大獎要送你！</div>
+        <div>小提醒：每天都能玩轉盤抽紅包<br>iPhone 17 Pro 大獎要送你！</div>
       `;
     }
 
@@ -196,7 +196,7 @@
         <div class="custom-result-message-coin">
           <img src="https://event.udn.com/bd_newyear2026/imgs/li_coin.png" alt="coin" />
         </div>
-        <div>小提醒<br>每天都能玩轉盤抽紅包<br>iPhone 17 大獎要送你！</div>
+        <div>小提醒：每天都能玩轉盤抽紅包<br>iPhone 17 Pro 大獎要送你！</div>
       `;
     } else if (playCount >= 2 && playCount <= 24) {
       resultType = "normal";
@@ -204,7 +204,7 @@
         <div class="custom-result-message-coin">
           <img src="https://event.udn.com/bd_newyear2026/imgs/li_coin.png" alt="coin" />
         </div>
-        <div>小提醒<br>每天都能玩轉盤抽紅包<br>iPhone 17 大獎要送你！</div>
+        <div>小提醒：每天都能玩轉盤抽紅包<br>iPhone 17 Pro 大獎要送你！</div>
       `;
     } else if (playCount >= 25) {
       resultType = "final";
@@ -212,7 +212,7 @@
         <div class="custom-result-message-coin">
           <img src="https://event.udn.com/bd_newyear2026/imgs/li_coin.png" alt="coin" />
         </div>
-        <div>恭喜你已完成全部挑戰<br>獲得最高級 iPhone 17 抽獎資格<br>將於 3/17 公告中獎，敬請期待！</div>
+        <div>小提醒：你已累積滿滿的紅包獎勵，同時獲得<br> iPhone 17 Pro 抽獎資格，敬請期待！</div>
       `;
     }
 
@@ -460,7 +460,8 @@
         justify-content: center;
         gap: clamp(8px, 2.73cqw, 15px);
         width: 100%;
-        margin: 0 auto min(12.73cqw, 70px);
+        margin: 0 auto;
+        margin-bottom: min(12.73cqw, 70px);
       }
 
       .fortune-result__title-wrapper--normal {
@@ -531,17 +532,19 @@
       .fortune-result__content--first .fortune-result__title {
         margin-top: -3%;
         margin-bottom: clamp(15px, 5.45cqw, 30px);
+        max-width: 100%;
       }
 
       .fortune-result__description {
-        width: 100%;
-        max-width: min(72.73cqw, 400px);
-        margin: 0 auto;
-        font-size: clamp(16px, 3.64cqw, 20px);
-        line-height: 1.3;
-        white-space: pre-line;
-        color: #fff;
-      }
+    width: 100%;
+    max-width: min(72.73cqw, 400px);
+    margin: 0 auto;
+    font-size: clamp(16px, 3.64cqw, 20px);
+    line-height: 1.3;
+    white-space: pre-line;
+    color: #fff;
+    text-align: center;
+  }
 
       .fortune-result__description-highlight {
         color: #FAEBB5;
@@ -705,13 +708,14 @@
       }
 
       .already-played__title-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        max-width: min(75.45cqw, 410px);
-        margin: 0 auto min(22cqw, 120px);
-      }
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: min(75.45cqw, 410px);
+    margin: 0 auto;
+    margin-bottom: min(22cqw, 120px);
+  }
 
       .already-played__img-container {
         width: 100%;
@@ -747,18 +751,20 @@
       .already-played__content--first .already-played__title {
         margin-top: -3%;
         margin-bottom: clamp(5px, 2.45cqw, 15px);
+        max-width: 100%;
       }
 
       .already-played__desc {
-        width: 100%;
-        max-width: min(81.82cqw, 450px);
-        margin: 0 auto;
-        padding: 0 min(1.82cqw, 10px);
-        font-size: clamp(12px, 3.64cqw, 20px);
-        line-height: 1.3;
-        white-space: pre-line;
-        color: #fff;
-      }
+    width: 100%;
+    max-width: min(81.82cqw, 450px);
+    margin: 0 auto;
+    padding: 0 min(1.82cqw, 10px);
+    font-size: clamp(12px, 3.64cqw, 20px);
+    line-height: 1.3;
+    white-space: pre-line;
+    color: #fff;
+    text-align: center;
+  }
 
       .already-played__desc-highlight {
         color: #FAEBB5;

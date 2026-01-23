@@ -151,7 +151,7 @@ export default defineNuxtConfig({
       turnstileSiteKey: process.env.NUXT_PUBLIC_TURNSTILE_SITE_KEY,
       externalRedirectUrl:
         process.env.NUXT_PUBLIC_EXTERNAL_REDIRECT_URL ||
-        "https://lab7-orange.udn.com/orange/issue/8887/2135",
+        "https://lab7-orange.udn.com/orange/issue/8887/2341",
     },
   },
 
