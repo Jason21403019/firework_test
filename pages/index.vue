@@ -25,10 +25,9 @@
     <Already_played_popup
       :is-visible="popupStore.showAlreadyPlayedPopup"
       :already-played-data="popupStore.alreadyPlayedData"
-      :total-play-count="divinationStore.totalPlayCount"
-      :is-development="isDevelopment"
+      :custom-message="popupStore.alreadyPlayedCustomMessage"
+      :repeat-type="popupStore.alreadyPlayedRepeatType"
       @close="popupStore.closeAlreadyPlayedPopup"
-      @clear-record="debugTools.clearPlayRecord"
     />
     <!-- 加載中彈窗 -->
     <Loading_popup
@@ -75,8 +74,11 @@
           <button @click="testFinalComplete" class="debug-btn">
             第25次完成
           </button>
-          <button @click="testAlreadyPlayedPopup" class="debug-btn">
-            測試重複遊玩彈窗
+          <button @click="testAlreadyPlayedFirst" class="debug-btn">
+            第一次重複彈窗
+          </button>
+          <button @click="testAlreadyPlayedNormal" class="debug-btn">
+            第一次之後重複彈窗
           </button>
         </div>
       </div>
@@ -295,7 +297,6 @@ function handleMilestoneAchieved(milestone) {
 
 // 顯示「今天已經玩過」的提示
 function showAlreadyPlayedMessage() {
-  let imgUrl = "./imgs/one_four.png";
   let message = "";
   let reminder = "小提醒: 每天來占卜，累積好運抽 Dyson 清淨機大獎喔！";
 
@@ -333,7 +334,6 @@ function showAlreadyPlayedMessage() {
   }
 
   popupStore.openAlreadyPlayedPopup({
-    image_url: imgUrl,
     message: message,
     reminder: reminder,
   });
@@ -417,10 +417,25 @@ function testFinalComplete() {
   console.log("🎨 測試第25次完成彈窗");
 }
 
-// 測試重複遊玩彈窗（使用正式內容）
-function testAlreadyPlayedPopup() {
-  showAlreadyPlayedMessage();
-  console.log("🎨 測試重複遊玩彈窗");
+// 測試第一次重複彈窗
+function testAlreadyPlayedFirst() {
+  const customMessage = "<span class='custom-result-message-coin'><img src='/imgs/li_coin.png' alt='li_coin' /></span>小提醒：每天都能玩轉盤抽紅包<br>iPhone 17 Pro 大獎要送你！";
+  
+  popupStore.openAlreadyPlayedPopup({
+    message: "今天已經玩過囉！\n明天再來繼續累積好運！",
+    reminder: "小提醒: 每天來占卜，累積好運抽 Dyson 清淨機大獎喔！",
+  }, customMessage, "first");
+  console.log("🎨 測試第一次重複彈窗");
+}
+
+// 測試第一次之後重複彈窗
+function testAlreadyPlayedNormal() {
+  const customMessage = "<span class='custom-result-message-coin'><img src='/imgs/li_coin.png' alt='li_coin' /></span>小提醒：每天都能玩轉盤抽紅包<br>iPhone 17 Pro 大獎要送你！";
+  
+  popupStore.openAlreadyPlayedPopup({
+    message: "今天已經玩過囉！\n明天再來繼續累積好運！",
+  }, customMessage, "normal");
+  console.log("🎨 測試第一次之後重複彈窗");
 }
 
 // ==================== 占卜流程主函數 ====================

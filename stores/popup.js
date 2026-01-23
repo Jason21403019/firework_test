@@ -11,6 +11,8 @@ export const usePopupStore = defineStore("popup", {
     // 已占卜過彈窗
     showAlreadyPlayedPopup: false,
     alreadyPlayedData: {},
+    alreadyPlayedCustomMessage: "",
+    alreadyPlayedRepeatType: "normal", // 'first' | 'normal'
 
     // Loading 彈窗
     showLoadingPopup: false,
@@ -43,8 +45,10 @@ export const usePopupStore = defineStore("popup", {
     },
 
     // 已占卜過彈窗
-    openAlreadyPlayedPopup(data) {
+    openAlreadyPlayedPopup(data, customMessage = "", repeatType = "normal") {
       this.alreadyPlayedData = data;
+      this.alreadyPlayedCustomMessage = customMessage;
+      this.alreadyPlayedRepeatType = repeatType;
       this.showAlreadyPlayedPopup = true;
     },
 

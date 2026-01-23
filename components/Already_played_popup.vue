@@ -1,39 +1,22 @@
 <template>
   <div
     v-if="isVisible"
-    class="fortune-result__overlay"
-    :class="{ 'fortune-result__overlay--closing': isClosing }"
+    class="already-played__overlay"
+    :class="{ 'already-played__overlay--closing': isClosing }"
     @click.self="closeModal"
   >
     <div
-      class="fortune-result__popup"
-      :class="{ 'fortune-result__popup--closing': isClosing }"
+      class="already-played__popup"
+      :class="{ 'already-played__popup--closing': isClosing }"
     >
         <!-- 紅包袋口裝飾 -->
-        <div class="fortune-result__bag-mouth">
+        <div class="already-played__bag-mouth">
           <svg xmlns="http://www.w3.org/2000/svg" width="550" height="150" viewBox="0 0 550 150">
-            <g id="Group_249" data-name="Group 249" transform="translate(-685 -111)">
-              <path id="袋口" d="M521.93,91.761l-145.15-71.9a276.343,276.343,0,0,0-203.96-.289L28.35,91.093a49.864,49.864,0,0,0-28.21,44.6L0,150.208H550V136.426a49.852,49.852,0,0,0-28.07-44.675Z" transform="translate(685 110.792)" fill="#bf2900"/>
-              <g id="Group_175" data-name="Group 175" transform="translate(-5 -64.5)">
-                <g id="Group_174" data-name="Group 174" transform="translate(84 -382)">
-                  <text id="紅包運勢" transform="translate(798 673)" fill="#faebb5" font-size="40" font-family="SourceHanSansTC-Bold, Source Han Sans TC" font-weight="700" letter-spacing="0.05em"><tspan x="0" y="0">紅包運勢</tspan></text>
-                </g>
-                <g id="Group_170" data-name="Group 170" transform="translate(81 -385)">
-                  <circle id="Ellipse_5" data-name="Ellipse 5" cx="3" cy="3" r="3" transform="translate(747 656)" fill="#faebb5"/>
-                  <circle id="Ellipse_6" data-name="Ellipse 6" cx="3" cy="3" r="3" transform="translate(761 656)" fill="#faebb5"/>
-                  <circle id="Ellipse_7" data-name="Ellipse 7" cx="3" cy="3" r="3" transform="translate(775 656)" fill="#faebb5"/>
-                </g>
-                <g id="Group_171" data-name="Group 171" transform="translate(349 -385)">
-                  <circle id="Ellipse_5-2" data-name="Ellipse 5" cx="3" cy="3" r="3" transform="translate(747 656)" fill="#faebb5"/>
-                  <circle id="Ellipse_8" data-name="Ellipse 8" cx="3" cy="3" r="3" transform="translate(733 656)" fill="#faebb5"/>
-                  <circle id="Ellipse_9" data-name="Ellipse 9" cx="3" cy="3" r="3" transform="translate(719 656)" fill="#faebb5"/>
-                </g>
-              </g>
-            </g>
+            <path id="袋口" d="M521.93,91.761l-145.15-71.9a276.343,276.343,0,0,0-203.96-.289L28.35,91.093a49.864,49.864,0,0,0-28.21,44.6L0,150.208H550V136.426a49.852,49.852,0,0,0-28.07-44.675Z" transform="translate(0 -0.208)" fill="#bf2900"/>
           </svg>
         </div>
 
-        <button class="fortune-result__close-btn" @click="closeModal">
+        <button class="already-played__close-btn" @click="closeModal">
             <svg
               width="60"
               height="60"
@@ -48,65 +31,47 @@
               />
             </svg>
           </button>
-        <div
-          class="fortune-result__image-container"
-          v-if="fortuneData.image_url"
-        >
+        <div class="already-played__img-container">
           <img
-            :src="fortuneData.image_url"
-            :alt="fortuneData.title"
-            class="fortune-result__image"
+            src="/imgs/repeatimg.png"
+            alt="已玩過圖片"
+            class="already-played__img"
           />
         </div>
 
-        <!-- 第一次完成：title 在 content 裡面 -->
-        <template v-if="resultType === 'first'">
-          <div class="fortune-result__content fortune-result__content--first">
-            <h2 class="fortune-result__title">
-              <span class="fortune-result__title-coin">
+        <!-- 第一次重複：title 在 content 裡面 -->
+        <template v-if="repeatType === 'first'">
+          <div class="already-played__content already-played__content--first">
+            <h2 class="already-played__title">
+              <span class="already-played__title-coin">
                 <img src="/public/imgs/title_coin.png" alt="title_coin" />
               </span>
-              <span class="fortune-result__title-text">新春好運轉到你！</span>
-              <span class="fortune-result__title-coin">
+              <span class="already-played__title-text">{{ '今天已經轉過好運囉！' }}</span>
+              <span class="already-played__title-coin">
                 <img src="/public/imgs/title_coin.png" alt="title_coin" />
               </span>
             </h2>
-            <p class="fortune-result__description">
-              獲得<span class="fortune-result__description-highlight"> LINE POINTS 5點 </span>抽獎資格<br>兌換序號將於活動後寄送。
+            <p class="already-played__desc">
+              {{ '獲得 LINE POINTS 5點 抽獎資格(送完為止)\n兌換序號將於活動後寄送。' }}
             </p>
           </div>
           <div
             v-if="customMessage"
             v-html="customMessage"
-            class="fortune-result__custom-message"
+            class="already-played__custom-msg"
             ></div>
         </template>
 
-        <!-- normal 和 final：只有 title，沒有 content -->
+        <!-- normal：只有 title，沒有 content -->
         <template v-else>
-          <div 
-            class="fortune-result__title-wrapper"
-            :class="{
-              'fortune-result__title-wrapper--normal': resultType === 'normal',
-              'fortune-result__title-wrapper--final': resultType === 'final'
-            }"
-          >
-            <span class="fortune-result__secondary_title-coin">
+          <div class="already-played__title-wrapper">
+            <span class="already-played__title-coin">
               <img src="/public/imgs/title_coin.png" alt="title_coin" />
             </span>
-            <h2 
-              class="fortune-result__secondary_title"
-              :class="{
-                'fortune-result__secondary_title--normal': resultType === 'normal',
-                'fortune-result__secondary_title--final': resultType === 'final'
-              }"
-            >
-              {{ resultType === 'final' 
-                ? '恭喜完成！\n你已轉出一整年的好運！' 
-                : '今日轉運已完成！\n明天再來小試身手！' 
-              }}
+            <h2 class="already-played__title already-played__title--normal">
+              {{ '今天已經轉過好運囉！' }}
             </h2>
-            <span class="fortune-result__secondary_title-coin">
+            <span class="already-played__title-coin">
               <img src="/public/imgs/title_coin.png" alt="title_coin" />
             </span>
           </div>
@@ -114,11 +79,7 @@
           <div
             v-if="customMessage"
             v-html="customMessage"
-            class="fortune-result__custom-message"
-            :class="{
-              'fortune-result__custom-message--normal': resultType === 'normal',
-              'fortune-result__custom-message--final': resultType === 'final'
-            }"
+            class="already-played__custom-msg already-played__custom-msg--normal"
           ></div>
         </template>
     </div>
@@ -126,14 +87,14 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { ref } from "vue";
 
 const props = defineProps({
   isVisible: {
     type: Boolean,
     default: false,
   },
-  fortuneData: {
+  alreadyPlayedData: {
     type: Object,
     default: () => ({}),
   },
@@ -141,9 +102,9 @@ const props = defineProps({
     type: String,
     default: "",
   },
-  resultType: {
+  repeatType: {
     type: String,
-    default: "normal", // 'first' | 'normal' | 'final'
+    default: "normal", // 'first' | 'normal'
   },
 });
 
@@ -162,7 +123,7 @@ const closeModal = () => {
 </script>
 
 <style lang="scss" scoped>
-.fortune-result {
+.already-played {
   &__overlay {
     position: fixed;
     top: 0;
@@ -253,7 +214,7 @@ const closeModal = () => {
 
   &__title {
     width: 100%;
-    max-width: min(63.64cqw, 350px);
+    max-width: min(72.64cqw, 400px);
     margin: 0 auto;
     background-color: #D83307;
     font-size: clamp(18px, 5.45cqw, 30px);
@@ -262,14 +223,14 @@ const closeModal = () => {
     text-align: center;
     margin-bottom: clamp(15px, 5.45cqw, 30px);
     white-space: pre-line;
-    
+    line-height: 1.5;
     text-shadow: min(0.18cqw, 1px) min(0.18cqw, 1px) min(0.73cqw, 4px) rgba(0, 0, 0, 0.5);
     
     @media (max-width: 360px) {
       font-size: 16px;
     }
     
-    &-coin {
+  &-coin {
       width: clamp(15px, 4.55cqw, 25px);
       height: clamp(15px, 4.55cqw, 25px);
       display: inline-block;
@@ -288,6 +249,14 @@ const closeModal = () => {
         object-fit: contain;
       }
     }
+
+    &-text {
+      flex: 1;
+    }
+
+    &--normal {
+      flex: 1;
+    }
   }
 
   &__title-wrapper {
@@ -296,63 +265,24 @@ const closeModal = () => {
     justify-content: center;
     gap: clamp(8px, 2.73cqw, 15px);
     width: 100%;
+    max-width: min(78.64cqw, 460px);
     margin: 0 auto min(12.73cqw, 70px);
-
-    // normal：文字較長，需要更寬的寬度
-    &--normal {
-      max-width: min(68.64cqw, 380px);
-    }
-
-    // final：文字較短，較窄的寬度
-    &--final {
-      max-width: min(78.64cqw, 460px);
-    }
   }
 
-  &__secondary_title {
-    flex: 1;
-    background-color: #D83307;
-    font-size: clamp(18px, 5.45cqw, 30px);
-    font-weight: bold;
-    color: #FAEBB5;
-    text-align: center;
-    white-space: pre-line;
-    line-height: 1.5;
-    text-shadow: min(0.18cqw, 1px) min(0.18cqw, 1px) min(0.73cqw, 4px) rgba(0, 0, 0, 0.5);
-    
-    @media (max-width: 360px) {
-      font-size: 16px;
-    }
-    
-    &-coin {
-      width: clamp(20px, 5.45cqw, 30px);
-      height: clamp(20px, 5.45cqw, 30px);
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-      }
-    }
-  }
-
-  &__image-container {
+  &__img-container {
     width: 100%;
-    max-width: min(45.45cqw, 250px);
+    max-width: min(69.09cqw, 380px);
+    aspect-ratio: 380 / 247;
     margin: 0 auto;
     margin-top: min(7.27cqw, 40px);
     margin-bottom: min(7.27cqw, 40px);
     text-align: center;
   }
 
-  &__image {
+  &__img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
   }
 
   &__content {
@@ -361,7 +291,7 @@ const closeModal = () => {
     color: #fff;
     margin-bottom: min(6.36cqw, 35px);
  
-    // 第一次完成樣式（title 在 content 裡面）
+    // 第一次重複樣式（title 在 content 裡面）
     &--first {
       width: 90%;
       max-width: min(88.36cqw, 486px);
@@ -369,14 +299,14 @@ const closeModal = () => {
       min-height: min(24cqw, 132px);
       border: 2px dashed #FAEBB5;
       // first 版本的 title 在 content 內部
-      .fortune-result__title {
+      .already-played__title {
         margin-top: -3%;
         margin-bottom: clamp(15px, 5.45cqw, 30px);
       }
     }
   }
 
-  &__description {
+  &__desc {
     width: 100%;
     max-width: min(72.73cqw, 400px);
     margin: 0 auto; 
@@ -388,14 +318,9 @@ const closeModal = () => {
     @media (max-width: 360px) {
       font-size: 14px;
     }
-    
-    &-highlight {
-      color: #FAEBB5;
-      font-weight: bold;
-    }
   }
 
-  &__custom-message {
+  &__custom-msg {
     width: 100%;
     margin: 0 auto; 
     border-top: min(2.73cqw, 15px) solid #E05C39;
@@ -414,8 +339,6 @@ const closeModal = () => {
     @media (max-width: 360px) {
       font-size: 12px;
     }
-
-    // normal 和 final 如果需要不同的樣式，可以使用 &--normal 和 &--final
 
     :deep(.custom-result-message-coin) {
       width: clamp(16px, 3.64cqw, 20px);
