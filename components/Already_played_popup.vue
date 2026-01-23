@@ -52,7 +52,7 @@
               </span>
             </h2>
             <p class="already-played__desc">
-              {{ '獲得 LINE POINTS 5點 抽獎資格(送完為止)\n兌換序號將於活動後寄送。' }}
+              獲得<span class="already-played__desc-highlight"> LINE POINTS 5點 </span>抽獎資格(送完為止)<br>兌換序號將於活動後寄送。
             </p>
           </div>
           <div
@@ -221,7 +221,6 @@ const closeModal = () => {
     font-weight: bold;
     color: #FAEBB5;
     text-align: center;
-    margin-bottom: clamp(15px, 5.45cqw, 30px);
     white-space: pre-line;
     line-height: 1.5;
     text-shadow: min(0.18cqw, 1px) min(0.18cqw, 1px) min(0.73cqw, 4px) rgba(0, 0, 0, 0.5);
@@ -230,7 +229,7 @@ const closeModal = () => {
       font-size: 16px;
     }
     
-  &-coin {
+    &-coin {
       width: clamp(15px, 4.55cqw, 25px);
       height: clamp(15px, 4.55cqw, 25px);
       display: inline-block;
@@ -263,10 +262,9 @@ const closeModal = () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: clamp(8px, 2.73cqw, 15px);
     width: 100%;
-    max-width: min(78.64cqw, 460px);
-    margin: 0 auto min(12.73cqw, 70px);
+    max-width: min(75.45cqw, 410px);
+    margin: 0 auto min(22cqw, 120px);
   }
 
   &__img-container {
@@ -301,22 +299,23 @@ const closeModal = () => {
       // first 版本的 title 在 content 內部
       .already-played__title {
         margin-top: -3%;
-        margin-bottom: clamp(15px, 5.45cqw, 30px);
+        margin-bottom: clamp(5px, 2.45cqw, 15px);
       }
     }
   }
 
   &__desc {
     width: 100%;
-    max-width: min(72.73cqw, 400px);
+    max-width: min(81.82cqw, 450px);
     margin: 0 auto; 
-    font-size: clamp(16px, 3.64cqw, 20px);
+    padding: 0 min(1.82cqw, 10px);
+    font-size: clamp(12px, 3.64cqw, 20px);
     line-height: 1.3;
     white-space: pre-line;
     color: #fff;
-    
-    @media (max-width: 360px) {
-      font-size: 14px;
+    &-highlight {
+      color: #FAEBB5;
+      font-weight: bold;
     }
   }
 
