@@ -84,25 +84,41 @@
 
         <!-- normal 和 final：只有 title，沒有 content -->
         <template v-else>
-          <h2 
-            class="fortune-result__title"
+          <div 
+            class="fortune-result__title-wrapper"
             :class="{
-              'fortune-result__title--normal': resultType === 'normal',
-              'fortune-result__title--final': resultType === 'final'
+              'fortune-result__title-wrapper--normal': resultType === 'normal',
+              'fortune-result__title-wrapper--final': resultType === 'final'
             }"
           >
-            {{ fortuneData.title || "您的占卜結果" }}
-          </h2>
-          <p 
-            v-if="fortuneData.description" 
-            class="fortune-result__description"
-          >
-            {{ fortuneData.description }}
-          </p>
+            <span class="fortune-result__secondary_title-coin">
+              <img src="/public/imgs/title_coin.png" alt="title_coin" />
+            </span>
+            <h2 
+              class="fortune-result__secondary_title"
+              :class="{
+                'fortune-result__secondary_title--normal': resultType === 'normal',
+                'fortune-result__secondary_title--final': resultType === 'final'
+              }"
+            >
+              {{ resultType === 'final' 
+                ? '恭喜完成！\n你已轉出一整年的好運！' 
+                : '今日轉運已完成！\n明天再來小試身手！' 
+              }}
+            </h2>
+            <span class="fortune-result__secondary_title-coin">
+              <img src="/public/imgs/title_coin.png" alt="title_coin" />
+            </span>
+          </div>
+      
           <div
             v-if="customMessage"
             v-html="customMessage"
             class="fortune-result__custom-message"
+            :class="{
+              'fortune-result__custom-message--normal': resultType === 'normal',
+              'fortune-result__custom-message--final': resultType === 'final'
+            }"
           ></div>
         </template>
     </div>
@@ -245,6 +261,7 @@ const closeModal = () => {
     color: #FAEBB5;
     text-align: center;
     margin-bottom: clamp(15px, 5.45cqw, 30px);
+    white-space: pre-line;
     
     text-shadow: min(0.18cqw, 1px) min(0.18cqw, 1px) min(0.73cqw, 4px) rgba(0, 0, 0, 0.5);
     
@@ -271,15 +288,54 @@ const closeModal = () => {
         object-fit: contain;
       }
     }
+  }
 
-    // final 版本的 title 獨立樣式
+  &__title-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(8px, 2.73cqw, 15px);
+    width: 100%;
+    margin: 0 auto min(12.73cqw, 70px);
+
+    // normal：文字較長，需要更寬的寬度
+    &--normal {
+      max-width: min(68.64cqw, 380px);
+    }
+
+    // final：文字較短，較窄的寬度
     &--final {
-      font-size: clamp(18px, 5.82cqw, 32px);
-      color: #ff69b4;
-      text-shadow: 0 0 min(1.82cqw, 10px) rgba(255, 105, 180, 0.8);
+      max-width: min(78.64cqw, 460px);
+    }
+  }
+
+  &__secondary_title {
+    flex: 1;
+    background-color: #D83307;
+    font-size: clamp(18px, 5.45cqw, 30px);
+    font-weight: bold;
+    color: #FAEBB5;
+    text-align: center;
+    white-space: pre-line;
+    line-height: 1.5;
+    text-shadow: min(0.18cqw, 1px) min(0.18cqw, 1px) min(0.73cqw, 4px) rgba(0, 0, 0, 0.5);
+    
+    @media (max-width: 360px) {
+      font-size: 16px;
+    }
+    
+    &-coin {
+      width: clamp(20px, 5.45cqw, 30px);
+      height: clamp(20px, 5.45cqw, 30px);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       
-      @media (max-width: 360px) {
-        font-size: 16px;
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
       }
     }
   }
@@ -352,9 +408,14 @@ const closeModal = () => {
     color: #fff;
     line-height: 1.3;
 
-    @media (max-width: 360px) {
+    @media (max-width: 380px) {
       font-size: 14px;
     }
+    @media (max-width: 360px) {
+      font-size: 12px;
+    }
+
+    // normal 和 final 如果需要不同的樣式，可以使用 &--normal 和 &--final
 
     :deep(.custom-result-message-coin) {
       width: clamp(16px, 3.64cqw, 20px);

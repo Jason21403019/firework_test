@@ -401,7 +401,7 @@ function testFirstComplete() {
 function testNormalComplete() {
   const fortuneData = divinationStore.generateFortuneResult();
   const customResultMessage =
-    "<div class='glowing-message'><span class='glowing-message-title'>占卜完成!</span><br>明天繼續來占卜，累積好運！</div>";
+    "<span class='custom-result-message-coin'><img src='/imgs/li_coin.png' alt='li_coin' /></span>小提醒：每天都能玩轉盤抽紅包<br>iPhone 17 Pro 大獎要送你！";
   
   popupStore.openFortuneResultPopup(fortuneData, customResultMessage, "normal");
   console.log("🎨 測試第二次之後完成彈窗");
@@ -411,7 +411,7 @@ function testNormalComplete() {
 function testFinalComplete() {
   const fortuneData = divinationStore.generateFortuneResult();
   const customResultMessage =
-    "<div class='glowing-message'><span class='glowing-message-title'>恭喜達成!</span><br>已完成 25 次占卜，獲得 Dyson 大獎抽獎資格！</div>";
+    "<span class='custom-result-message-coin'><img src='/imgs/li_coin.png' alt='li_coin' /></span>小提醒：你已累積滿滿的紅包獎勵，同時獲得<br> iPhone 17 Pro 抽獎資格，敬請期待！";
   
   popupStore.openFortuneResultPopup(fortuneData, customResultMessage, "final");
   console.log("🎨 測試第25次完成彈窗");

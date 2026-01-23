@@ -1,16 +1,39 @@
 <template>
   <div
     v-if="isVisible"
-    class="already-played__overlay"
-    :class="{ 'already-played__overlay--closing': isClosing }"
+    class="fortune-result__overlay"
+    :class="{ 'fortune-result__overlay--closing': isClosing }"
     @click.self="closeModal"
   >
     <div
-      class="already-played__popup"
-      :class="{ 'already-played__popup--closing': isClosing }"
+      class="fortune-result__popup"
+      :class="{ 'fortune-result__popup--closing': isClosing }"
     >
-      <div class="already-played__popup-inner">
-        <button class="already-played__close-btn" @click="closeModal">
+        <!-- 紅包袋口裝飾 -->
+        <div class="fortune-result__bag-mouth">
+          <svg xmlns="http://www.w3.org/2000/svg" width="550" height="150" viewBox="0 0 550 150">
+            <g id="Group_249" data-name="Group 249" transform="translate(-685 -111)">
+              <path id="袋口" d="M521.93,91.761l-145.15-71.9a276.343,276.343,0,0,0-203.96-.289L28.35,91.093a49.864,49.864,0,0,0-28.21,44.6L0,150.208H550V136.426a49.852,49.852,0,0,0-28.07-44.675Z" transform="translate(685 110.792)" fill="#bf2900"/>
+              <g id="Group_175" data-name="Group 175" transform="translate(-5 -64.5)">
+                <g id="Group_174" data-name="Group 174" transform="translate(84 -382)">
+                  <text id="紅包運勢" transform="translate(798 673)" fill="#faebb5" font-size="40" font-family="SourceHanSansTC-Bold, Source Han Sans TC" font-weight="700" letter-spacing="0.05em"><tspan x="0" y="0">紅包運勢</tspan></text>
+                </g>
+                <g id="Group_170" data-name="Group 170" transform="translate(81 -385)">
+                  <circle id="Ellipse_5" data-name="Ellipse 5" cx="3" cy="3" r="3" transform="translate(747 656)" fill="#faebb5"/>
+                  <circle id="Ellipse_6" data-name="Ellipse 6" cx="3" cy="3" r="3" transform="translate(761 656)" fill="#faebb5"/>
+                  <circle id="Ellipse_7" data-name="Ellipse 7" cx="3" cy="3" r="3" transform="translate(775 656)" fill="#faebb5"/>
+                </g>
+                <g id="Group_171" data-name="Group 171" transform="translate(349 -385)">
+                  <circle id="Ellipse_5-2" data-name="Ellipse 5" cx="3" cy="3" r="3" transform="translate(747 656)" fill="#faebb5"/>
+                  <circle id="Ellipse_8" data-name="Ellipse 8" cx="3" cy="3" r="3" transform="translate(733 656)" fill="#faebb5"/>
+                  <circle id="Ellipse_9" data-name="Ellipse 9" cx="3" cy="3" r="3" transform="translate(719 656)" fill="#faebb5"/>
+                </g>
+              </g>
+            </g>
+          </svg>
+        </div>
+
+        <button class="fortune-result__close-btn" @click="closeModal">
             <svg
               width="60"
               height="60"
@@ -25,67 +48,106 @@
               />
             </svg>
           </button>
-
-        <div class="already-played__title">
-          <img
-            src="/imgs/play_again.png"
-            alt="您今天已經占卜過了"
-            class="already-played__title-image"
-          />
-        </div>
         <div
-          class="already-played__image-container"
-          v-if="alreadyPlayedData.image_url"
+          class="fortune-result__image-container"
+          v-if="fortuneData.image_url"
         >
           <img
-            :src="alreadyPlayedData.image_url"
-            alt="今日已參加過囉!"
-            class="already-played__image"
+            :src="fortuneData.image_url"
+            :alt="fortuneData.title"
+            class="fortune-result__image"
           />
         </div>
 
-        <div class="already-played__content">
-          <div
-            v-if="alreadyPlayedData.message"
-            class="already-played__points-message"
-          >
-            {{ alreadyPlayedData.message }}
+        <!-- 第一次完成：title 在 content 裡面 -->
+        <template v-if="resultType === 'first'">
+          <div class="fortune-result__content fortune-result__content--first">
+            <h2 class="fortune-result__title">
+              <span class="fortune-result__title-coin">
+                <img src="/public/imgs/title_coin.png" alt="title_coin" />
+              </span>
+              <span class="fortune-result__title-text">新春好運轉到你！</span>
+              <span class="fortune-result__title-coin">
+                <img src="/public/imgs/title_coin.png" alt="title_coin" />
+              </span>
+            </h2>
+            <p class="fortune-result__description">
+              獲得<span class="fortune-result__description-highlight"> LINE POINTS 5點 </span>抽獎資格<br>兌換序號將於活動後寄送。
+            </p>
           </div>
+          <div
+            v-if="customMessage"
+            v-html="customMessage"
+            class="fortune-result__custom-message"
+            ></div>
+        </template>
 
-          <div
-            v-if="alreadyPlayedData.reminder"
-            class="already-played__reminder"
+        <!-- normal 和 final：只有 title，沒有 content -->
+        <template v-else>
+          <div 
+            class="fortune-result__title-wrapper"
+            :class="{
+              'fortune-result__title-wrapper--normal': resultType === 'normal',
+              'fortune-result__title-wrapper--final': resultType === 'final'
+            }"
           >
-            {{ alreadyPlayedData.reminder }}
+            <span class="fortune-result__secondary_title-coin">
+              <img src="/public/imgs/title_coin.png" alt="title_coin" />
+            </span>
+            <h2 
+              class="fortune-result__secondary_title"
+              :class="{
+                'fortune-result__secondary_title--normal': resultType === 'normal',
+                'fortune-result__secondary_title--final': resultType === 'final'
+              }"
+            >
+              {{ resultType === 'final' 
+                ? '恭喜完成！\n你已轉出一整年的好運！' 
+                : '今日轉運已完成！\n明天再來小試身手！' 
+              }}
+            </h2>
+            <span class="fortune-result__secondary_title-coin">
+              <img src="/public/imgs/title_coin.png" alt="title_coin" />
+            </span>
           </div>
-        </div>
-      </div>
+      
+          <div
+            v-if="customMessage"
+            v-html="customMessage"
+            class="fortune-result__custom-message"
+            :class="{
+              'fortune-result__custom-message--normal': resultType === 'normal',
+              'fortune-result__custom-message--final': resultType === 'final'
+            }"
+          ></div>
+        </template>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
+
 const props = defineProps({
   isVisible: {
     type: Boolean,
     default: false,
   },
-  alreadyPlayedData: {
+  fortuneData: {
     type: Object,
     default: () => ({}),
   },
-  totalPlayCount: {
-    type: Number,
-    default: 0,
+  customMessage: {
+    type: String,
+    default: "",
   },
-  isDevelopment: {
-    type: Boolean,
-    default: false,
+  resultType: {
+    type: String,
+    default: "normal", // 'first' | 'normal' | 'final'
   },
 });
 
-const emit = defineEmits(["close", "clear-record"]);
+const emit = defineEmits(["close"]);
 
 const isClosing = ref(false);
 
@@ -96,10 +158,11 @@ const closeModal = () => {
     emit("close");
   });
 };
+
 </script>
 
 <style lang="scss" scoped>
-.already-played {
+.fortune-result {
   &__overlay {
     position: fixed;
     top: 0;
@@ -114,104 +177,65 @@ const closeModal = () => {
     z-index: 1000;
     padding: 12px;
     animation: overlayFadeIn 0.3s ease-out;
-    @media (max-width: 640px) {
-      padding: 32px;
-    }
-    @media (max-width: 380px) {
-      padding: 22px;
-    }
+
     &--closing {
       animation: overlayFadeOut 0.3s ease-out;
     }
   }
 
   &__popup {
-    background: linear-gradient(to bottom, #05026a, #4a46fc);
-    border-radius: 10px;
-    max-width: 400px;
-    max-height: 80vh;
+    background:#D83307;
+    border-bottom-left-radius: min(9.09cqw, 50px);
+    border-bottom-right-radius: min(9.09cqw, 50px);
+    width: 100%;
+    max-width: 550px;
+    max-height: 630px;
     position: relative;
-    padding: 20px;
     animation: modalBounceIn 0.3s ease-out;
+    container-type: inline-size;
+    padding-bottom: min(3.64cqw, 20px);
+    aspect-ratio: 550 / 600;
+    overflow: visible;
+    margin-top: 15vh;
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      height: min(2.73cqw, 15px);
+      background-color: #E05C39;
+    }
 
     &--closing {
       animation: modalBounceOut 0.25s ease-in;
     }
-    @media (max-width: 640px) {
-      border: none;
-      max-width: 95vw;
-    }
-    @media (max-width: 410px) {
-      max-width: 90vw;
-      padding: 10px;
-    }
-    @media (max-width: 480px) {
-      border: none;
-      max-width: 95vw;
-    }
-    @media (max-width: 360px) {
-      padding: 10px;
-    }
-
-    &::before {
-      content: "";
-      position: absolute;
-      width: 80%;
-      height: 100%;
-      border-top-left-radius: 10px;
-      border-bottom-left-radius: 10px;
-      top: 0;
-      left: 0;
-      background: rgba(255, 255, 255, 0.05);
-    }
-    &::after {
-      content: url("../imgs/right_circle.png");
-      position: absolute;
-      bottom: -20px;
-      right: 40px;
-      z-index: 10;
-    }
   }
 
-  &__popup-inner {
-    position: relative;
-    padding: 10px 10px;
-    border-radius: 10px;
+  &__bag-mouth {
+    position: absolute;
+    left: 50%;
+    bottom: 99.7%;
+    transform: translateX(-50%);
+    width: 100%;
     z-index: 1;
-    border: 2px solid #577bff52;
-
-    &::before {
-      content: url("../imgs/left_circle.png");
-      position: absolute;
-      top: 370px;
-      left: -40px;
-      @media (max-width: 410px) {
-        left: -30px;
-      }
-      @media (max-width: 380px) {
-        top: 300px;
-      }
-    }
-
-    @media (max-width: 768px) {
-      padding: 30px 20px;
-    }
-    @media (max-width: 480px) {
-      padding: 25px 15px;
-    }
-    @media (max-width: 360px) {
-      padding: 20px 10px;
+    
+    svg {
+      width: 100%;
+      height: auto;
     }
   }
 
   &__close-btn {
     position: absolute;
-    top: -22px;
-    right: -22px;
-    width: 40px;
-    height: 40px;
+    top: -75px;
+    right: 0px;
+    width: 50px;
+    height: 50px;
     border: none;
     background: #E7C170;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -220,110 +244,189 @@ const closeModal = () => {
     transition: all 0.2s ease;
     color: #80552B;
     z-index: 10;
+    @media (max-width: 480px) {
+      top: -55px;
+      width: 40px;
+      height: 40px;
+    }
   }
 
   &__title {
+    width: 100%;
+    max-width: min(63.64cqw, 350px);
+    margin: 0 auto;
+    background-color: #D83307;
+    font-size: clamp(18px, 5.45cqw, 30px);
+    font-weight: bold;
+    color: #FAEBB5;
     text-align: center;
-    margin: 40px 0px;
-    &::after {
-      content: url("../imgs/title_right_leaf.png");
-      position: absolute;
-      right: -20px;
-      top: 150px;
-      width: 100px;
-      height: 100px;
-      z-index: 10;
+    margin-bottom: clamp(15px, 5.45cqw, 30px);
+    white-space: pre-line;
+    
+    text-shadow: min(0.18cqw, 1px) min(0.18cqw, 1px) min(0.73cqw, 4px) rgba(0, 0, 0, 0.5);
+    
+    @media (max-width: 360px) {
+      font-size: 16px;
     }
-    &::before {
-      content: url("../imgs/title_left_top_leaf.png");
-      position: absolute;
-      left: -30px;
-      top: -30px;
-      width: 100px;
-      height: 100px;
-      z-index: 10;
+    
+    &-coin {
+      width: clamp(15px, 4.55cqw, 25px);
+      height: clamp(15px, 4.55cqw, 25px);
+      display: inline-block;
+      &:first-child {
+        margin-right: clamp(8px, 2.73cqw, 15px);
+        padding-left: clamp(5px, 1.82cqw, 10px);
+      }
+      &:last-child {
+        margin-left: clamp(3px, 0.91cqw, 5px);
+        padding-right: clamp(5px, 1.82cqw, 10px);
+      }
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
     }
   }
 
-  &__title-image {
-    max-width: 80%;
-    height: auto;
+  &__title-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(8px, 2.73cqw, 15px);
+    width: 100%;
+    margin: 0 auto min(12.73cqw, 70px);
+
+    // normal：文字較長，需要更寬的寬度
+    &--normal {
+      max-width: min(68.64cqw, 380px);
+    }
+
+    // final：文字較短，較窄的寬度
+    &--final {
+      max-width: min(78.64cqw, 460px);
+    }
+  }
+
+  &__secondary_title {
+    flex: 1;
+    background-color: #D83307;
+    font-size: clamp(18px, 5.45cqw, 30px);
+    font-weight: bold;
+    color: #FAEBB5;
+    text-align: center;
+    white-space: pre-line;
+    line-height: 1.5;
+    text-shadow: min(0.18cqw, 1px) min(0.18cqw, 1px) min(0.73cqw, 4px) rgba(0, 0, 0, 0.5);
+    
+    @media (max-width: 360px) {
+      font-size: 16px;
+    }
+    
+    &-coin {
+      width: clamp(20px, 5.45cqw, 30px);
+      height: clamp(20px, 5.45cqw, 30px);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+    }
   }
 
   &__image-container {
+    width: 100%;
+    max-width: min(45.45cqw, 250px);
+    margin: 0 auto;
+    margin-top: min(7.27cqw, 40px);
+    margin-bottom: min(7.27cqw, 40px);
     text-align: center;
-    margin-bottom: 20px;
-
-    &::before {
-      content: url("../imgs/left_ribbons.png");
-      position: absolute;
-      top: 160px;
-      left: -35px;
-      @media (max-width: 410px) {
-        left: -30px;
-      }
-    }
-    &::after {
-      content: url("../imgs/right_ribbons.png");
-      position: absolute;
-      top: 240px;
-      right: -50px;
-      @media (max-width: 410px) {
-        right: -30px;
-        top: 190px;
-      }
-      @media (max-width: 380px) {
-        right: -35px;
-        top: 180px;
-      }
-    }
   }
 
   &__image {
     width: 100%;
-    max-width: 400px;
-    @media (max-width: 640px) {
-      max-width: 300px;
-    }
+    height: 100%;
+    object-fit: cover;
   }
 
   &__content {
     text-align: center;
+    margin: 0 auto;
     color: #fff;
+    margin-bottom: min(6.36cqw, 35px);
+ 
+    // 第一次完成樣式（title 在 content 裡面）
+    &--first {
+      width: 90%;
+      max-width: min(88.36cqw, 486px);
+      border-radius: min(7.27cqw, 40px);
+      min-height: min(24cqw, 132px);
+      border: 2px dashed #FAEBB5;
+      // first 版本的 title 在 content 內部
+      .fortune-result__title {
+        margin-top: -3%;
+        margin-bottom: clamp(15px, 5.45cqw, 30px);
+      }
+    }
   }
 
-  &__points-message {
-    font-size: 22px;
-    line-height: 1.6;
-    margin-bottom: 20px;
-    color: #f8dfb2;
-    font-weight: bold;
+  &__description {
+    width: 100%;
+    max-width: min(72.73cqw, 400px);
+    margin: 0 auto; 
+    font-size: clamp(16px, 3.64cqw, 20px);
+    line-height: 1.3;
     white-space: pre-line;
-    @media (max-width: 640px) {
-      font-size: 18px;
+    color: #fff;
+    
+    @media (max-width: 360px) {
+      font-size: 14px;
     }
-    @media (max-width: 480px) {
-      font-size: 16px;
-    }
-    @media (max-width: 460px) {
-      white-space: normal;
+    
+    &-highlight {
+      color: #FAEBB5;
+      font-weight: bold;
     }
   }
 
-  &__reminder {
-    font-size: 22px;
-    line-height: 1.5;
-    margin-bottom: 40px;
+  &__custom-message {
+    width: 100%;
+    margin: 0 auto; 
+    border-top: min(2.73cqw, 15px) solid #E05C39;
+    padding-top: min(3.64cqw, 20px);
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    font-size: clamp(16px, 3.64cqw, 20px);
     color: #fff;
-    white-space: pre-line;
-    @media (max-width: 640px) {
-      font-size: 18px;
+    line-height: 1.3;
+
+    @media (max-width: 380px) {
+      font-size: 14px;
     }
-    @media (max-width: 480px) {
-      font-size: 16px;
+    @media (max-width: 360px) {
+      font-size: 12px;
     }
-    @media (max-width: 460px) {
-      white-space: normal;
+
+    // normal 和 final 如果需要不同的樣式，可以使用 &--normal 和 &--final
+
+    :deep(.custom-result-message-coin) {
+      width: clamp(16px, 3.64cqw, 20px);
+      height: clamp(16px, 3.64cqw, 20px);
+      margin-right: clamp(8px, 1.82cqw, 10px);
+      padding-top: clamp(3px, 0.73cqw, 4px);
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
     }
   }
 }
