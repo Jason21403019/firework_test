@@ -20,28 +20,24 @@
     {
       id: 'fortune_1',
       title: '',
-      description: '今日你愛情能量報表!特別適合告白、約會，\n你的魅力讓你閃閃發光。',
       image_url: 'https://event.udn.com/bd_newyear2026/imgs/daji.png',
       weight: 40,
     },
     {
       id: 'fortune_2',
       title: '',
-      description: '財務上有不錯的直覺和機會，適合投資、\n做小額理財規劃。也有機會獲得意外之財或小獎喔!',
       image_url: 'https://event.udn.com/bd_newyear2026/imgs/zhongji.png',
       weight: 30,
     },
     {
       id: 'fortune_3',
       title: '',
-      description: '今天適合慢下腳步，讓身心放鬆，\n多親近自然或早點休息，補充滿滿能量!',
       image_url: 'https://event.udn.com/bd_newyear2026/imgs/xiaoji.png',
       weight: 20,
     },
     {
       id: 'fortune_4',
       title: '',
-      description: '你的工作運極佳，有重要會議或報告時表現亮眼，\n適合發展實力的好日子。',
       image_url: 'https://event.udn.com/bd_newyear2026/imgs/ping.png',
       weight: 10,
     },
@@ -110,7 +106,7 @@
           <span class="already-played__title-coin">
             <img src="https://event.udn.com/bd_newyear2026/imgs/title_coin.png" alt="title_coin" />
           </span>
-          <span class="already-played__title-text">今天已經轉過好運囉！</span>
+          <span class="already-played__title-text">  今天已經轉過好運囉！</span>
           <span class="already-played__title-coin">
             <img src="https://event.udn.com/bd_newyear2026/imgs/title_coin.png" alt="title_coin" />
           </span>
@@ -226,7 +222,7 @@
           <span class="fortune-result__title-coin">
             <img src="https://event.udn.com/bd_newyear2026/imgs/title_coin.png" alt="title_coin" />
           </span>
-          <span class="fortune-result__title-text">新春好運轉到你！</span>
+          <span class="fortune-result__title-text">&ensp;新春好運轉到你！</span>
           <span class="fortune-result__title-coin">
             <img src="https://event.udn.com/bd_newyear2026/imgs/title_coin.png" alt="title_coin" />
           </span>
@@ -326,6 +322,30 @@
     const styles = document.createElement('style')
     styles.id = 'divination-card-styles'
     styles.textContent = `
+      // /* ===== CSS Reset for Divination Card ===== */
+      // .fortune-result__overlay,
+      // .fortune-result__overlay *,
+      // .fortune-result__overlay *::before,
+      // .fortune-result__overlay *::after,
+      // .already-played__overlay,
+      // .already-played__overlay *,
+      // .already-played__overlay *::before,
+      // .already-played__overlay *::after {
+      //   box-sizing: border-box;
+      //   margin: 0;
+      //   padding: 0;
+      // }
+
+      // .fortune-result__overlay h2,
+      // .fortune-result__overlay p,
+      // .already-played__overlay h2,
+      // .already-played__overlay p {
+      //   margin: 0;
+      //   padding: 0;
+      //   font-weight: normal;
+      //   line-height: normal;
+      // }
+
       /* ===== 占卜結果卡片樣式 ===== */
       .fortune-result__overlay {
         position: fixed;
@@ -352,6 +372,7 @@
       }
 
       .fortune-result__popup {
+        box-sizing: border-box;
         background: #D83307;
         border-bottom-left-radius: min(9.09cqw, 50px);
         border-bottom-right-radius: min(9.09cqw, 50px);
@@ -438,15 +459,15 @@
         justify-content: center;
       }
 
-      .fortune-result__title-coin:first-child {
-        margin-right: clamp(8px, 2.73cqw, 15px);
-        padding-left: clamp(5px, 1.82cqw, 10px);
-      }
+      // .fortune-result__title-coin:first-child {
+      //   margin-right: clamp(8px, 2.73cqw, 15px);
+      //   padding-left: clamp(5px, 1.82cqw, 10px);
+      // }
 
-      .fortune-result__title-coin:last-child {
-        margin-left: clamp(3px, 0.91cqw, 5px);
-        padding-right: clamp(5px, 1.82cqw, 10px);
-      }
+      // .fortune-result__title-coin:last-child {
+      //   margin-left: clamp(3px, 0.91cqw, 5px);
+      //   padding-right: clamp(5px, 1.82cqw, 10px);
+      // }
 
       .fortune-result__title-coin img {
         width: 100%;
@@ -483,7 +504,7 @@
         // white-space: pre-line;
         line-height: 1.5;
         text-shadow: min(0.18cqw, 1px) min(0.18cqw, 1px) min(0.73cqw, 4px) rgba(0, 0, 0, 0.5);
-        magin: 0;
+        margin: 0;
       }
 
       .fortune-result__secondary_title-coin {
@@ -608,6 +629,7 @@
       }
 
       .already-played__popup {
+        box-sizing: border-box;
         background: #D83307;
         border-bottom-left-radius: min(9.09cqw, 50px);
         border-bottom-right-radius: min(9.09cqw, 50px);
@@ -692,15 +714,15 @@
         display: inline-block;
       }
 
-      .already-played__title-coin:first-child {
-        margin-right: clamp(8px, 2.73cqw, 15px);
-        padding-left: clamp(5px, 1.82cqw, 10px);
-      }
+      // .already-played__title-coin:first-child {
+      //   margin-right: clamp(8px, 2.73cqw, 15px);
+      //   padding-left: clamp(5px, 1.82cqw, 10px);
+      // }
 
-      .already-played__title-coin:last-child {
-        margin-left: clamp(3px, 0.91cqw, 5px);
-        padding-right: clamp(5px, 1.82cqw, 10px);
-      }
+      // .already-played__title-coin:last-child {
+      //   margin-left: clamp(3px, 0.91cqw, 5px);
+      //   padding-right: clamp(5px, 1.82cqw, 10px);
+      // }
 
       .already-played__title-coin img {
         width: 100%;
