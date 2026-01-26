@@ -4,57 +4,33 @@
       <button @click="showNoticePopup" class="notice__btn notice__btn--notice">
         注意事項
       </button>
-      <button
-        @click="showPrivacyPopup"
-        class="notice__btn notice__btn--privacy"
-      >
+      <button @click="showPrivacyPopup" class="notice__btn notice__btn--privacy">
         個資聲明
       </button>
     </div>
 
-    <div
-      v-if="isPopupVisible"
-      class="notice__overlay"
-      :class="{ 'notice__overlay--closing': isClosing }"
-      @click.self="closeModal"
-    >
-      <div
-        class="notice__popup"
-        :class="{ 'notice__popup--closing': isClosing }"
-      >
-          <button class="notice__close-btn" @click="closeModal">
-            <svg
-              width="60"
-              height="60"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M20 20L4 4M4 20L20 4"
-                stroke="currentColor"
-                stroke-width="4"
-              />
-            </svg>
-          </button>
+    <div v-if="isPopupVisible" class="notice__overlay" :class="{ 'notice__overlay--closing': isClosing }"
+      @click.self="closeModal">
+      <div class="notice__popup" :class="{ 'notice__popup--closing': isClosing }">
+        <button class="notice__close-btn" @click="closeModal">
+          <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 20L4 4M4 20L20 4" stroke="currentColor" stroke-width="4" />
+          </svg>
+        </button>
 
-          <div class="notice__header">
-            <h2 class="notice__title">{{ currentContent.title }}</h2>
-          </div>
+        <div class="notice__header">
+          <h2 class="notice__title">{{ currentContent.title }}</h2>
+        </div>
 
-          <div class="notice__content">
-            <p>{{ currentContent.description }}</p>
-            <p>{{ currentContent.extraInfo }}</p>
-            <ul class="notice__list">
-              <li
-                v-for="(item, index) in currentContent.items"
-                :key="index"
-                class="notice__item"
-              >
-                {{ item }}
-              </li>
-            </ul>
-          </div>
+        <div class="notice__content">
+          <p>{{ currentContent.description }}</p>
+          <p>{{ currentContent.extraInfo }}</p>
+          <ul class="notice__list">
+            <li v-for="(item, index) in currentContent.items" :key="index" class="notice__item">
+              {{ item }}
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -139,6 +115,7 @@ const closeModal = () => {
   margin: 0 auto;
   position: relative;
   margin-bottom: 120px;
+
   @media (max-width: 480px) {
     margin-bottom: 100px;
   }
@@ -147,9 +124,11 @@ const closeModal = () => {
     display: flex;
     gap: 40px;
     justify-content: center;
+
     @media (max-width: 360px) {
       gap: 20px;
     }
+
     @media (max-width: 330px) {
       gap: 10px;
     }
@@ -166,6 +145,7 @@ const closeModal = () => {
     cursor: pointer;
     border: none;
     position: relative;
+
     @media (max-width: 450px) {
       max-width: 280px;
       padding: 8px 30px;
@@ -178,7 +158,7 @@ const closeModal = () => {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(10px);
     display: flex;
     justify-content: center;
@@ -205,9 +185,11 @@ const closeModal = () => {
     &--closing {
       animation: modalBounceOut 0.25s ease-in;
     }
+
     @media (max-width: 768px) {
       padding: 40px;
     }
+
     @media (max-width: 480px) {
       padding: 30px;
       border: none;
@@ -239,6 +221,7 @@ const closeModal = () => {
     font-weight: bold;
     color: #FAEBB5;
     text-align: left;
+
     @media (max-width: 480px) {
       font-size: 24px;
     }
@@ -250,13 +233,16 @@ const closeModal = () => {
     color: #fff;
     font-size: 18px;
     overflow-y: scroll;
+
     @media (max-width: 768px) {
       padding: 2px 30px 2px 2px;
     }
+
     @media (max-width: 480px) {
       padding: 2px 20px 2px 2px;
       font-size: 16px;
     }
+
     @media (max-width: 360px) {
       padding: 2px 10px 2px 2px;
     }
@@ -293,9 +279,11 @@ const closeModal = () => {
     line-height: 1.6;
     position: relative;
     counter-increment: list-counter;
+
     &:first-child {
       padding-top: 0;
     }
+
     @media (max-width: 480px) {
       font-size: 16px;
     }
@@ -306,6 +294,7 @@ const closeModal = () => {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -315,6 +304,7 @@ const closeModal = () => {
   from {
     opacity: 1;
   }
+
   to {
     opacity: 0;
   }
@@ -325,6 +315,7 @@ const closeModal = () => {
     opacity: 0;
     transform: translateY(-50px) scale(0.8);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -336,6 +327,7 @@ const closeModal = () => {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+
   100% {
     opacity: 0;
     transform: translateY(-20px) scale(0.9);

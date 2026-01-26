@@ -91,16 +91,16 @@ onUnmounted(() => {
 
   &__content {
     position: relative;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 20px;
+    background: #D83307;
+    border-radius: 25px;
     padding: 40px 60px;
     text-align: center;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    border: 10px solid #E05C39;
     animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
     @media (max-width: 768px) {
       padding: 30px 40px;
-      border-radius: 15px;
+      border-radius: 25px;
       margin: 0 20px;
     }
   }
@@ -108,7 +108,7 @@ onUnmounted(() => {
   &__message {
     font-size: 28px;
     font-weight: bold;
-    color: #fff;
+    color: #FAEBB5;
     margin-bottom: 20px;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 
@@ -121,7 +121,7 @@ onUnmounted(() => {
   &__countdown {
     font-size: 72px;
     font-weight: bold;
-    color: #ffd700;
+    color: #FAEBB5;
     line-height: 1;
     margin-bottom: 10px;
     text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
@@ -134,7 +134,7 @@ onUnmounted(() => {
 
   &__desc {
     font-size: 20px;
-    color: rgba(255, 255, 255, 0.9);
+    color: #FAEBB5;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 
     @media (max-width: 768px) {
@@ -148,6 +148,7 @@ onUnmounted(() => {
     opacity: 0;
     transform: scale(0.5);
   }
+
   100% {
     opacity: 1;
     transform: scale(1);
@@ -155,13 +156,14 @@ onUnmounted(() => {
 }
 
 @keyframes pulse {
+
   0%,
   100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.1);
   }
 }
 </style>
-

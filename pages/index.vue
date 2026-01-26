@@ -1,61 +1,31 @@
 <template>
-  <Banner
-    ref="bannerRef"
-    @startDivination="startDivination"
-    :loginUrl="loginUrl"
-  />
+  <Banner ref="bannerRef" @startDivination="startDivination" :loginUrl="loginUrl" />
   <div class="divination-container">
-    <PlayCount
-      :count="divinationStore.totalPlayCount"
-      @milestone-achieved="handleMilestoneAchieved"
-    />
+    <PlayCount :count="divinationStore.totalPlayCount" @milestone-achieved="handleMilestoneAchieved" />
     <Act_area />
     <Notice_popup />
     <!-- <ToTop /> -->
 
     <!-- 占卜結果彈窗 -->
-    <Fortune_result_popup
-      :is-visible="popupStore.showFortuneResultPopup"
-      :fortune-data="popupStore.fortuneResultData"
-      :custom-message="popupStore.fortuneCustomMessage"
-      :result-type="popupStore.fortuneResultType"
-      @close="closeFortune"
-    />
+    <Fortune_result_popup :is-visible="popupStore.showFortuneResultPopup" :fortune-data="popupStore.fortuneResultData"
+      :custom-message="popupStore.fortuneCustomMessage" :result-type="popupStore.fortuneResultType"
+      @close="closeFortune" />
     <!-- 已經占卜過的彈窗 -->
-    <Already_played_popup
-      :is-visible="popupStore.showAlreadyPlayedPopup"
-      :already-played-data="popupStore.alreadyPlayedData"
-      :custom-message="popupStore.alreadyPlayedCustomMessage"
-      :repeat-type="popupStore.alreadyPlayedRepeatType"
-      @close="popupStore.closeAlreadyPlayedPopup"
-    />
+    <Already_played_popup :is-visible="popupStore.showAlreadyPlayedPopup"
+      :already-played-data="popupStore.alreadyPlayedData" :custom-message="popupStore.alreadyPlayedCustomMessage"
+      :repeat-type="popupStore.alreadyPlayedRepeatType" @close="popupStore.closeAlreadyPlayedPopup" />
     <!-- 加載中彈窗 -->
-    <Loading_popup
-      :is-visible="popupStore.showLoadingPopup"
-      :loading-data="popupStore.loadingData"
-      @close="popupStore.closeLoadingPopup"
-    />
+    <Loading_popup :is-visible="popupStore.showLoadingPopup" :loading-data="popupStore.loadingData"
+      @close="popupStore.closeLoadingPopup" />
     <!-- 驗證彈窗 -->
-    <Verification_popup
-      :is-visible="popupStore.showVerificationPopup"
-      @close="closeVerificationPopup"
-      @opened="onVerificationPopupOpened"
-    />
+    <Verification_popup :is-visible="popupStore.showVerificationPopup" @close="closeVerificationPopup"
+      @opened="onVerificationPopupOpened" />
     <!-- 通用彈窗 -->
-    <Universal_popup
-      :is-visible="popupStore.showUniversalPopup"
-      :popup-data="popupStore.universalPopupData"
-      @close="popupStore.closeUniversalPopup"
-      @confirm="handleUniversalConfirm"
-      @cancel="handleUniversalCancel"
-    />
+    <Universal_popup :is-visible="popupStore.showUniversalPopup" :popup-data="popupStore.universalPopupData"
+      @close="popupStore.closeUniversalPopup" @confirm="handleUniversalConfirm" @cancel="handleUniversalCancel" />
     <!-- 待跳轉彈窗 -->
-    <Redirect_popup
-      :is-visible="popupStore.showRedirectPopup"
-      :message="popupStore.redirectPopupData.message"
-      :initial-countdown="popupStore.redirectPopupData.countdown"
-      @countdown-end="handleRedirectCountdownEnd"
-    />
+    <Redirect_popup :is-visible="popupStore.showRedirectPopup" :message="popupStore.redirectPopupData.message"
+      :initial-countdown="popupStore.redirectPopupData.countdown" @countdown-end="handleRedirectCountdownEnd" />
 
     <!-- 開發工具區域 - 按 Shift+D 顯示 -->
     <div v-if="showDebugTools" class="debug-tools">
@@ -392,7 +362,7 @@ function testFirstComplete() {
   const fortuneData = divinationStore.generateFortuneResult();
   const customResultMessage =
     "<span class='custom-result-message-coin'><img src='/imgs/li_coin.png' alt='li_coin' /></span>小提醒：每天都能玩轉盤抽紅包<br>iPhone 17 Pro 大獎要送你！";
-  
+
   popupStore.openFortuneResultPopup(fortuneData, customResultMessage, "first");
   console.log("🎨 測試第一次完成彈窗");
 }
@@ -402,7 +372,7 @@ function testNormalComplete() {
   const fortuneData = divinationStore.generateFortuneResult();
   const customResultMessage =
     "<span class='custom-result-message-coin'><img src='/imgs/li_coin.png' alt='li_coin' /></span>小提醒：每天都能玩轉盤抽紅包<br>iPhone 17 Pro 大獎要送你！";
-  
+
   popupStore.openFortuneResultPopup(fortuneData, customResultMessage, "normal");
   console.log("🎨 測試第二次之後完成彈窗");
 }
@@ -412,7 +382,7 @@ function testFinalComplete() {
   const fortuneData = divinationStore.generateFortuneResult();
   const customResultMessage =
     "<span class='custom-result-message-coin'><img src='/imgs/li_coin.png' alt='li_coin' /></span>小提醒：你已累積滿滿的紅包獎勵，同時獲得<br> iPhone 17 Pro 抽獎資格，敬請期待！";
-  
+
   popupStore.openFortuneResultPopup(fortuneData, customResultMessage, "final");
   console.log("🎨 測試第25次完成彈窗");
 }
@@ -420,7 +390,7 @@ function testFinalComplete() {
 // 測試第一次重複彈窗
 function testAlreadyPlayedFirst() {
   const customMessage = "<span class='custom-result-message-coin'><img src='/imgs/li_coin.png' alt='li_coin' /></span>小提醒：每天都能玩轉盤抽紅包<br>iPhone 17 Pro 大獎要送你！";
-  
+
   popupStore.openAlreadyPlayedPopup({
     message: "今天已經玩過囉！\n明天再來繼續累積好運！",
     reminder: "小提醒: 每天來占卜，累積好運抽 Dyson 清淨機大獎喔！",
@@ -431,7 +401,7 @@ function testAlreadyPlayedFirst() {
 // 測試第一次之後重複彈窗
 function testAlreadyPlayedNormal() {
   const customMessage = "<span class='custom-result-message-coin'><img src='/imgs/li_coin.png' alt='li_coin' /></span>小提醒：每天都能玩轉盤抽紅包<br>iPhone 17 Pro 大獎要送你！";
-  
+
   popupStore.openAlreadyPlayedPopup({
     message: "今天已經玩過囉！\n明天再來繼續累積好運！",
   }, customMessage, "normal");
@@ -545,17 +515,24 @@ async function proceedToNewYearFlow() {
 
     await redirectFlow.handleNewYearFlow(
       turnstile?.turnstileToken?.value ||
-        localStorage.getItem("temp_turnstile_token"),
+      localStorage.getItem("temp_turnstile_token"),
       startWheelSpin,
       csrfToken,
     );
   } catch (error) {
     console.error("❌ 活動流程錯誤:", error);
-    showUniversalDialog({
-      icon: "error",
-      title: "系統錯誤",
-      text: error.message || "處理活動流程時發生錯誤，請稍後再試",
-    });
+
+    // 如果錯誤包含 errorType，使用特定的錯誤處理
+    if (error.errorType) {
+      await handleApiErrorUI(error.errorType);
+    } else {
+      // 一般錯誤
+      showUniversalDialog({
+        icon: "error",
+        title: "系統錯誤",
+        text: error.message || "處理活動流程時發生錯誤，請稍後再試",
+      });
+    }
   }
 }
 
@@ -570,6 +547,19 @@ async function handleApiErrorUI(errorType) {
   // 所有彈窗都在結果頁顯示
   if (errorType.type === "already_played") {
     // 什麼都不做，讓流程繼續跳轉到結果頁
+    return;
+  }
+
+  // 操作過於頻繁
+  if (errorType.type === "rate_limit") {
+    const waitTime = errorType.waitTime || 60;
+    showUniversalDialog({
+      icon: "warning",
+      title: "操作過於頻繁",
+      text: `請稍後再試，還需要等待 ${waitTime} 秒`,
+      confirmButtonText: "我知道了",
+      showCancelButton: false,
+    });
     return;
   }
 
@@ -839,6 +829,7 @@ onMounted(async () => {
     box-shadow: 0 6px 16px rgba(255, 122, 69, 0.5);
   }
 }
+
 .play-count-info {
   margin-top: 15px;
   font-size: 16px;

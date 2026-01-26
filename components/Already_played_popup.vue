@@ -1,87 +1,61 @@
 <template>
-  <div
-    v-if="isVisible"
-    class="already-played__overlay"
-    :class="{ 'already-played__overlay--closing': isClosing }"
-    @click.self="closeModal"
-  >
-    <div
-      class="already-played__popup"
-      :class="{ 'already-played__popup--closing': isClosing }"
-    >
-        <!-- 紅包袋口裝飾 -->
-        <div class="already-played__bag-mouth">
-          <svg xmlns="http://www.w3.org/2000/svg" width="550" height="150" viewBox="0 0 550 150">
-            <path id="袋口" d="M521.93,91.761l-145.15-71.9a276.343,276.343,0,0,0-203.96-.289L28.35,91.093a49.864,49.864,0,0,0-28.21,44.6L0,150.208H550V136.426a49.852,49.852,0,0,0-28.07-44.675Z" transform="translate(0 -0.208)" fill="#bf2900"/>
-          </svg>
-        </div>
+  <div v-if="isVisible" class="already-played__overlay" :class="{ 'already-played__overlay--closing': isClosing }"
+    @click.self="closeModal">
+    <div class="already-played__popup" :class="{ 'already-played__popup--closing': isClosing }">
+      <!-- 紅包袋口裝飾 -->
+      <div class="already-played__bag-mouth">
+        <svg xmlns="http://www.w3.org/2000/svg" width="550" height="150" viewBox="0 0 550 150">
+          <path id="袋口"
+            d="M521.93,91.761l-145.15-71.9a276.343,276.343,0,0,0-203.96-.289L28.35,91.093a49.864,49.864,0,0,0-28.21,44.6L0,150.208H550V136.426a49.852,49.852,0,0,0-28.07-44.675Z"
+            transform="translate(0 -0.208)" fill="#bf2900" />
+        </svg>
+      </div>
 
-        <button class="already-played__close-btn" @click="closeModal">
-            <svg
-              width="60"
-              height="60"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M20 20L4 4M4 20L20 4"
-                stroke="currentColor"
-                stroke-width="4"
-              />
-            </svg>
-          </button>
-        <div class="already-played__img-container">
-          <img
-            src="/imgs/repeatimg.png"
-            alt="已玩過圖片"
-            class="already-played__img"
-          />
-        </div>
+      <button class="already-played__close-btn" @click="closeModal">
+        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 20L4 4M4 20L20 4" stroke="currentColor" stroke-width="4" />
+        </svg>
+      </button>
+      <div class="already-played__img-container">
+        <img src="/imgs/repeatimg.png" alt="已玩過圖片" class="already-played__img" />
+      </div>
 
-        <!-- 第一次重複：title 在 content 裡面 -->
-        <template v-if="repeatType === 'first'">
-          <div class="already-played__content already-played__content--first">
-            <h2 class="already-played__title">
-              <span class="already-played__title-coin">
-                <img src="/public/imgs/title_coin.png" alt="title_coin" />
-              </span>
-              <span class="already-played__title-text">{{ '今天已經轉過好運囉！' }}</span>
-              <span class="already-played__title-coin">
-                <img src="/public/imgs/title_coin.png" alt="title_coin" />
-              </span>
-            </h2>
-            <p class="already-played__desc">
-              獲得<span class="already-played__desc-highlight"> LINE POINTS 5點 </span>抽獎資格(送完為止)<br>兌換序號將於活動後寄送。
-            </p>
-          </div>
-          <div
-            v-if="customMessage"
-            v-html="customMessage"
-            class="already-played__custom-msg"
-            ></div>
-        </template>
-
-        <!-- normal：只有 title，沒有 content -->
-        <template v-else>
-          <div class="already-played__title-wrapper">
+      <!-- 第一次重複：title 在 content 裡面 -->
+      <template v-if="repeatType === 'first'">
+        <div class="already-played__content already-played__content--first">
+          <h2 class="already-played__title">
             <span class="already-played__title-coin">
               <img src="/public/imgs/title_coin.png" alt="title_coin" />
             </span>
-            <h2 class="already-played__title already-played__title--normal">
-              {{ '今天已經轉過好運囉！' }}
-            </h2>
+            <span class="already-played__title-text">{{ '今天已經轉過好運囉！' }}</span>
             <span class="already-played__title-coin">
               <img src="/public/imgs/title_coin.png" alt="title_coin" />
             </span>
-          </div>
-      
-          <div
-            v-if="customMessage"
-            v-html="customMessage"
-            class="already-played__custom-msg already-played__custom-msg--normal"
-          ></div>
-        </template>
+          </h2>
+          <p class="already-played__desc">
+            獲得<span class="already-played__desc-highlight"> LINE POINTS 5點 </span>抽獎資格(送完為止)<br>兌換序號將於活動後寄送。
+          </p>
+        </div>
+        <div v-if="customMessage" v-html="customMessage" class="already-played__custom-msg"></div>
+      </template>
+
+      <!-- normal：只有 title，沒有 content -->
+      <template v-else>
+        <div class="already-played__title-wrapper">
+          <span class="already-played__title-coin">
+            <img src="/public/imgs/title_coin.png" alt="title_coin" />
+          </span>
+          <h2 class="already-played__title already-played__title--normal">
+            {{ '今天已經轉過好運囉！' }}
+          </h2>
+          <span class="already-played__title-coin">
+            <img src="/public/imgs/title_coin.png" alt="title_coin" />
+          </span>
+        </div>
+
+        <div v-if="customMessage" v-html="customMessage"
+          class="already-played__custom-msg already-played__custom-msg--normal"></div>
+      </template>
     </div>
   </div>
 </template>
@@ -130,7 +104,7 @@ const closeModal = () => {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(15px);
     display: flex;
     justify-content: center;
@@ -145,7 +119,7 @@ const closeModal = () => {
   }
 
   &__popup {
-    background:#D83307;
+    background: #D83307;
     border-bottom-left-radius: min(9.09cqw, 50px);
     border-bottom-right-radius: min(9.09cqw, 50px);
     width: 100%;
@@ -158,6 +132,7 @@ const closeModal = () => {
     aspect-ratio: 550 / 600;
     overflow: visible;
     margin-top: 15vh;
+
     &::before {
       content: "";
       position: absolute;
@@ -181,7 +156,7 @@ const closeModal = () => {
     transform: translateX(-50%);
     width: 100%;
     z-index: 1;
-    
+
     svg {
       width: 100%;
       height: auto;
@@ -205,6 +180,7 @@ const closeModal = () => {
     transition: all 0.2s ease;
     color: #80552B;
     z-index: 10;
+
     @media (max-width: 480px) {
       top: -55px;
       width: 40px;
@@ -224,24 +200,26 @@ const closeModal = () => {
     white-space: pre-line;
     line-height: 1.5;
     text-shadow: min(0.18cqw, 1px) min(0.18cqw, 1px) min(0.73cqw, 4px) rgba(0, 0, 0, 0.5);
-    
+
     @media (max-width: 360px) {
       font-size: 16px;
     }
-    
+
     &-coin {
       width: clamp(15px, 4.55cqw, 25px);
       height: clamp(15px, 4.55cqw, 25px);
       display: inline-block;
+
       &:first-child {
         margin-right: clamp(8px, 2.73cqw, 15px);
         padding-left: clamp(5px, 1.82cqw, 10px);
       }
+
       &:last-child {
         margin-left: clamp(3px, 0.91cqw, 5px);
         padding-right: clamp(5px, 1.82cqw, 10px);
       }
-      
+
       img {
         width: 100%;
         height: 100%;
@@ -288,7 +266,7 @@ const closeModal = () => {
     margin: 0 auto;
     color: #fff;
     margin-bottom: min(6.36cqw, 35px);
- 
+
     // 第一次重複樣式（title 在 content 裡面）
     &--first {
       width: 90%;
@@ -296,6 +274,7 @@ const closeModal = () => {
       border-radius: min(7.27cqw, 40px);
       min-height: min(24cqw, 132px);
       border: 2px dashed #FAEBB5;
+
       // first 版本的 title 在 content 內部
       .already-played__title {
         margin-top: -3%;
@@ -307,12 +286,13 @@ const closeModal = () => {
   &__desc {
     width: 100%;
     max-width: min(81.82cqw, 450px);
-    margin: 0 auto; 
+    margin: 0 auto;
     padding: 0 min(1.82cqw, 10px);
     font-size: clamp(12px, 3.64cqw, 20px);
     line-height: 1.3;
     white-space: pre-line;
     color: #fff;
+
     &-highlight {
       color: #FAEBB5;
       font-weight: bold;
@@ -321,7 +301,7 @@ const closeModal = () => {
 
   &__custom-msg {
     width: 100%;
-    margin: 0 auto; 
+    margin: 0 auto;
     border-top: min(2.73cqw, 15px) solid #E05C39;
     padding-top: min(3.64cqw, 20px);
     position: relative;
@@ -335,6 +315,7 @@ const closeModal = () => {
     @media (max-width: 380px) {
       font-size: 14px;
     }
+
     @media (max-width: 360px) {
       font-size: 12px;
     }
@@ -344,6 +325,7 @@ const closeModal = () => {
       height: clamp(16px, 3.64cqw, 20px);
       margin-right: clamp(8px, 1.82cqw, 10px);
       padding-top: clamp(3px, 0.73cqw, 4px);
+
       img {
         width: 100%;
         height: 100%;
@@ -357,6 +339,7 @@ const closeModal = () => {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -366,6 +349,7 @@ const closeModal = () => {
   from {
     opacity: 1;
   }
+
   to {
     opacity: 0;
   }
@@ -376,6 +360,7 @@ const closeModal = () => {
     opacity: 0;
     transform: translateY(-50px) scale(0.8);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -387,6 +372,7 @@ const closeModal = () => {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+
   100% {
     opacity: 0;
     transform: translateY(-20px) scale(0.9);

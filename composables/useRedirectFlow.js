@@ -41,7 +41,13 @@ export const useRedirectFlow = () => {
         if (result.already_played === true) {
           console.log("已占卜，繼續跳轉");
         } else {
-          throw new Error(result.message || "API 錯誤");
+          // 使用 handleApiError 來識別錯誤類型
+          const errorType = await divinationFlow.handleApiError(result);
+
+          // 將錯誤類型包裝起來，讓上層可以處理
+          const error = new Error(result.message || "API 錯誤");
+          error.errorType = errorType;
+          throw error;
         }
       }
 

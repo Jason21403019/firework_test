@@ -149,7 +149,7 @@ try {
         $timeSinceLastAttempt = time() - strtotime($lastAttempt);
         if ($timeSinceLastAttempt < 60) {
             error_log("[LIMIT] 操作過於頻繁 - IP: {$ip}");
-            JSONReturn('操作過於頻繁，請稍後再試', 'error', ['wait_time' => 60 - $timeSinceLastAttempt]);
+            JSONReturn(['message' => sanitizeOutput('操作過於頻繁，請稍後再試'),'wait_time' => 60 - $timeSinceLastAttempt], 'error');
         }
     }
     

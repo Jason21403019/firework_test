@@ -139,6 +139,14 @@ export const useDivinationFlow = () => {
         return;
       }
 
+      // 操作過於頻繁
+      if (result.message && result.message.includes("操作過於頻繁")) {
+        console.log("操作過於頻繁，需要等待");
+        const waitTime = result.wait_time || 60;
+        resolve({ type: "rate_limit", waitTime: waitTime });
+        return;
+      }
+
       // 機器人驗證失敗
       if (result.message && result.message.includes("機器人驗證失敗")) {
         console.log("機器人驗證失敗，要求重新驗證");
