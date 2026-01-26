@@ -1,29 +1,11 @@
 <template>
-  <div
-    v-if="isVisible"
-    class="loading__overlay"
-    :class="{ 'loading__overlay--closing': isClosing }"
-  >
-    <div
-      class="loading__popup"
-      :class="{ 'loading__popup--closing': isClosing }"
-    >
+  <div v-if="isVisible" class="loading__overlay" :class="{ 'loading__overlay--closing': isClosing }">
+    <div class="loading__popup" :class="{ 'loading__popup--closing': isClosing }">
       <div class="loading__popup-inner">
         <button class="loading__close-btn" @click="closeModal">
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M18 6L6 18M6 6L18 18"
-              stroke="currentColor"
-              stroke-width="3"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+              stroke-linejoin="round" />
           </svg>
         </button>
         <div class="loading__content">
@@ -84,9 +66,11 @@ const closeModal = () => {
     z-index: 1000;
     padding: 12px;
     animation: overlayFadeIn 0.3s ease-out;
+
     @media (max-width: 640px) {
       padding: 32px;
     }
+
     @media (max-width: 380px) {
       padding: 22px;
     }
@@ -113,6 +97,7 @@ const closeModal = () => {
       border: none;
       max-width: 95vw;
     }
+
     @media (max-width: 410px) {
       padding: 10px;
     }
@@ -128,11 +113,13 @@ const closeModal = () => {
       left: 0;
       background: rgba(255, 255, 255, 0.05);
     }
+
     &::after {
       content: url("../imgs/right_ribbons.png");
       position: absolute;
       top: 100px;
       right: -30px;
+
       @media (max-width: 410px) {
         top: 80px;
       }
@@ -151,6 +138,7 @@ const closeModal = () => {
       position: absolute;
       top: 140px;
       left: -40px;
+
       @media (max-width: 410px) {
         top: 110px;
         left: -30px;
@@ -160,6 +148,7 @@ const closeModal = () => {
     @media (max-width: 410px) {
       padding: 10px 80px;
     }
+
     @media (max-width: 360px) {
       // padding: 20px 10px;
     }
@@ -186,6 +175,7 @@ const closeModal = () => {
       top: -20px;
       right: -20px;
     }
+
     @media (max-width: 410px) {
       width: 36px;
       height: 36px;
@@ -207,11 +197,13 @@ const closeModal = () => {
     text-align: center;
     color: #fff;
     padding: 20px 0;
+
     &::before {
       content: url("../imgs/left_ribbons.png");
       position: absolute;
       top: 10px;
       left: -35px;
+
       @media (max-width: 410px) {
         left: -30px;
       }
@@ -253,6 +245,7 @@ const closeModal = () => {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -262,6 +255,7 @@ const closeModal = () => {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -271,6 +265,7 @@ const closeModal = () => {
   from {
     opacity: 1;
   }
+
   to {
     opacity: 0;
   }
@@ -281,6 +276,7 @@ const closeModal = () => {
     opacity: 0;
     transform: translateY(-50px) scale(0.8);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -292,6 +288,7 @@ const closeModal = () => {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+
   100% {
     opacity: 0;
     transform: translateY(-20px) scale(0.9);

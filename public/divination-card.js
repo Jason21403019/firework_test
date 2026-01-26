@@ -12,83 +12,76 @@
  * </script>
  */
 
-(function (window) {
-  "use strict";
+; (function (window) {
+  'use strict'
 
   // 占卜結果數據
   const FORTUNE_RESULTS = [
     {
-      id: "fortune_1",
-      title: "",
-      description:
-        "今日你愛情能量報表!特別適合告白、約會，\n你的魅力讓你閃閃發光。",
-      image_url: "https://event.udn.com/bd_newyear2026/imgs/daji.png",
+      id: 'fortune_1',
+      title: '',
+      description: '今日你愛情能量報表!特別適合告白、約會，\n你的魅力讓你閃閃發光。',
+      image_url: 'https://event.udn.com/bd_newyear2026/imgs/daji.png',
       weight: 40,
     },
     {
-      id: "fortune_2",
-      title: "",
-      description:
-        "財務上有不錯的直覺和機會，適合投資、\n做小額理財規劃。也有機會獲得意外之財或小獎喔!",
-      image_url: "https://event.udn.com/bd_newyear2026/imgs/zhongji.png",
+      id: 'fortune_2',
+      title: '',
+      description: '財務上有不錯的直覺和機會，適合投資、\n做小額理財規劃。也有機會獲得意外之財或小獎喔!',
+      image_url: 'https://event.udn.com/bd_newyear2026/imgs/zhongji.png',
       weight: 30,
     },
     {
-      id: "fortune_3",
-      title: "",
-      description:
-        "今天適合慢下腳步，讓身心放鬆，\n多親近自然或早點休息，補充滿滿能量!",
-      image_url: "https://event.udn.com/bd_newyear2026/imgs/xiaoji.png",
+      id: 'fortune_3',
+      title: '',
+      description: '今天適合慢下腳步，讓身心放鬆，\n多親近自然或早點休息，補充滿滿能量!',
+      image_url: 'https://event.udn.com/bd_newyear2026/imgs/xiaoji.png',
       weight: 20,
     },
     {
-      id: "fortune_4",
-      title: "",
-      description:
-        "你的工作運極佳，有重要會議或報告時表現亮眼，\n適合發展實力的好日子。",
-      image_url: "https://event.udn.com/bd_newyear2026/imgs/ping.png",
+      id: 'fortune_4',
+      title: '',
+      description: '你的工作運極佳，有重要會議或報告時表現亮眼，\n適合發展實力的好日子。',
+      image_url: 'https://event.udn.com/bd_newyear2026/imgs/ping.png',
       weight: 10,
     },
-  ];
+  ]
 
   // 從 URL 獲取參數
   function getUrlParam(name) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(name);
+    const urlParams = new URLSearchParams(window.location.search)
+    return urlParams.get(name)
   }
 
   // 生成隨機占卜結果（使用權重）
   function generateFortuneResult() {
-    const totalWeight = FORTUNE_RESULTS.reduce(
-      (sum, fortune) => sum + fortune.weight,
-      0,
-    );
+    const totalWeight = FORTUNE_RESULTS.reduce((sum, fortune) => sum + fortune.weight, 0)
 
-    const randomBytes = new Uint32Array(1);
-    crypto.getRandomValues(randomBytes);
-    const randomValue = (randomBytes[0] % totalWeight) + 1;
+    const randomBytes = new Uint32Array(1)
+    crypto.getRandomValues(randomBytes)
+    const randomValue = (randomBytes[0] % totalWeight) + 1
 
-    let currentWeight = 0;
+    let currentWeight = 0
     for (const fortune of FORTUNE_RESULTS) {
-      currentWeight += fortune.weight;
+      currentWeight += fortune.weight
       if (randomValue <= currentWeight) {
-        const result = { ...fortune };
-        delete result.weight;
-        return result;
+        const result = { ...fortune }
+        delete result.weight
+        return result
       }
     }
 
     // 預設返回第一個結果
-    const defaultResult = { ...FORTUNE_RESULTS[0] };
-    delete defaultResult.weight;
-    return defaultResult;
+    const defaultResult = { ...FORTUNE_RESULTS[0] }
+    delete defaultResult.weight
+    return defaultResult
   }
 
   // 顯示重複遊玩卡片
   function showAlreadyPlayedCard(container, playCount) {
     // 根據次數決定類型和訊息
-    let repeatType = playCount === 1 ? "first" : "normal";
-    let customMessage = "";
+    let repeatType = playCount === 1 ? 'first' : 'normal'
+    let customMessage = ''
 
     if (playCount === 1) {
       customMessage = `
@@ -96,12 +89,20 @@
           <img src="https://event.udn.com/bd_newyear2026/imgs/li_coin.png" alt="coin" />
         </div>
         <div>小提醒：每天都能玩轉盤抽紅包<br>iPhone 17 Pro 大獎要送你！</div>
-      `;
+      `
+    } else {
+      // 非第一次的重複遊玩也顯示客製化訊息
+      customMessage = `
+        <div class="custom-result-message-coin">
+          <img src="https://event.udn.com/bd_newyear2026/imgs/li_coin.png" alt="coin" />
+        </div>
+        <div>小提醒：每天都能玩轉盤抽紅包<br>iPhone 17 Pro 大獎要送你！</div>
+    `
     }
 
-    const card = document.createElement("div");
-    card.className = "already-played__overlay";
-    
+    const card = document.createElement('div')
+    card.className = 'already-played__overlay'
+
     // first 類型：title 在 content 裡面
     const firstTypeContent = `
       <div class="already-played__content already-played__content--first">
@@ -118,8 +119,8 @@
           獲得<span class="already-played__desc-highlight"> LINE POINTS 5點 </span>抽獎資格(送完為止)<br>兌換序號將於活動後寄送。
         </p>
       </div>
-      ${customMessage ? `<div class="already-played__custom-msg">${customMessage}</div>` : ""}
-    `;
+      ${customMessage ? `<div class="already-played__custom-msg">${customMessage}</div>` : ''}
+    `
 
     // normal 類型：只有 title，沒有 content
     const normalTypeContent = `
@@ -134,8 +135,8 @@
           <img src="https://event.udn.com/bd_newyear2026/imgs/title_coin.png" alt="title_coin" />
         </span>
       </div>
-      ${customMessage ? `<div class="already-played__custom-msg already-played__custom-msg--normal">${customMessage}</div>` : ""}
-    `;
+      ${customMessage ? `<div class="already-played__custom-msg already-played__custom-msg--normal">${customMessage}</div>` : ''}
+    `
 
     card.innerHTML = `
       <div class="already-played__popup">
@@ -156,68 +157,67 @@
           <img src="https://event.udn.com/bd_newyear2026/imgs/repeatimg.png" alt="已玩過圖片" class="already-played__img" />
         </div>
         
-        ${repeatType === "first" ? firstTypeContent : normalTypeContent}
+        ${repeatType === 'first' ? firstTypeContent : normalTypeContent}
       </div>
-    `;
+    `
 
-    container.innerHTML = "";
-    container.appendChild(card);
+    container.innerHTML = ''
+    container.appendChild(card)
 
     // 添加進入動畫
-    setTimeout(() => {
-      card.classList.add("already-played__overlay--show");
-    }, 100);
+
+    card.classList.add('already-played__overlay--show')
 
     // 點擊 overlay 背景關閉卡片
-    card.addEventListener("click", (e) => {
+    card.addEventListener('click', (e) => {
       if (e.target === card) {
-        card.classList.add("already-played__overlay--closing");
-        setTimeout(() => card.remove(), 300);
+        card.classList.add('already-played__overlay--closing')
+        card.remove()
       }
-    });
+    })
 
     // 關閉按鈕事件
-    const closeBtn = card.querySelector(".already-played__close-btn");
-    closeBtn.addEventListener("click", () => {
-      card.classList.add("already-played__overlay--closing");
-      setTimeout(() => card.remove(), 300);
-    });
+    const closeBtn = card.querySelector('.already-played__close-btn')
+    closeBtn.addEventListener('click', () => {
+      card.classList.add('already-played__overlay--closing')
+      card.remove()
+    })
   }
 
   // 顯示占卜卡片
   function showFortuneCard(container, fortuneData, playCount) {
     // 根據次數決定類型和訊息
-    let resultType = "normal";
-    let customMessage = "";
+    let resultType = 'normal'
+    let customMessage = ''
 
     if (playCount === 1) {
-      resultType = "first";
+      resultType = 'first'
       customMessage = `
         <div class="custom-result-message-coin">
           <img src="https://event.udn.com/bd_newyear2026/imgs/li_coin.png" alt="coin" />
         </div>
         <div>小提醒：每天都能玩轉盤抽紅包<br>iPhone 17 Pro 大獎要送你！</div>
-      `;
+      `
     } else if (playCount >= 2 && playCount <= 24) {
-      resultType = "normal";
+      resultType = 'normal'
       customMessage = `
         <div class="custom-result-message-coin">
           <img src="https://event.udn.com/bd_newyear2026/imgs/li_coin.png" alt="coin" />
         </div>
         <div>小提醒：每天都能玩轉盤抽紅包<br>iPhone 17 Pro 大獎要送你！</div>
-      `;
+      `
     } else if (playCount >= 25) {
-      resultType = "final";
+      resultType = 'final'
       customMessage = `
         <div class="custom-result-message-coin">
           <img src="https://event.udn.com/bd_newyear2026/imgs/li_coin.png" alt="coin" />
         </div>
         <div>小提醒：你已累積滿滿的紅包獎勵，同時獲得<br> iPhone 17 Pro 抽獎資格，敬請期待！</div>
-      `;
+      `
     }
 
-    const card = document.createElement("div");
-    card.className = "fortune-result__overlay";
+    const card = document.createElement('div')
+    card.className = 'fortune-result__overlay'
 
     // first 類型：title 在 content 裡面
     const firstTypeContent = `
@@ -235,14 +235,13 @@
           獲得<span class="fortune-result__description-highlight"> LINE POINTS 5點 </span>抽獎資格<br>兌換序號將於活動後寄送。
         </p>
       </div>
-      ${customMessage ? `<div class="fortune-result__custom-message">${customMessage}</div>` : ""}
-    `;
+      ${customMessage ? `<div class="fortune-result__custom-message">${customMessage}</div>` : ''}
+    `
 
     // normal 和 final 類型：只有 title，沒有 content
-    const secondaryTitle = resultType === "final" 
-      ? "恭喜完成！\n你已轉出一整年的好運！" 
-      : "今日轉運已完成！\n明天再來小試身手！";
-    
+    const secondaryTitle =
+      resultType === 'final' ? '恭喜完成！<br >你已轉出一整年的好運！' : '今日轉運已完成！<br >明天再來小試身手！'
+
     const normalOrFinalContent = `
       <div class="fortune-result__title-wrapper fortune-result__title-wrapper--${resultType}">
         <span class="fortune-result__secondary_title-coin">
@@ -255,8 +254,8 @@
           <img src="https://event.udn.com/bd_newyear2026/imgs/title_coin.png" alt="title_coin" />
         </span>
       </div>
-      ${customMessage ? `<div class="fortune-result__custom-message fortune-result__custom-message--${resultType}">${customMessage}</div>` : ""}
-    `;
+      ${customMessage ? `<div class="fortune-result__custom-message fortune-result__custom-message--${resultType}">${customMessage}</div>` : ''}
+    `
 
     card.innerHTML = `
       <div class="fortune-result__popup">
@@ -294,40 +293,38 @@
           <img src="${fortuneData.image_url}" alt="${fortuneData.title}" class="fortune-result__image" />
         </div>
         
-        ${resultType === "first" ? firstTypeContent : normalOrFinalContent}
+        ${resultType === 'first' ? firstTypeContent : normalOrFinalContent}
       </div>
-    `;
+    `
 
-    container.innerHTML = "";
-    container.appendChild(card);
+    container.innerHTML = ''
+    container.appendChild(card)
 
     // 添加進入動畫
-    setTimeout(() => {
-      card.classList.add("fortune-result__overlay--show");
-    }, 100);
+    card.classList.add('fortune-result__overlay--show')
 
     // 點擊 overlay 背景關閉卡片
-    card.addEventListener("click", (e) => {
+    card.addEventListener('click', (e) => {
       if (e.target === card) {
-        card.classList.add("fortune-result__overlay--closing");
-        setTimeout(() => card.remove(), 300);
+        card.classList.add('fortune-result__overlay--closing')
+        card.remove()
       }
-    });
+    })
 
     // 關閉按鈕事件
-    const closeBtn = card.querySelector(".fortune-result__close-btn");
-    closeBtn.addEventListener("click", () => {
-      card.classList.add("fortune-result__overlay--closing");
-      setTimeout(() => card.remove(), 300);
-    });
+    const closeBtn = card.querySelector('.fortune-result__close-btn')
+    closeBtn.addEventListener('click', () => {
+      card.classList.add('fortune-result__overlay--closing')
+      card.remove()
+    })
   }
 
   // 注入樣式
   function injectStyles() {
-    if (document.getElementById("divination-card-styles")) return;
+    if (document.getElementById('divination-card-styles')) return
 
-    const styles = document.createElement("style");
-    styles.id = "divination-card-styles";
+    const styles = document.createElement('style')
+    styles.id = 'divination-card-styles'
     styles.textContent = `
       /* ===== 占卜結果卡片樣式 ===== */
       .fortune-result__overlay {
@@ -397,6 +394,7 @@
       .fortune-result__bag-mouth svg {
         width: 100%;
         height: auto;
+        display: block;
       }
 
       .fortune-result__close-btn {
@@ -428,14 +426,16 @@
         color: #FAEBB5;
         text-align: center;
         margin-bottom: clamp(15px, 5.45cqw, 30px);
-        white-space: pre-line;
+        // white-space: pre-line;
         text-shadow: min(0.18cqw, 1px) min(0.18cqw, 1px) min(0.73cqw, 4px) rgba(0, 0, 0, 0.5);
       }
 
       .fortune-result__title-coin {
         width: clamp(15px, 4.55cqw, 25px);
         height: clamp(15px, 4.55cqw, 25px);
-        display: inline-block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .fortune-result__title-coin:first-child {
@@ -452,6 +452,7 @@
         width: 100%;
         height: 100%;
         object-fit: contain;
+        display: block;
       }
 
       .fortune-result__title-wrapper {
@@ -479,9 +480,10 @@
         font-weight: bold;
         color: #FAEBB5;
         text-align: center;
-        white-space: pre-line;
+        // white-space: pre-line;
         line-height: 1.5;
         text-shadow: min(0.18cqw, 1px) min(0.18cqw, 1px) min(0.73cqw, 4px) rgba(0, 0, 0, 0.5);
+        magin: 0;
       }
 
       .fortune-result__secondary_title-coin {
@@ -530,21 +532,23 @@
       }
 
       .fortune-result__content--first .fortune-result__title {
-        margin-top: -3%;
-        margin-bottom: clamp(15px, 5.45cqw, 30px);
-        max-width: 100%;
+        margin-top: -5%;
+        margin-bottom: clamp(15px, 4cqw, 30px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .fortune-result__description {
-    width: 100%;
-    max-width: min(72.73cqw, 400px);
-    margin: 0 auto;
-    font-size: clamp(16px, 3.64cqw, 20px);
-    line-height: 1.3;
-    white-space: pre-line;
-    color: #fff;
-    text-align: center;
-  }
+        width: 100%;
+        max-width: min(72.73cqw, 400px);
+        margin: 0 auto;
+        font-size: clamp(16px, 3.64cqw, 20px);
+        line-height: 1.3;
+        // white-space: pre-line;
+        color: #fff;
+        text-align: center;
+      }
 
       .fortune-result__description-highlight {
         color: #FAEBB5;
@@ -646,6 +650,7 @@
       .already-played__bag-mouth svg {
         width: 100%;
         height: auto;
+        display: block;
       }
 
       .already-played__close-btn {
@@ -676,7 +681,7 @@
         font-weight: bold;
         color: #FAEBB5;
         text-align: center;
-        white-space: pre-line;
+        // white-space: pre-line;
         line-height: 1.5;
         text-shadow: min(0.18cqw, 1px) min(0.18cqw, 1px) min(0.73cqw, 4px) rgba(0, 0, 0, 0.5);
       }
@@ -708,14 +713,14 @@
       }
 
       .already-played__title-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    max-width: min(75.45cqw, 410px);
-    margin: 0 auto;
-    margin-bottom: min(22cqw, 120px);
-  }
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        max-width: min(75.45cqw, 410px);
+        margin: 0 auto;
+        margin-bottom: min(22cqw, 120px);
+      }
 
       .already-played__img-container {
         width: 100%;
@@ -749,22 +754,21 @@
       }
 
       .already-played__content--first .already-played__title {
-        margin-top: -3%;
+        margin-top: -5%;
         margin-bottom: clamp(5px, 2.45cqw, 15px);
-        max-width: 100%;
       }
 
       .already-played__desc {
-    width: 100%;
-    max-width: min(81.82cqw, 450px);
-    margin: 0 auto;
-    padding: 0 min(1.82cqw, 10px);
-    font-size: clamp(12px, 3.64cqw, 20px);
-    line-height: 1.3;
-    white-space: pre-line;
-    color: #fff;
-    text-align: center;
-  }
+        width: 100%;
+        max-width: min(81.82cqw, 450px);
+        margin: 0 auto;
+        padding: 0 min(1.82cqw, 10px);
+        font-size: clamp(12px, 3.64cqw, 20px);
+        line-height: 1.3;
+        // white-space: pre-line;
+        color: #fff;
+        text-align: center;
+      }
 
       .already-played__desc-highlight {
         color: #FAEBB5;
@@ -847,6 +851,22 @@
           width: 40px;
           height: 40px;
         }
+        .fortune-result__title-coin:last-child,
+        .already-played__title-coin:last-child {
+          padding-right: 0;
+        }
+        .fortune-result__title-coin:first-child,
+        .already-played__title-coin:first-child {
+          padding-left: 0;
+        }
+        .fortune-result__title-coin:last-child,
+        .already-played__title-coin:last-child {
+          margin: 0;
+        }
+        .fortune-result__title-coin:first-child,
+        .already-played__title-coin:first-child {
+          margin: 0;
+        }
       }
 
       @media (max-width: 380px) {
@@ -878,89 +898,89 @@
           font-size: 12px;
         }
       }
-    `;
+    `
 
-    document.head.appendChild(styles);
+    document.head.appendChild(styles)
   }
 
   // 主要初始化函數
   function init(options = {}) {
-    const containerId = options.containerId || "divination-container";
-    const container = document.getElementById(containerId);
+    const containerId = options.containerId || 'divination-container'
+    const container = document.getElementById(containerId)
 
     if (!container) {
-      console.error(`找不到容器元素: #${containerId}`);
-      return;
+      console.error(`找不到容器元素: #${containerId}`)
+      return
     }
 
     // 注入樣式
-    injectStyles();
+    injectStyles()
 
     // 從 URL 取得參數
-    const playCount = parseInt(getUrlParam("count") || "0");
-    const alreadyPlayed = getUrlParam("already_played") === "1";
-    const fortuneId = getUrlParam("fortune_id");
+    const playCount = parseInt(getUrlParam('count') || '0')
+    const alreadyPlayed = getUrlParam('already_played') === '1'
+    const fortuneId = getUrlParam('fortune_id')
 
-    console.log("DivinationCard 初始化:", {
+    console.log('DivinationCard 初始化:', {
       playCount,
       alreadyPlayed,
       fortuneId,
-    });
+    })
 
     // 檢查是否已經顯示過（同一個 session 內只顯示一次）
-    if (sessionStorage.getItem("divination-card-shown")) {
-      console.log("卡片已顯示過，不再重複顯示");
+    if (sessionStorage.getItem('divination-card-shown')) {
+      console.log('卡片已顯示過，不再重複顯示')
       return {
         playCount,
         alreadyPlayed,
         fortuneData: null,
-      };
+      }
     }
 
     // 如果已經玩過，顯示重複遊玩卡片
     if (alreadyPlayed) {
-      showAlreadyPlayedCard(container, playCount);
-      sessionStorage.setItem("divination-card-shown", "true");
+      showAlreadyPlayedCard(container, playCount)
+      sessionStorage.setItem('divination-card-shown', 'true')
       return {
         playCount,
         alreadyPlayed,
         fortuneData: null,
-      };
+      }
     }
 
     // 生成並顯示占卜結果
     // 如果有 fortuneId，使用指定的結果；否則隨機生成
-    let fortuneData;
+    let fortuneData
     if (fortuneId) {
       // 根據 ID 找到對應的結果
-      fortuneData = FORTUNE_RESULTS.find((f) => f.id === fortuneId);
+      fortuneData = FORTUNE_RESULTS.find((f) => f.id === fortuneId)
       if (!fortuneData) {
-        console.warn(`找不到 fortuneId: ${fortuneId}，使用隨機結果`);
-        fortuneData = generateFortuneResult();
+        console.warn(`找不到 fortuneId: ${fortuneId}，使用隨機結果`)
+        fortuneData = generateFortuneResult()
       } else {
         // 移除 weight 屬性
-        fortuneData = { ...fortuneData };
-        delete fortuneData.weight;
+        fortuneData = { ...fortuneData }
+        delete fortuneData.weight
       }
     } else {
-      fortuneData = generateFortuneResult();
+      fortuneData = generateFortuneResult()
     }
 
-    showFortuneCard(container, fortuneData, playCount);
-    sessionStorage.setItem("divination-card-shown", "true");
+    showFortuneCard(container, fortuneData, playCount)
+    sessionStorage.setItem('divination-card-shown', 'true')
 
     return {
       playCount,
       alreadyPlayed,
       fortuneData,
-    };
+    }
   }
 
   // Line 分享功能
   function shareFortune() {
-    const shareUrl = "https://event.udn.com/bd_newyear2026";
-    const lineShareUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}`;
-    window.open(lineShareUrl, "_blank", "width=600,height=600");
+    const shareUrl = 'https://event.udn.com/bd_newyear2026'
+    const lineShareUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}`
+    window.open(lineShareUrl, '_blank', 'width=600,height=600')
   }
 
   // 暴露到全域
@@ -968,11 +988,11 @@
     init: init,
     generateFortuneResult: generateFortuneResult,
     showAlreadyPlayedCard: showAlreadyPlayedCard,
+    showFortuneCard: showFortuneCard,
     getUrlParam: getUrlParam,
     FORTUNE_RESULTS: FORTUNE_RESULTS,
-  };
+  }
 
   // 暴露分享功能
-  window.shareFortune = shareFortune;
-})(window);
-
+  window.shareFortune = shareFortune
+})(window)
