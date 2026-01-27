@@ -139,14 +139,6 @@ export const useDivinationFlow = () => {
         return;
       }
 
-      // 操作過於頻繁
-      if (result.message && result.message.includes("操作過於頻繁")) {
-        console.log("操作過於頻繁，需要等待");
-        const waitTime = result.wait_time || 60;
-        resolve({ type: "rate_limit", waitTime: waitTime });
-        return;
-      }
-
       // 機器人驗證失敗
       if (result.message && result.message.includes("機器人驗證失敗")) {
         console.log("機器人驗證失敗，要求重新驗證");
@@ -162,7 +154,15 @@ export const useDivinationFlow = () => {
       }
 
       console.log("其他 API 錯誤，不更新占卜狀態:", result.message);
-      resolve({ type: "other_error", message: result.message });
+      
+      // 避免將包含"成功"字樣的訊息當作錯誤訊息
+      let errorMessage = result.message || "伺服器錯誤，請稍後再試";
+      if (errorMessage.includes("成功")) {
+        console.warn("⚠️ 警告: 錯誤訊息包含「成功」字樣，這不應該發生");
+        errorMessage = "系統處理異常，請稍後再試";
+      }
+      
+      resolve({ type: "other_error", message: errorMessage });
     });
   };
 

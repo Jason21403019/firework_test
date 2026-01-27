@@ -522,17 +522,17 @@ async function proceedToNewYearFlow() {
   } catch (error) {
     console.error("❌ 活動流程錯誤:", error);
 
-    // 如果錯誤包含 errorType，使用特定的錯誤處理
-    if (error.errorType) {
-      await handleApiErrorUI(error.errorType);
-    } else {
-      // 一般錯誤
-      showUniversalDialog({
-        icon: "error",
-        title: "系統錯誤",
-        text: error.message || "處理活動流程時發生錯誤，請稍後再試",
-      });
-    }
+    // 避免顯示包含"成功"字樣的錯誤訊息
+    const errorMessage = error.message || "處理活動流程時發生錯誤，請稍後再試";
+    const displayMessage = errorMessage.includes("成功")
+      ? "系統處理異常，請稍後再試"
+      : errorMessage;
+
+    showUniversalDialog({
+      icon: "error",
+      title: "系統錯誤",
+      text: displayMessage,
+    });
   }
 }
 
@@ -547,19 +547,6 @@ async function handleApiErrorUI(errorType) {
   // 所有彈窗都在結果頁顯示
   if (errorType.type === "already_played") {
     // 什麼都不做，讓流程繼續跳轉到結果頁
-    return;
-  }
-
-  // 操作過於頻繁
-  if (errorType.type === "rate_limit") {
-    const waitTime = errorType.waitTime || 60;
-    showUniversalDialog({
-      icon: "warning",
-      title: "操作過於頻繁",
-      text: `請稍後再試，還需要等待 ${waitTime} 秒`,
-      confirmButtonText: "我知道了",
-      showCancelButton: false,
-    });
     return;
   }
 
@@ -589,10 +576,16 @@ async function handleApiErrorUI(errorType) {
     return;
   }
 
+  // 避免顯示包含"成功"字樣的錯誤訊息
+  const errorMessage = errorType.message || "伺服器錯誤，請稍後再試";
+  const displayMessage = errorMessage.includes("成功")
+    ? "系統處理異常，請重新嘗試"
+    : errorMessage;
+
   showUniversalDialog({
     icon: "error",
     title: "占卜失敗",
-    text: errorType.message || "伺服器錯誤，請稍後再試",
+    text: displayMessage,
     confirmButtonText: "確定",
     showCancelButton: true,
     cancelButtonText: "重新嘗試",
