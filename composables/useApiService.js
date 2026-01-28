@@ -7,11 +7,11 @@ export const useApiService = () => {
   const getApiUrl = (endpoint) => {
     const baseUrl = (() => {
       if (config.public.domain?.includes("lab-event")) {
-        return "https://lab-event.udn.com/bd_newyear2026/newyear2026php";
+        return "https://lab-event.udn.com/bd_newyear_2026/newyear2026php";
       } else if (config.public.domain?.includes("event.udn")) {
-        return "https://event.udn.com/bd_newyear2026/newyear2026php";
+        return "https://event.udn.com/bd_newyear_2026/newyear2026php";
       } else {
-        return "https://lab-event.udn.com/bd_newyear2026/newyear2026php";
+        return "https://lab-event.udn.com/bd_newyear_2026/newyear2026php";
       }
     })();
 
@@ -26,25 +26,25 @@ export const useApiService = () => {
       const hostname = window.location.hostname;
 
       if (hostname === "lab-event.udn.com") {
-        redirectUrl = "https://lab-event.udn.com/bd_newyear2026/";
+        redirectUrl = "https://lab-event.udn.com/bd_newyear_2026/";
       } else if (hostname === "event.udn.com") {
-        redirectUrl = "https://event.udn.com/bd_newyear2026/";
+        redirectUrl = "https://event.udn.com/bd_newyear_2026/";
       } else {
-        redirectUrl = "https://lab-event.udn.com/bd_newyear2026/";
+        redirectUrl = "https://lab-event.udn.com/bd_newyear_2026/";
       }
     } else {
       const domain = config.public.domain;
 
       if (domain?.includes("lab-event")) {
-        redirectUrl = "https://lab-event.udn.com/bd_newyear2026/";
+        redirectUrl = "https://lab-event.udn.com/bd_newyear_2026/";
       } else if (domain?.includes("event.udn")) {
-        redirectUrl = "https://event.udn.com/bd_newyear2026/";
+        redirectUrl = "https://event.udn.com/bd_newyear_2026/";
       } else {
-        redirectUrl = "https://lab-event.udn.com/bd_newyear2026/";
+        redirectUrl = "https://lab-event.udn.com/bd_newyear_2026/";
       }
     }
 
-    return `https://member.udn.com/member/login.jsp?site=bd_newyear2026&again=y&redirect=${redirectUrl}`;
+    return `https://member.udn.com/member/login.jsp?site=bd_newyear_2026&again=y&redirect=${redirectUrl}`;
   };
 
   // 檢查用戶今天是否已經占卜過

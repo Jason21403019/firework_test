@@ -5,9 +5,8 @@
       <div class="universal__popup-inner">
         <!-- 關閉按鈕 (僅在允許關閉時顯示) -->
         <button v-if="showCloseButton" class="universal__close-btn" @click="closeModal">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="3" stroke-linecap="round"
-              stroke-linejoin="round" />
+          <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 20L4 4M4 20L20 4" stroke="currentColor" stroke-width="4" />
           </svg>
         </button>
 
@@ -171,36 +170,21 @@ const handleCancel = () => {
     max-height: 700px;
     position: relative;
     animation: modalBounceIn 0.3s ease-out;
-    padding: 30px;
     border: 10px solid #E05C39;
 
     &--closing {
       animation: modalBounceOut 0.25s ease-in;
     }
 
-    @media (max-width: 768px) {
-      padding: 40px;
-    }
 
-    @media (max-width: 480px) {
-      padding: 30px;
-      border: none;
-    }
   }
 
   &__popup-inner {
     position: relative;
-
-    @media (max-width: 768px) {
-      padding: 0;
-    }
+    padding: 80px 20px;
 
     @media (max-width: 480px) {
-      padding: 0;
-    }
-
-    @media (max-width: 360px) {
-      padding: 0;
+      padding: 40px 20px;
     }
   }
 
@@ -229,12 +213,10 @@ const handleCancel = () => {
     align-items: center;
     text-align: center;
     color: #fff;
-    padding: 20px 0;
+    gap: 30px;
   }
 
   &__icon {
-    margin-bottom: 20px;
-
     &--success svg {
       filter: drop-shadow(0 0 10px rgba(82, 196, 26, 0.3));
     }
@@ -251,7 +233,6 @@ const handleCancel = () => {
   &__title {
     font-size: 30px;
     line-height: 1.6;
-    margin-bottom: 15px;
     color: #FAEBB5;
     font-weight: bold;
 
@@ -263,7 +244,6 @@ const handleCancel = () => {
   &__text {
     font-size: 18px;
     line-height: 1.5;
-    margin-bottom: 20px;
     color: #fff;
     white-space: pre-line;
 
@@ -275,7 +255,6 @@ const handleCancel = () => {
   &__html {
     font-size: 18px;
     line-height: 1.5;
-    margin-bottom: 20px;
     color: #fff;
 
     @media (max-width: 480px) {
@@ -287,7 +266,6 @@ const handleCancel = () => {
     display: flex;
     gap: 15px;
     justify-content: center;
-    margin-top: 20px;
   }
 
   &__btn {

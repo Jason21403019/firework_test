@@ -12,7 +12,7 @@ $data = handleApiRequest(['POST'], true);
 if (isset($data['admin_mode']) && $data['admin_mode'] === true) {
     try {
         // 管理模式：返回所有用戶資料
-        $stmt = $pdo->prepare("SELECT * FROM act2026_bd_newyear2026 ORDER BY id DESC");
+        $stmt = $pdo->prepare("SELECT * FROM act2026_bd_newyear_2026 ORDER BY id DESC");
         $stmt->execute();
         $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
@@ -87,7 +87,7 @@ try {
     // 取得當天日期
     $today = date('Y-m-d');
     
-    $sql = "SELECT * FROM act2026_bd_newyear2026 WHERE email = ? AND DATE(updated_at) = ?";
+    $sql = "SELECT * FROM act2026_bd_newyear_2026 WHERE email = ? AND DATE(updated_at) = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$email, $today]);
     

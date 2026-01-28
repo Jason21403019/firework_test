@@ -1,0 +1,160 @@
+/* ===== 紅包轉盤推廣彈窗樣式 ===== */
+/* 這個 CSS 檔案可以獨立引入，也可以透過 JS 自動注入 */
+
+.redpacket-popup__overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 12px;
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+
+.redpacket-popup__overlay--show {
+  opacity: 1;
+}
+
+.redpacket-popup__overlay--closing {
+  opacity: 0;
+}
+
+.redpacket-popup__popup {
+  background: #D83307;
+  border-radius: 25px;
+  max-width: 550px;
+  width: 100%;
+  position: relative;
+  border: 10px solid #E05C39;
+  animation: modalBounceIn 0.3s ease-out;
+}
+
+.redpacket-popup__popup--closing {
+  animation: modalBounceOut 0.25s ease-in;
+}
+
+.redpacket-popup__close-btn {
+  position: absolute;
+  top: -22px;
+  right: -22px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: #E7C170;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #80552B;
+  z-index: 10;
+}
+
+.redpacket-popup__close-btn:hover {
+  transform: scale(1.1);
+  background: #F5D98A;
+}
+
+.redpacket-popup__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+
+.redpacket-popup__img-container {
+  width: 100%;
+  max-width: 380px;
+  aspect-ratio: 380 / 247;
+}
+
+.redpacket-popup__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.redpacket-popup__text {
+  color: #ffffff;
+  font-size: clamp(20px, 4vw, 24px);
+  font-weight: bold;
+  text-align: center;
+  line-height: 1.6;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.redpacket-popup__btn {
+  padding: 15px 60px;
+  border-radius: 50px;
+  background: linear-gradient(to bottom, #FAEBB5, #E7C170);
+  color: #80552B;
+  font-size: clamp(22px, 4vw, 32px);
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.redpacket-popup__btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(to bottom, #FCF3D0, #EAC980);
+}
+
+.redpacket-popup__btn:active {
+  transform: translateY(0);
+}
+
+/* ===== 動畫 ===== */
+@keyframes modalBounceIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes modalBounceOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.9);
+  }
+}
+
+/* ===== 響應式設計 ===== */
+@media (max-width: 768px) {
+  .redpacket-popup__popup {
+    padding: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .redpacket-popup__popup {
+    padding: 30px;
+  }
+
+  .redpacket-popup__text {
+    font-size: 18px;
+  }
+
+  .redpacket-popup__btn {
+    padding: 12px 40px;
+    font-size: 20px;
+  }
+}

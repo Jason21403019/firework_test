@@ -34,7 +34,7 @@ export default defineNuxtConfig({
         },
         {
           property: "og:url",
-          content: "https://event.udn.com/bd_newyear2026",
+          content: "https://event.udn.com/bd_newyear_2026",
         },
         {
           property: "og:type",
@@ -46,13 +46,13 @@ export default defineNuxtConfig({
         },
         {
           property: "og:image",
-          content: "https://event.udn.com/bd_newyear2026/imgs/meta_img.png",
+          content: "https://event.udn.com/bd_newyear_2026/imgs/meta_img.png",
         },
       ],
       link: [
         { rel: "icon", type: "image/x-icon" },
         { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
-        { rel: "canonical", href: "https://event.udn.com/bd_newyear2026" },
+        { rel: "canonical", href: "https://event.udn.com/bd_newyear_2026" },
       ],
       script: [
         // comScore 追蹤代碼

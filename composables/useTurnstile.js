@@ -45,7 +45,7 @@ export const useTurnstile = (onVerificationSuccess) => {
         "#turnstile-container",
         {
           sitekey: TURNSTILE_SITE_KEY,
-          theme: "dark",
+          theme: "light",
           callback: function (token) {
             console.log("✅ Turnstile 驗證成功");
 

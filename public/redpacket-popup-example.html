@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>紅包轉盤推廣彈窗 - 使用範例</title>
+  <style>
+    body {
+      font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      text-align: center;
+      color: #667eea;
+      margin-bottom: 30px;
+      font-size: 32px;
+    }
+
+    .info {
+      background: #f5f5f5;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+    }
+
+    .info h2 {
+      color: #333;
+      font-size: 20px;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+
+    .info pre {
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+      line-height: 1.6;
+    }
+
+    .info code {
+      background: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #d63384;
+      font-family: 'Courier New', monospace;
+      word-break: break-all;
+    }
+
+    .info ul {
+      padding-left: 20px;
+    }
+
+    .info li {
+      margin: 8px 0;
+      line-height: 1.6;
+    }
+
+    .test-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .test-btn {
+      padding: 15px 25px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .test-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    }
+
+    .test-btn:active {
+      transform: translateY(0);
+    }
+
+    .test-btn--primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .test-btn--success {
+      background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+    }
+
+    .test-btn--warning {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .feature {
+      background: #e8f4f8;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+      border-left: 4px solid #3498db;
+    }
+
+    .feature strong {
+      color: #2c3e50;
+    }
+
+    /* 響應式設計 */
+    @media (max-width: 768px) {
+      .container {
+        padding: 30px 20px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .info h2 {
+        font-size: 18px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+
+      .container {
+        padding: 20px 15px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      .info {
+        padding: 15px;
+      }
+
+      .info pre {
+        font-size: 13px;
+        padding: 10px;
+      }
+
+      .test-buttons {
+        grid-template-columns: 1fr;
+      }
+
+      .test-btn {
+        font-size: 14px;
+        padding: 12px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧧 紅包轉盤推廣彈窗 - 使用範例</h1>
+
+    <div class="info">
+      <h2>💡 功能特色</h2>
+      <div class="feature">
+        <strong>📅 智能顯示：</strong>一週只顯示一次，不打擾用戶
+      </div>
+      <div class="feature">
+        <strong>⏰ 時間控制：</strong>可設定活動開始/結束時間
+      </div>
+      <div class="feature">
+        <strong>🎨 樣式一致：</strong>與 Notice_popup 使用相同視覺風格
+      </div>
+      <div class="feature">
+        <strong>📱 響應式設計：</strong>完美支援各種裝置尺寸
+      </div>
+    </div>
+
+    <div class="info">
+      <h2>🚀 快速開始</h2>
+      <p><strong>步驟 1：</strong>在您的網頁中引入 JS 檔案</p>
+      <pre><code>&lt;script src="https://event.udn.com/bd_newyear_2026/redpacket-popup.js"&gt;&lt;/script&gt;</code></pre>
+
+      <p><strong>步驟 2：</strong>初始化彈窗（頁面載入時自動顯示）</p>
+      <pre><code>&lt;script&gt;
+  // 基本用法（使用預設值）
+  RedpacketPopup.init();
+
+  // 進階用法（自訂參數）
+  RedpacketPopup.init({
+    targetUrl: 'https://event.udn.com/your-activity-page',
+    imageUrl: 'https://event.udn.com/imgs/your-image.png',
+    title: '天天轉盤抽紅包，LINE POINTS 免費&lt;br&gt;領、iPhone17 Pro 大獎要送你！',
+    buttonText: '立即轉運',
+    startDate: '2025-01-01T00:00:00+08:00',
+    endDate: '2025-12-31T23:59:59+08:00',
+    delay: 1000 // 延遲 1 秒顯示（毫秒）
+  });
+&lt;/script&gt;</code></pre>
+    </div>
+
+    <div class="info">
+      <h2>⚙️ 參數說明</h2>
+      <ul>
+        <li><code>targetUrl</code> - 點擊按鈕後要跳轉的網址</li>
+        <li><code>imageUrl</code> - 彈窗中顯示的圖片網址</li>
+        <li><code>title</code> - 彈窗標題文字（支援 HTML）</li>
+        <li><code>buttonText</code> - 按鈕文字</li>
+        <li><code>startDate</code> - 活動開始時間（選填）</li>
+        <li><code>endDate</code> - 活動結束時間（選填）</li>
+        <li><code>delay</code> - 延遲顯示時間（毫秒，預設 1000）</li>
+      </ul>
+    </div>
+
+    <div class="info">
+      <h2>📋 完整使用範例</h2>
+      <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="zh-TW"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;我的網站&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;歡迎來到我的網站&lt;/h1&gt;
+  
+  &lt;!-- 引入紅包彈窗 JS --&gt;
+  &lt;script src="https://event.udn.com/bd_newyear_2026/redpacket-popup.js"&gt;&lt;/script&gt;
+  
+  &lt;!-- 初始化彈窗 --&gt;
+  &lt;script&gt;
+    RedpacketPopup.init({
+      targetUrl: 'https://event.udn.com/bd_newyear_2026',
+      startDate: '2025-08-14T10:00:00+08:00',
+      endDate: '2025-09-15T10:00:00+08:00'
+    });
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+    </div>
+
+    <div class="info">
+      <h2>🧪 測試按鈕</h2>
+      <p>點擊下方按鈕測試不同功能：</p>
+      <div class="test-buttons">
+        <button class="test-btn test-btn--primary" onclick="testBasicPopup()">
+          測試基本彈窗
+        </button>
+        <button class="test-btn test-btn--success" onclick="testCustomPopup()">
+          測試自訂內容
+        </button>
+        <button class="test-btn test-btn--warning" onclick="clearStorage()">
+          清除記錄（重新顯示）
+        </button>
+      </div>
+    </div>
+
+    <div class="info">
+      <h2>❓ 常見問題</h2>
+      <p><strong>Q: 彈窗多久顯示一次？</strong></p>
+      <p>A: 預設為一週顯示一次，使用 localStorage 記錄上次顯示時間。</p>
+
+      <p><strong>Q: 如何讓彈窗立即顯示？</strong></p>
+      <p>A: 清除瀏覽器的 localStorage 中的 <code>redpacket_popup_last_shown</code> 項目。</p>
+
+      <p><strong>Q: 可以設定活動時間嗎？</strong></p>
+      <p>A: 可以，設定 <code>startDate</code> 和 <code>endDate</code> 參數即可。</p>
+
+      <p><strong>Q: 樣式可以自訂嗎？</strong></p>
+      <p>A: 可以覆寫 CSS 類別來自訂樣式，或直接修改 <code>redpacket-popup.css</code> 檔案。</p>
+    </div>
+  </div>
+
+  <!-- 引入紅包彈窗 JS -->
+  <script src="./redpacket-popup.js"></script>
+
+  <script>
+    // 測試基本彈窗
+    function testBasicPopup() {
+      RedpacketPopup.showPopup({
+        targetUrl: 'https://event.udn.com/bd_newyear_2026',
+        imageUrl: 'https://event.udn.com/bd_newyear_2026/imgs/repeatimg.png',
+        title: '天天轉盤抽紅包，LINE POINTS 免費<br>領、iPhone17 Pro 大禮要送你！',
+        buttonText: '立即轉運'
+      })
+    }
+
+    // 測試自訂內容彈窗
+    function testCustomPopup() {
+      RedpacketPopup.showPopup({
+        targetUrl: 'https://www.udn.com',
+        imageUrl: 'https://event.udn.com/bd_newyear_2026/imgs/repeatimg.png',
+        title: '🎊 自訂標題測試<br>這是第二行文字！',
+        buttonText: '我要參加'
+      })
+    }
+
+    // 清除 localStorage 記錄
+    function clearStorage() {
+      localStorage.removeItem('redpacket_popup_last_shown')
+      alert('✅ 已清除記錄！\n重新整理頁面後會再次顯示彈窗。')
+    }
+
+    // 頁面載入後自動顯示彈窗（註解掉避免干擾測試）
+    // RedpacketPopup.init({
+    //   targetUrl: 'https://event.udn.com/bd_newyear_2026',
+    //   delay: 2000 // 延遲 2 秒顯示
+    // });
+
+    console.log('紅包彈窗模組已載入')
+  </script>
+</body>
+</html>

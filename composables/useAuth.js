@@ -89,7 +89,7 @@ export const useAuth = () => {
         "lab-event.udn.com",
       ];
 
-      const paths = ["/", "/bd_newyear2026", "/bd_newyear2026"];
+      const paths = ["/", "/bd_newyear_2026", "/bd_newyear_2026"];
       const cookieNames = ["udnmember", "um2", "nickname", "fg_mail"];
 
       domains.forEach((domain) => {
@@ -139,7 +139,7 @@ export const useAuth = () => {
         ".lab-event.udn.com",
       ];
 
-      const paths = ["/", "/bd_newyear2026/"];
+      const paths = ["/", "/bd_newyear_2026/"];
 
       domains.forEach((domain) => {
         paths.forEach((path) => {
@@ -183,8 +183,8 @@ export const useAuth = () => {
 
       const allowedPaths = [
         "/member/login.jsp",
-        "/bd_newyear2026/",
-        "/bd_newyear2026/",
+        "/bd_newyear_2026/",
+        "/bd_newyear_2026/",
       ];
 
       const isValidPath = allowedPaths.some((path) =>

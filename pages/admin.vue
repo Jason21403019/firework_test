@@ -33,21 +33,11 @@
     <div class="filter-panel">
       <div class="filter-group">
         <label>用戶ID：</label>
-        <input
-          type="text"
-          v-model="filters.userId"
-          placeholder="輸入用戶ID"
-          @input="debouncedFilter"
-        />
+        <input type="text" v-model="filters.userId" placeholder="輸入用戶ID" @input="debouncedFilter" />
       </div>
       <div class="filter-group">
         <label>IP地址：</label>
-        <input
-          type="text"
-          v-model="filters.ip"
-          placeholder="輸入IP地址"
-          @input="debouncedFilter"
-        />
+        <input type="text" v-model="filters.ip" placeholder="輸入IP地址" @input="debouncedFilter" />
       </div>
       <div class="filter-group">
         <label>占卜次數：</label>
@@ -117,20 +107,14 @@
               <td>{{ record.email }}</td>
               <td>{{ record.ip || "-" }}</td>
               <td>
-                <span
-                  class="play-count-badge"
-                  :class="getPlayCountClass(record.play_times_total)"
-                >
+                <span class="play-count-badge" :class="getPlayCountClass(record.play_times_total)">
                   {{ record.play_times_total }}
                 </span>
               </td>
               <td>{{ formatDate(record.updated_at) }}</td>
               <td>{{ formatDate(record.created_at) }}</td>
               <td>
-                <button
-                  @click="viewDetails(record)"
-                  class="btn btn-sm btn-info"
-                >
+                <button @click="viewDetails(record)" class="btn btn-sm btn-info">
                   詳細
                 </button>
               </td>
@@ -145,49 +129,27 @@
           共 {{ totalPages }} 頁，{{ filteredRecords.length }} 筆記錄
         </div>
         <div class="pagination">
-          <button
-            @click="changePage(1)"
-            :disabled="currentPage === 1"
-            class="btn btn-secondary"
-          >
+          <button @click="changePage(1)" :disabled="currentPage === 1" class="btn btn-secondary">
             首頁
           </button>
-          <button
-            @click="changePage(currentPage - 1)"
-            :disabled="currentPage === 1"
-            class="btn btn-secondary"
-          >
+          <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1" class="btn btn-secondary">
             上一頁
           </button>
 
           <!-- 頁碼輸入框 -->
           <div class="page-input-group">
-            <input
-              type="number"
-              v-model.number="pageInput"
-              @keyup.enter="goToPage"
-              :min="1"
-              :max="totalPages"
-              class="page-input"
-            />
+            <input type="number" v-model.number="pageInput" @keyup.enter="goToPage" :min="1" :max="totalPages"
+              class="page-input" />
             <span>/ {{ totalPages }}</span>
             <button @click="goToPage" class="btn btn-secondary btn-sm">
               跳轉
             </button>
           </div>
 
-          <button
-            @click="changePage(currentPage + 1)"
-            :disabled="currentPage === totalPages"
-            class="btn btn-secondary"
-          >
+          <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages" class="btn btn-secondary">
             下一頁
           </button>
-          <button
-            @click="changePage(totalPages)"
-            :disabled="currentPage === totalPages"
-            class="btn btn-secondary"
-          >
+          <button @click="changePage(totalPages)" :disabled="currentPage === totalPages" class="btn btn-secondary">
             末頁
           </button>
         </div>
@@ -217,10 +179,7 @@
             </div>
             <div class="detail-item">
               <label>累計占卜次數：</label>
-              <span
-                class="play-count-badge"
-                :class="getPlayCountClass(selectedRecord?.play_times_total)"
-              >
+              <span class="play-count-badge" :class="getPlayCountClass(selectedRecord?.play_times_total)">
                 {{ selectedRecord?.play_times_total }}
               </span>
             </div>
@@ -315,11 +274,11 @@ const config = useRuntimeConfig();
 function getApiUrl(endpoint) {
   const baseUrl = (() => {
     if (config.public.domain?.includes("lab-event")) {
-      return "https://lab-event.udn.com/bd_newyear2026/newyear2026php";
+      return "https://lab-event.udn.com/bd_newyear_2026/newyear2026php";
     } else if (config.public.domain?.includes("event.udn")) {
-      return "https://event.udn.com/bd_newyear2026/newyear2026php";
+      return "https://event.udn.com/bd_newyear_2026/newyear2026php";
     } else {
-      return "https://lab-event.udn.com/bd_newyear2026/newyear2026php";
+      return "https://lab-event.udn.com/bd_newyear_2026/newyear2026php";
     }
   })();
   return `${baseUrl}/${endpoint}`;
@@ -817,11 +776,9 @@ $accent-purple: rgba(109, 39, 234, 0.1);
     &:hover {
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(109, 39, 234, 0.3);
-      background: linear-gradient(
-        135deg,
-        $dark-purple 0%,
-        $primary-purple 100%
-      );
+      background: linear-gradient(135deg,
+          $dark-purple 0%,
+          $primary-purple 100%);
     }
 
     &:active {
@@ -1059,24 +1016,31 @@ $accent-purple: rgba(109, 39, 234, 0.1);
   th:nth-child(1) {
     width: 60px;
   }
+
   th:nth-child(2) {
     width: 180px;
   }
+
   th:nth-child(3) {
     width: 220px;
   }
+
   th:nth-child(4) {
     width: 130px;
   }
+
   th:nth-child(5) {
     width: 90px;
   }
+
   th:nth-child(6) {
     width: 140px;
   }
+
   th:nth-child(7) {
     width: 140px;
   }
+
   th:nth-child(8) {
     width: 80px;
   }
@@ -1084,6 +1048,7 @@ $accent-purple: rgba(109, 39, 234, 0.1);
 
 .data-table {
   td {
+
     &:nth-child(2),
     &:nth-child(3) {
       text-overflow: ellipsis;
@@ -1338,6 +1303,7 @@ $accent-purple: rgba(109, 39, 234, 0.1);
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -1368,24 +1334,31 @@ $accent-purple: rgba(109, 39, 234, 0.1);
     th:nth-child(1) {
       width: 50px;
     }
+
     th:nth-child(2) {
       width: 160px;
     }
+
     th:nth-child(3) {
       width: 200px;
     }
+
     th:nth-child(4) {
       width: 120px;
     }
+
     th:nth-child(5) {
       width: 80px;
     }
+
     th:nth-child(6) {
       width: 130px;
     }
+
     th:nth-child(7) {
       width: 130px;
     }
+
     th:nth-child(8) {
       width: 70px;
     }
@@ -1408,6 +1381,7 @@ $accent-purple: rgba(109, 39, 234, 0.1);
 
 @media (max-width: 1200px) {
   .data-table {
+
     th,
     td {
       font-size: 13px;
@@ -1420,24 +1394,31 @@ $accent-purple: rgba(109, 39, 234, 0.1);
     th:nth-child(1) {
       width: 80px;
     }
+
     th:nth-child(2) {
       width: 200px;
     }
+
     th:nth-child(3) {
       width: 250px;
     }
+
     th:nth-child(4) {
       width: 140px;
     }
+
     th:nth-child(5) {
       width: 100px;
     }
+
     th:nth-child(6) {
       width: 160px;
     }
+
     th:nth-child(7) {
       width: 160px;
     }
+
     th:nth-child(8) {
       width: 90px;
     }

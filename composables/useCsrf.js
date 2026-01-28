@@ -10,11 +10,11 @@ export const useCsrf = () => {
     const config = useRuntimeConfig();
     const baseUrl = (() => {
       if (config.public.domain?.includes("lab-event")) {
-        return "https://lab-event.udn.com/bd_newyear2026/newyear2026php";
+        return "https://lab-event.udn.com/bd_newyear_2026/newyear2026php";
       } else if (config.public.domain?.includes("event.udn")) {
-        return "https://event.udn.com/bd_newyear2026/newyear2026php";
+        return "https://event.udn.com/bd_newyear_2026/newyear2026php";
       } else {
-        return "https://lab-event.udn.com/bd_newyear2026/newyear2026php";
+        return "https://lab-event.udn.com/bd_newyear_2026/newyear2026php";
       }
     })();
 

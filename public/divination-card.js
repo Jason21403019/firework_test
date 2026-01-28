@@ -20,25 +20,25 @@
     {
       id: 'fortune_1',
       title: '',
-      image_url: 'https://event.udn.com/bd_newyear2026/imgs/daji.png',
+      image_url: 'https://event.udn.com/bd_newyear_2026/imgs/daji.png',
       weight: 40,
     },
     {
       id: 'fortune_2',
       title: '',
-      image_url: 'https://event.udn.com/bd_newyear2026/imgs/zhongji.png',
+      image_url: 'https://event.udn.com/bd_newyear_2026/imgs/zhongji.png',
       weight: 30,
     },
     {
       id: 'fortune_3',
       title: '',
-      image_url: 'https://event.udn.com/bd_newyear2026/imgs/xiaoji.png',
+      image_url: 'https://event.udn.com/bd_newyear_2026/imgs/xiaoji.png',
       weight: 20,
     },
     {
       id: 'fortune_4',
       title: '',
-      image_url: 'https://event.udn.com/bd_newyear2026/imgs/ping.png',
+      image_url: 'https://event.udn.com/bd_newyear_2026/imgs/ping.png',
       weight: 10,
     },
   ]
@@ -82,7 +82,7 @@
     if (playCount === 1) {
       customMessage = `
         <div class="custom-result-message-coin">
-          <img src="https://event.udn.com/bd_newyear2026/imgs/li_coin.png" alt="coin" />
+          <img src="https://event.udn.com/bd_newyear_2026/imgs/li_coin.png" alt="coin" />
         </div>
         <div>小提醒：每天都能玩轉盤抽紅包<br>iPhone 17 Pro 大獎要送你！</div>
       `
@@ -90,7 +90,7 @@
       // 非第一次的重複遊玩也顯示客製化訊息
       customMessage = `
         <div class="custom-result-message-coin">
-          <img src="https://event.udn.com/bd_newyear2026/imgs/li_coin.png" alt="coin" />
+          <img src="https://event.udn.com/bd_newyear_2026/imgs/li_coin.png" alt="coin" />
         </div>
         <div>小提醒：每天都能玩轉盤抽紅包<br>iPhone 17 Pro 大獎要送你！</div>
     `
@@ -104,11 +104,11 @@
       <div class="already-played__content already-played__content--first">
         <h2 class="already-played__title">
           <span class="already-played__title-coin">
-            <img src="https://event.udn.com/bd_newyear2026/imgs/title_coin.png" alt="title_coin" />
+            <img src="https://event.udn.com/bd_newyear_2026/imgs/title_coin.png" alt="title_coin" />
           </span>
           <span class="already-played__title-text">  今天已經轉過好運囉！</span>
           <span class="already-played__title-coin">
-            <img src="https://event.udn.com/bd_newyear2026/imgs/title_coin.png" alt="title_coin" />
+            <img src="https://event.udn.com/bd_newyear_2026/imgs/title_coin.png" alt="title_coin" />
           </span>
         </h2>
         <p class="already-played__desc">
@@ -122,13 +122,13 @@
     const normalTypeContent = `
       <div class="already-played__title-wrapper">
         <span class="already-played__title-coin">
-          <img src="https://event.udn.com/bd_newyear2026/imgs/title_coin.png" alt="title_coin" />
+          <img src="https://event.udn.com/bd_newyear_2026/imgs/title_coin.png" alt="title_coin" />
         </span>
         <h2 class="already-played__title already-played__title--normal">
           今天已經轉過好運囉！
         </h2>
         <span class="already-played__title-coin">
-          <img src="https://event.udn.com/bd_newyear2026/imgs/title_coin.png" alt="title_coin" />
+          <img src="https://event.udn.com/bd_newyear_2026/imgs/title_coin.png" alt="title_coin" />
         </span>
       </div>
       ${customMessage ? `<div class="already-played__custom-msg already-played__custom-msg--normal">${customMessage}</div>` : ''}
@@ -150,7 +150,7 @@
         </button>
         
         <div class="already-played__img-container">
-          <img src="https://event.udn.com/bd_newyear2026/imgs/repeatimg.png" alt="已玩過圖片" class="already-played__img" />
+          <img src="https://event.udn.com/bd_newyear_2026/imgs/repeatimg.png" alt="已玩過圖片" class="already-played__img" />
         </div>
         
         ${repeatType === 'first' ? firstTypeContent : normalTypeContent}
@@ -190,7 +190,7 @@
       resultType = 'first'
       customMessage = `
         <div class="custom-result-message-coin">
-          <img src="https://event.udn.com/bd_newyear2026/imgs/li_coin.png" alt="coin" />
+          <img src="https://event.udn.com/bd_newyear_2026/imgs/li_coin.png" alt="coin" />
         </div>
         <div>小提醒：每天都能玩轉盤抽紅包<br>iPhone 17 Pro 大獎要送你！</div>
       `
@@ -198,7 +198,7 @@
       resultType = 'normal'
       customMessage = `
         <div class="custom-result-message-coin">
-          <img src="https://event.udn.com/bd_newyear2026/imgs/li_coin.png" alt="coin" />
+          <img src="https://event.udn.com/bd_newyear_2026/imgs/li_coin.png" alt="coin" />
         </div>
         <div>小提醒：每天都能玩轉盤抽紅包<br>iPhone 17 Pro 大獎要送你！</div>
       `
@@ -206,7 +206,7 @@
       resultType = 'final'
       customMessage = `
         <div class="custom-result-message-coin">
-          <img src="https://event.udn.com/bd_newyear2026/imgs/li_coin.png" alt="coin" />
+          <img src="https://event.udn.com/bd_newyear_2026/imgs/li_coin.png" alt="coin" />
         </div>
         <div>小提醒：你已累積滿滿的紅包獎勵，同時獲得<br> iPhone 17 Pro 抽獎資格，敬請期待！</div>
       `
@@ -220,11 +220,11 @@
       <div class="fortune-result__content fortune-result__content--first">
         <h2 class="fortune-result__title">
           <span class="fortune-result__title-coin">
-            <img src="https://event.udn.com/bd_newyear2026/imgs/title_coin.png" alt="title_coin" />
+            <img src="https://event.udn.com/bd_newyear_2026/imgs/title_coin.png" alt="title_coin" />
           </span>
           <span class="fortune-result__title-text">&ensp;新春好運轉到你！</span>
           <span class="fortune-result__title-coin">
-            <img src="https://event.udn.com/bd_newyear2026/imgs/title_coin.png" alt="title_coin" />
+            <img src="https://event.udn.com/bd_newyear_2026/imgs/title_coin.png" alt="title_coin" />
           </span>
         </h2>
         <p class="fortune-result__description">
@@ -241,13 +241,13 @@
     const normalOrFinalContent = `
       <div class="fortune-result__title-wrapper fortune-result__title-wrapper--${resultType}">
         <span class="fortune-result__secondary_title-coin">
-          <img src="https://event.udn.com/bd_newyear2026/imgs/title_coin.png" alt="title_coin" />
+          <img src="https://event.udn.com/bd_newyear_2026/imgs/title_coin.png" alt="title_coin" />
         </span>
         <h2 class="fortune-result__secondary_title fortune-result__secondary_title--${resultType}">
           ${secondaryTitle}
         </h2>
         <span class="fortune-result__secondary_title-coin">
-          <img src="https://event.udn.com/bd_newyear2026/imgs/title_coin.png" alt="title_coin" />
+          <img src="https://event.udn.com/bd_newyear_2026/imgs/title_coin.png" alt="title_coin" />
         </span>
       </div>
       ${customMessage ? `<div class="fortune-result__custom-message fortune-result__custom-message--${resultType}">${customMessage}</div>` : ''}
@@ -1000,7 +1000,7 @@
 
   // Line 分享功能
   function shareFortune() {
-    const shareUrl = 'https://event.udn.com/bd_newyear2026'
+    const shareUrl = 'https://event.udn.com/bd_newyear_2026'
     const lineShareUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}`
     window.open(lineShareUrl, '_blank', 'width=600,height=600')
   }

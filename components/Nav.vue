@@ -4,78 +4,33 @@
       <div class="navbar__content">
         <div class="navbar__logo">
           <NuxtLink to="https://udn.com/news/index" target="_blank">
-            <img
-              src="/imgs/logo.png"
-              alt="logo_udn_Logo"
-              class="navbar__logo-image"
-            />
+            <img src="/imgs/logo.png" alt="logo_udn_Logo" class="navbar__logo-image" />
           </NuxtLink>
           <NuxtLink to="https://udn.com/news/index" target="_blank">
-            <img
-              src="/imgs/og_logo.png"
-              alt="og_logo_udn_Logo"
-              class="navbar__logo-image navbar__logo-image--og"
-            />
+            <img src="/imgs/og_logo.png" alt="og_logo_udn_Logo" class="navbar__logo-image navbar__logo-image--og" />
           </NuxtLink>
         </div>
 
         <div class="navbar__right">
-          <div
-            class="navbar__links"
-            :class="{ 'navbar__links--active': isMobileMenuOpen }"
-          >
-            <NuxtLink
-              to="#activity"
-              class="navbar__link"
-              @click="isMobileMenuOpen = false"
-              >活動辦法</NuxtLink
-            >
-            <NuxtLink
-              to="#prizes"
-              class="navbar__link"
-              @click="isMobileMenuOpen = false"
-              >馬上開運小秘招</NuxtLink
-            >
-            <NuxtLink
-              to="/"
-              class="navbar__link navbar__link--button"
-              @click="handleWinnerListClick"
-              >中獎名單</NuxtLink
-            >
+          <div class="navbar__links" :class="{ 'navbar__links--active': isMobileMenuOpen }">
+            <NuxtLink to="#activity" class="navbar__link" @click="isMobileMenuOpen = false">活動辦法</NuxtLink>
+            <NuxtLink to="#prizes" class="navbar__link" @click="isMobileMenuOpen = false">馬上開運小秘招</NuxtLink>
+            <NuxtLink to="/" class="navbar__link navbar__link--button" @click="handleWinnerListClick">中獎名單</NuxtLink>
           </div>
 
           <div class="navbar__social">
-            <a
-              :href="facebookShareUrl"
-              target="_blank"
-              class="navbar__social-link navbar__social-link--facebook"
-              aria-label="分享到臉書"
-            >
-              <img
-                src="/imgs/share_fb.svg"
-                alt="Facebook"
-                class="navbar__social-icon"
-              />
+            <a :href="facebookShareUrl" target="_blank" class="navbar__social-link navbar__social-link--facebook"
+              aria-label="分享到臉書">
+              <img src="/imgs/share_fb.svg" alt="Facebook" class="navbar__social-icon" />
             </a>
-            <a
-              :href="lineShareUrl"
-              target="_blank"
-              class="navbar__social-link navbar__social-link--line"
-              aria-label="分享到LINE"
-            >
-              <img
-                src="/imgs/share_line.svg"
-                alt="LINE"
-                class="navbar__social-icon"
-              />
+            <a :href="lineShareUrl" target="_blank" class="navbar__social-link navbar__social-link--line"
+              aria-label="分享到LINE">
+              <img src="/imgs/share_line.svg" alt="LINE" class="navbar__social-icon" />
             </a>
           </div>
 
-          <div
-            class="navbar__hamburger"
-            :class="{ 'navbar__hamburger--active': isMobileMenuOpen }"
-            @click="toggleMobileMenu"
-          >
+          <div class="navbar__hamburger" :class="{ 'navbar__hamburger--active': isMobileMenuOpen }"
+            @click="toggleMobileMenu">
             <span class="navbar__hamburger-line"></span>
             <span class="navbar__hamburger-line"></span>
             <span class="navbar__hamburger-line"></span>
@@ -84,18 +39,10 @@
       </div>
     </Nav_container>
 
-    <div
-      v-if="isMobileMenuOpen"
-      class="navbar__backdrop"
-      @click="isMobileMenuOpen = false"
-    ></div>
+    <div v-if="isMobileMenuOpen" class="navbar__backdrop" @click="isMobileMenuOpen = false"></div>
 
-    <Universal_popup
-      :is-visible="showWinnerListPopup"
-      :popup-data="winnerListPopupData"
-      @close="closeWinnerListPopup"
-      @confirm="handleWinnerListConfirm"
-    />
+    <Universal_popup :is-visible="showWinnerListPopup" :popup-data="winnerListPopupData" @close="closeWinnerListPopup"
+      @confirm="handleWinnerListConfirm" />
   </nav>
 </template>
 
@@ -167,11 +114,11 @@ const getCurrentPageUrl = () => {
     // SSR 時使用環境變數
     const domain = config.public.domain;
     if (domain?.includes("lab-event")) {
-      return "https://lab-event.udn.com/bd_newyear2026";
+      return "https://lab-event.udn.com/bd_newyear_2026";
     } else if (domain?.includes("event.udn")) {
-      return "https://event.udn.com/bd_newyear2026";
+      return "https://event.udn.com/bd_newyear_2026";
     } else {
-      return "https://lab-event.udn.com/bd_newyear2026";
+      return "https://lab-event.udn.com/bd_newyear_2026";
     }
   }
   // 瀏覽器端使用當前 URL
@@ -206,6 +153,7 @@ const lineShareUrl = computed(() => {
     align-items: center;
     width: 100%;
     border-radius: 8px;
+
     @media (max-width: 992px) {
       position: relative;
       z-index: 102;
@@ -222,15 +170,18 @@ const lineShareUrl = computed(() => {
     background-color: transparent;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+
     @media (max-width: 992px) {
       position: relative;
       z-index: 1000;
     }
+
     @media (max-width: 640px) {
       width: auto;
       max-width: 90vw;
       gap: clamp(10px, 4vw, 30px);
     }
+
     @media (max-width: 480px) {
       max-width: 85vw;
       gap: clamp(8px, 3vw, 15px);
@@ -240,11 +191,13 @@ const lineShareUrl = computed(() => {
       width: 177px;
       height: 35px;
       display: block;
+
       @media (max-width: 640px) {
         width: clamp(120px, 25vw, 177px);
         height: auto;
         aspect-ratio: 177/35;
       }
+
       @media (max-width: 480px) {
         width: clamp(90px, 20vw, 130px);
       }
@@ -254,11 +207,13 @@ const lineShareUrl = computed(() => {
       width: 115px;
       height: 40px;
       display: block;
+
       @media (max-width: 640px) {
         width: clamp(80px, 16vw, 115px);
         height: auto;
         aspect-ratio: 115/40;
       }
+
       @media (max-width: 480px) {
         width: clamp(60px, 13vw, 85px);
       }
@@ -274,11 +229,13 @@ const lineShareUrl = computed(() => {
     background-color: transparent;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+
     @media (max-width: 992px) {
       gap: 1rem;
       position: relative;
       z-index: 102;
     }
+
     @media (max-width: 480px) {
       gap: 0.5rem;
     }
@@ -287,6 +244,7 @@ const lineShareUrl = computed(() => {
   &__links {
     display: flex;
     align-items: center;
+
     @media (max-width: 992px) {
       position: fixed;
       top: 0;
@@ -325,12 +283,15 @@ const lineShareUrl = computed(() => {
     font-weight: 300;
     transition: color 0.3s ease;
     position: relative;
+
     &:first-child {
       padding-right: 12px;
     }
+
     &:last-child {
       padding-left: 12px;
     }
+
     &:nth-child(2) {
       padding: 0 12px;
     }
@@ -381,6 +342,7 @@ const lineShareUrl = computed(() => {
   &__social {
     display: flex;
     gap: 0.5rem;
+
     @media (max-width: 480px) {
       gap: 0rem;
     }
@@ -402,6 +364,7 @@ const lineShareUrl = computed(() => {
     &-icon {
       width: 36px;
       height: 36px;
+
       @media (max-width: 480px) {
         width: 28px;
         height: 28px;
@@ -419,11 +382,13 @@ const lineShareUrl = computed(() => {
     cursor: pointer;
     z-index: 110;
     position: relative;
+
     @media (max-width: 992px) {
       display: flex;
       position: relative;
       z-index: 103;
     }
+
     @media (max-width: 480px) {
       width: 25px;
       height: 25px;
@@ -464,11 +429,9 @@ const lineShareUrl = computed(() => {
     left: 0;
     width: 100%;
     height: 100vh;
-    background: linear-gradient(
-      135deg,
-      rgba(27, 3, 62, 0.6),
-      rgba(109, 39, 234, 0.4)
-    );
+    background: linear-gradient(135deg,
+        rgba(27, 3, 62, 0.6),
+        rgba(109, 39, 234, 0.4));
     backdrop-filter: blur(5px) saturate(150%);
     -webkit-backdrop-filter: blur(5px) saturate(150%);
     z-index: 98;
@@ -481,6 +444,7 @@ const lineShareUrl = computed(() => {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
