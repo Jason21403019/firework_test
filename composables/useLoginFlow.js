@@ -13,6 +13,34 @@ export const useLoginFlow = () => {
     try {
       if (typeof window === "undefined") return;
 
+      // 檢查頻繁操作限制
+      const browserUtils = useBrowserUtils();
+      const rateLimit = browserUtils.checkRateLimit();
+
+      if (rateLimit.limited) {
+        // 在舊分頁顯示彈窗提示
+        popupStore.openUniversalPopup({
+          icon: "warning",
+          title: "操作過於頻繁",
+          text: `請稍後再試\n剩餘等待時間：${rateLimit.remainingSeconds} 秒`,
+          confirmButtonText: "我知道了",
+          showCancelButton: false,
+        });
+
+        // 設置標記，讓新分頁也能檢測到（但仍允許繼續流程，因為 <a> 標籤會跳轉）
+        localStorage.setItem('fate2025_rate_limit_blocked', JSON.stringify({
+          blocked: true,
+          remainingSeconds: rateLimit.remainingSeconds,
+          timestamp: Date.now()
+        }));
+
+        // 繼續執行流程（讓 <a> 標籤正常跳轉），但設置特殊標記
+        // 注意：不 return false，讓流程繼續
+      } else {
+        // 清除舊的頻繁操作標記（如果有）
+        localStorage.removeItem('fate2025_rate_limit_blocked');
+      }
+
       // 顯示處理中訊息
       popupStore.openLoadingPopup({
         message: "處理中...",
@@ -36,6 +64,9 @@ export const useLoginFlow = () => {
       localStorage.setItem("fate2025_tab_id", tabId);
       localStorage.setItem("fate2025_just_logged_in", "true");
       localStorage.setItem("fate2025_normal_flow", "true");
+
+      // 設置頻繁操作限制 cookie（2分鐘）
+      browserUtils.setRateLimitCookie();
 
       popupStore.closeLoadingPopup();
 
@@ -76,6 +107,42 @@ export const useLoginFlow = () => {
     }
 
     return true; // 返回 true 表示流程有效
+  };
+
+  // 檢查新分頁是否有頻繁操作標記
+  const checkRateLimitOnReturn = (showUniversalDialogFn) => {
+    const rateLimitData = localStorage.getItem('fate2025_rate_limit_blocked');
+
+    if (!rateLimitData) {
+      return false; // 沒有標記，可以繼續
+    }
+
+    try {
+      const data = JSON.parse(rateLimitData);
+      const now = Date.now();
+      const elapsed = Math.floor((now - data.timestamp) / 1000);
+      const remainingSeconds = Math.max(0, data.remainingSeconds - elapsed);
+
+      if (remainingSeconds > 0) {
+        // 還在冷卻時間內，顯示彈窗
+        showUniversalDialogFn({
+          icon: "warning",
+          title: "操作過於頻繁",
+          text: `請稍後再試\n剩餘等待時間：${remainingSeconds} 秒`,
+          confirmButtonText: "我知道了",
+          showCancelButton: false,
+        });
+        return true; // 被限制
+      } else {
+        // 冷卻時間已過，清除標記
+        localStorage.removeItem('fate2025_rate_limit_blocked');
+        return false;
+      }
+    } catch (error) {
+      console.error('解析頻繁操作標記錯誤:', error);
+      localStorage.removeItem('fate2025_rate_limit_blocked');
+      return false;
+    }
   };
 
   // 處理登入後返回的流程
@@ -140,5 +207,6 @@ export const useLoginFlow = () => {
     checkAndHandleNonNormalFlow,
     showNonNormalFlowWarning,
     handlePostLoginProcess,
+    checkRateLimitOnReturn,
   };
 };

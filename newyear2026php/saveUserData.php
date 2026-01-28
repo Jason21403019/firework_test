@@ -139,21 +139,6 @@ try {
     }
     
     $ip = getIP();
-    $ipCheckStmt = $pdo->prepare("SELECT MAX(updated_at) AS last_attempt FROM act2026_bd_newyear_2026 WHERE ip = :ip");
-    $ipCheckStmt->bindParam(':ip', $ip);
-    $ipCheckStmt->execute();
-    $ipResult = $ipCheckStmt->fetch(PDO::FETCH_ASSOC);
-    $lastAttempt = $ipResult ? $ipResult['last_attempt'] : null;
-    
-    if ($lastAttempt) {
-        $timeSinceLastAttempt = time() - strtotime($lastAttempt);
-        if ($timeSinceLastAttempt < 60) {
-            error_log("[LIMIT] 操作過於頻繁 - IP: {$ip}");
-            JSONReturn('操作過於頻繁，請稍後再試', 'error', ['wait_time' => 60 - $timeSinceLastAttempt]);
-        }
-    }
-    
-    
     $today = date('Y-m-d');
     $stmt = $pdo->prepare("SELECT * FROM act2026_bd_newyear_2026 WHERE email = :email");
     $stmt->bindParam(':email', $email);

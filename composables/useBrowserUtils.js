@@ -3,6 +3,36 @@ export const useBrowserUtils = () => {
   const divinationStore = useDivinationStore();
   const auth = useAuth();
 
+  // 設置頻繁操作 cookie（2分鐘）
+  const setRateLimitCookie = () => {
+    const now = Date.now();
+    const expireTime = now + 2 * 60 * 1000; // 2分鐘後過期
+    document.cookie = `fate2025_rate_limit=${expireTime}; path=/; max-age=120`;
+  };
+
+  // 檢查是否在頻繁操作冷卻時間內
+  const checkRateLimit = () => {
+    const cookies = document.cookie.split(';');
+    const rateLimitCookie = cookies.find(c => c.trim().startsWith('fate2025_rate_limit='));
+
+    if (!rateLimitCookie) {
+      return { limited: false };
+    }
+
+    const expireTime = parseInt(rateLimitCookie.split('=')[1]);
+    const now = Date.now();
+
+    if (now < expireTime) {
+      const remainingSeconds = Math.ceil((expireTime - now) / 1000);
+      return {
+        limited: true,
+        remainingSeconds
+      };
+    }
+
+    return { limited: false };
+  };
+
   // 瀏覽器檢測和跳轉
   const checkAndRedirect = (showUniversalDialogFn) => {
     const ua = navigator.userAgent.toLowerCase();
@@ -98,5 +128,7 @@ export const useBrowserUtils = () => {
     initSimpleSync,
     checkRefreshReminder,
     initVisibilityListener,
+    setRateLimitCookie,
+    checkRateLimit,
   };
 };

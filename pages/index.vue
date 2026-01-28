@@ -242,6 +242,14 @@ watch(
         localStorage.removeItem("login_checked");
         localStorage.setItem("login_checked", "true");
 
+        // 檢查是否有頻繁操作限制
+        const isRateLimited = loginFlow.checkRateLimitOnReturn(showUniversalDialog);
+        if (isRateLimited) {
+          console.log("⚠️ 檢測到頻繁操作，阻止流程");
+          verificationTriggered.value = false; // 重置標記，允許下次嘗試
+          return;
+        }
+
         // 更新占卜狀態
         await divinationFlow.updatePlayedStatus();
 
@@ -709,14 +717,21 @@ onMounted(async () => {
   const isFirstTimeCheck = !localStorage.getItem("login_checked");
 
   if (justLoggedIn && userStore.isLoggedIn && !verificationTriggered.value) {
-    // 新年活動流程：先驗證 -> 轉盤動畫 -> 待跳轉彈窗 -> 跳轉到外部網頁
-    verificationTriggered.value = true;
+    // 檢查是否有頻繁操作限制
+    const isRateLimited = loginFlow.checkRateLimitOnReturn(showUniversalDialog);
+    if (isRateLimited) {
+      console.log("⚠️ 檢測到頻繁操作，阻止流程");
+      // 不設置 verificationTriggered，允許下次嘗試
+    } else {
+      // 新年活動流程：先驗證 -> 轉盤動畫 -> 待跳轉彈窗 -> 跳轉到外部網頁
+      verificationTriggered.value = true;
 
-    // 清除檢查標記，避免顯示非正常流程警告
-    localStorage.setItem("login_checked", "true");
+      // 清除檢查標記，避免顯示非正常流程警告
+      localStorage.setItem("login_checked", "true");
 
-    // 不論是否已占卜過，都會走完整流程並跳轉到外部網頁
-    showPostLoginVerificationDialog();
+      // 不論是否已占卜過，都會走完整流程並跳轉到外部網頁
+      showPostLoginVerificationDialog();
+    }
   } else if (userStore.isLoggedIn && isFirstTimeCheck) {
     // 處理非正常流程登入的情況（直接訪問頁面但已登入）
     await loginFlow.checkAndHandleNonNormalFlow(showUniversalDialog);
