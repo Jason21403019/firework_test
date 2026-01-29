@@ -20,7 +20,7 @@ export default defineNuxtConfig({
         {
           name: "keywords",
           content:
-            "馬年、輪盤、紅包禮、抽紅包、轉好運、免費領、加碼獎、LINE POINTS 、 iPhone 、濕拖機器人、CITY CAFF券、咖啡機、商品卡",
+            "馬年、輪盤、紅包禮、抽紅包、轉好運、免費領、加碼獎、LINE POINTS 、 iPhone 、全聯禮券、商品卡",
         },
         // Open Graph 標籤
         {

@@ -116,10 +116,10 @@ onUnmounted(() => {
 
   &__popup-inner {
     position: relative;
-    padding: 80px 40px;
+    padding: 60px 40px;
 
     @media (max-width: 480px) {
-      padding: 40px 20px;
+      padding: 30px 30px;
     }
   }
 

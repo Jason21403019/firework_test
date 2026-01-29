@@ -82,14 +82,14 @@ export const useRedirectFlow = () => {
       // 步驟 5: 顯示待跳轉彈窗
       popupStore.openRedirectPopup({
         message: "準備進入新年活動",
-        countdown: 4,
+        countdown: 3,
       });
 
-      // 步驟 6: 等待彈窗倒數 (4秒)
-      await new Promise((resolve) => setTimeout(resolve, 4000));
+      // 步驟 6: 等待彈窗倒數 (3秒)
+      await new Promise((resolve) => setTimeout(resolve, 3000));
 
       // 在跳轉前啟動重新整理提醒計時器
-      const reminderTime = Date.now() + 4 * 60 * 1000;
+      const reminderTime = Date.now() + 3 * 60 * 1000;
       localStorage.setItem(
         "fate2025_refresh_reminder_time",
         String(reminderTime),
@@ -123,7 +123,7 @@ export const useRedirectFlow = () => {
   ) => {
     // TODO: 替換成實際的外部網頁網址
     const baseUrl =
-      config.public.externalRedirectUrl || "https://udn.com/news/cate/2/6638";
+      config.public.externalRedirectUrl;
 
     const params = new URLSearchParams({
       first: isFirstTime ? "1" : "0",
@@ -131,6 +131,7 @@ export const useRedirectFlow = () => {
       already_played: alreadyPlayed ? "1" : "0",
       udnmember: userStore.udnmember || "",
       timestamp: Date.now().toString(),
+      from_event: "1",
     });
 
     // 如果有占卜結果 ID，加入參數

@@ -181,10 +181,10 @@ const handleCancel = () => {
 
   &__popup-inner {
     position: relative;
-    padding: 80px 40px;
+    padding: 60px 40px;
 
     @media (max-width: 480px) {
-      padding: 40px 20px;
+      padding: 30px 30px;
     }
   }
 
@@ -284,13 +284,13 @@ const handleCancel = () => {
 
       &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4);
+        box-shadow: 0 4px 12px rgba(231, 193, 112, 0.4);
       }
     }
 
     &--cancel {
-      background: linear-gradient(to right, #dbb156, #beb595);
-      color: #422c16;
+      background: linear-gradient(to right, #FAEBB5, #E7C170);
+      color: #80552B;
 
       &:hover {
         transform: translateY(-2px);

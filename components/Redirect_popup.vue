@@ -23,7 +23,7 @@ const props = defineProps({
   },
   initialCountdown: {
     type: Number,
-    default: 4,
+    default: 3,
   },
 });
 

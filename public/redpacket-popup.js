@@ -298,8 +298,21 @@
     document.head.appendChild(styles)
   }
 
+  // 從 URL 取得參數
+  function getUrlParam(name) {
+    const urlParams = new URLSearchParams(window.location.search)
+    return urlParams.get(name)
+  }
+
   // 主要初始化函數
   function init(options = {}) {
+    // 檢查是否從活動頁過來（如果有 from_event 參數，就不顯示彈窗）
+    const fromEvent = getUrlParam('from_event')
+    if (fromEvent === '1') {
+      console.log('從活動頁過來，不顯示紅包彈窗')
+      return
+    }
+
     // 設定預設值
     const config = {
       targetUrl: 'https://orange.udn.com/orange/issue/8887/2341',

@@ -1,23 +1,17 @@
 <template>
-    <div class="prize-grid">
-      <component 
-        v-for="(prize, index) in prizes" 
-        :key="index" 
-        :is="prize.link ? 'a' : 'div'"
-        :href="prize.link"
-        :target="prize.link ? '_blank' : undefined"
-        :rel="prize.link ? 'noopener noreferrer' : undefined"
-        class="prize-card"
-      >
-        <div class="prize-image">
-          <img :src="prize.image" :alt="prize.title" :style="{ '--img-width': getImageWidth(prize.id) }" />
-        </div>
-        <div class="prize-content">
-          <h3 class="prize-title">{{ prize.title }}</h3>
-          <p class="prize-subtitle">{{ prize.subtitle }}</p>
-        </div>
-      </component>
-    </div>
+  <div class="prize-grid">
+    <component v-for="(prize, index) in prizes" :key="index" :is="prize.link ? 'a' : 'div'" :href="prize.link"
+      :target="prize.link ? '_blank' : undefined" :rel="prize.link ? 'noopener noreferrer' : undefined"
+      class="prize-card">
+      <div class="prize-image">
+        <img :src="prize.image" :alt="prize.title" :style="{ '--img-width': getImageWidth(prize.id) }" />
+      </div>
+      <div class="prize-content">
+        <h3 class="prize-title">{{ prize.title }}</h3>
+        <p class="prize-subtitle">{{ prize.subtitle }}</p>
+      </div>
+    </component>
+  </div>
 </template>
 
 <script setup>
@@ -54,9 +48,9 @@ const prizes = ref([
   },
   {
     id: 5,
-    image: "./imgs/711.png",
+    image: "./imgs/pix.png",
     title: "開春好禮補給獎",
-    subtitle: "7-11 虛擬商品卡200元 | 10 名",
+    subtitle: "全聯禮券 500元 | 35 名",
   },
   {
     id: 6,
@@ -73,7 +67,7 @@ const getImageWidth = (prizeId) => {
     2: '80%', // 課程 (225*150)
     3: '80%', // 料理 (225*150)
     4: '80%', // 收納 (225*150)
-    5: '60%',  // 711 (160*175)
+    5: '80%',  // pix (225*150)
     6: '85%'   // Points (180*93)
   };
   return widthMap[prizeId] || '100%';
@@ -81,15 +75,16 @@ const getImageWidth = (prizeId) => {
 </script>
 
 <style lang="scss" scoped>
-
 .prize-grid {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 25px;
+
   @media (max-width: 1180px) {
     gap: 20px;
   }
+
   @media (max-width: 360px) {
     gap: 12px;
   }
@@ -105,24 +100,24 @@ const getImageWidth = (prizeId) => {
   position: relative;
   text-decoration: none;
   color: inherit;
-  
+
   @media (max-width: 768px) {
     flex: 0 1 calc(50% - 10px);
   }
-  
+
   @media (max-width: 480px) {
     flex: 0 1 100%;
   }
-  
+
   // 為 a 標籤添加 hover 效果
   &:hover {
     transform: translateY(-5px);
-    
+
     .prize-image img {
       transform: scale(1.05);
     }
   }
-  
+
   // 確保 a 標籤樣式一致
   &[href] {
     cursor: pointer;
@@ -140,7 +135,7 @@ const getImageWidth = (prizeId) => {
   border-radius: 50%;
   background-color: #fff;
   border: 6px solid #EED48C;
-  
+
   @media (max-width: 768px) {
     width: 245px;
     height: 245px;
@@ -163,22 +158,28 @@ const getImageWidth = (prizeId) => {
     line-height: 1.2;
     letter-spacing: 4px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+
     @media (max-width: 1180px) {
       font-size: 32px;
     }
+
     @media (max-width: 992px) {
       font-size: 28px;
     }
+
     @media (max-width: 870px) {
       font-size: 24px;
     }
+
     @media (max-width: 640px) {
       font-size: 20px;
     }
+
     @media (max-width: 480px) {
       font-size: 24px;
       letter-spacing: 2px;
     }
+
     @media (max-width: 360px) {
       font-size: 20px;
     }
@@ -191,9 +192,11 @@ const getImageWidth = (prizeId) => {
     line-height: 1.5;
     display: inline-block;
     white-space: pre-line;
+
     @media (max-width: 480px) {
       font-size: 16px;
     }
+
     @media (max-width: 360px) {
       font-size: 14px;
     }
@@ -205,10 +208,12 @@ const getImageWidth = (prizeId) => {
   0% {
     transform: translateX(-100%) translateY(-100%) rotate(45deg);
   }
+
   100% {
     transform: translateX(100%) translateY(100%) rotate(45deg);
   }
 }
+
 .footer {
   width: 100%;
   background: url("./imgs/footer_bg.png") no-repeat center center;

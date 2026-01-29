@@ -22,7 +22,7 @@ export const useLoginFlow = () => {
         popupStore.openUniversalPopup({
           icon: "warning",
           title: "操作過於頻繁",
-          text: `請稍後再試\n剩餘等待時間：${rateLimit.remainingSeconds} 秒`,
+          text: `請稍後再玩`,
           confirmButtonText: "我知道了",
           showCancelButton: false,
         });
@@ -128,7 +128,7 @@ export const useLoginFlow = () => {
         showUniversalDialogFn({
           icon: "warning",
           title: "操作過於頻繁",
-          text: `請稍後再試\n剩餘等待時間：${remainingSeconds} 秒`,
+          text: `請稍後再玩`,
           confirmButtonText: "我知道了",
           showCancelButton: false,
         });
