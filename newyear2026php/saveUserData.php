@@ -12,8 +12,8 @@ setCorsHeaders('POST, OPTIONS', 'Content-Type, X-CSRF-Token, X-Requested-With');
 $data = handleApiRequest(['POST'], true);
 
 // 從請求中獲取關鍵參數
-$udnmember = isset($data['udnmember']) ? $data['udnmember'] : null;
-$um2 = isset($data['um2']) ? $data['um2'] : null;
+$udnland = isset($data['udnland']) ? $data['udnland'] : null;
+$udngold = isset($data['udngold']) ? $data['udngold'] : null;
 $turnstileToken = isset($data['turnstile_token']) ? $data['turnstile_token'] : null;
 
 // 驗證 CSRF Token（可選，但強烈建議）
@@ -97,27 +97,27 @@ if (!empty($turnstileToken)) {
 }
 
 // 檢查是否取得必要的會員資訊
-if (empty($udnmember) || empty($um2)) {
+if (empty($udnland) || empty($udngold)) {
     error_log("[E101] 未提供會員資訊");
     JSONReturn('請先登入會員（E101）', 'error');
 }
 
 try {
-    $username = $udnmember;
+    $username = $udnland;
     $email = '';
     $isVerified = false;
     
-    if (!empty($udnmember)) {
-        $memberData = getMemberMail($udnmember);
+    if (!empty($udnland)) {
+        $memberData = getudnland($udnland, $udngold);
         if (is_array($memberData)) {
             $isVerified = $memberData['verified'] ?? false;
             
             if ($isVerified && !empty($memberData['email'])) {
                 $email = $memberData['email'];
             } else {
-                if (!empty($um2)) {
+                if (!empty($udngold)) {
                     try {
-                        $userLogin = getUdnMember($udnmember, $um2);
+                        $userLogin = getudnland($udnland, $udngold);
                         if (isset($userLogin['response']['status']) && 
                             $userLogin['response']['status'] === 'success' &&
                             isset($userLogin['response']['email'])) {
@@ -134,13 +134,29 @@ try {
     
     // 如果無法取得 email，使用預設格式
     if (empty($email)) {
-        $email = $udnmember . '@example.com';
-        error_log("Warning: Could not fetch email for user {$udnmember}, using default: {$email}");
+        $email = $udnland . '@example.com';
+        error_log("Warning: Could not fetch email for user {$udnland}, using default: {$email}");
     }
     
     $ip = getIP();
+    $ipCheckStmt = $pdo->prepare("SELECT MAX(updated_at) AS last_attempt FROM act2026_bd_newyear2026 WHERE ip = :ip");
+    $ipCheckStmt->bindParam(':ip', $ip);
+    $ipCheckStmt->execute();
+    $ipResult = $ipCheckStmt->fetch(PDO::FETCH_ASSOC);
+    $lastAttempt = $ipResult ? $ipResult['last_attempt'] : null;
+    
+    if ($lastAttempt) {
+        $timeSinceLastAttempt = time() - strtotime($lastAttempt);
+        if ($timeSinceLastAttempt < 60) {
+            error_log("[LIMIT] 操作過於頻繁 - IP: {$ip}");
+            JSONReturn('操作過於頻繁，請稍後再試', 'error', ['wait_time' => 60 - $timeSinceLastAttempt]);
+
+        }
+    }
+    
+    
     $today = date('Y-m-d');
-    $stmt = $pdo->prepare("SELECT * FROM act2026_bd_newyear_2026 WHERE email = :email");
+    $stmt = $pdo->prepare("SELECT * FROM act2026_bd_newyear2026 WHERE email = :email");
     $stmt->bindParam(':email', $email);
     $stmt->execute();
     
@@ -168,7 +184,7 @@ try {
         }
         
         $play_times_total = intval($row['play_times_total']) + 1;
-        $updateStmt = $pdo->prepare("UPDATE act2026_bd_newyear_2026 SET 
+        $updateStmt = $pdo->prepare("UPDATE act2026_bd_newyear2026 SET 
             username = :username,
             play_times_total = :play_times_total,
             updated_at = NOW(),
@@ -180,7 +196,7 @@ try {
         $updateStmt->bindParam(':ip', $ip);
         $updateStmt->bindParam(':email', $email);
         $updateStmt->execute();
-        $fetchStmt = $pdo->prepare("SELECT * FROM act2026_bd_newyear_2026 WHERE email = :email");
+        $fetchStmt = $pdo->prepare("SELECT * FROM act2026_bd_newyear2026 WHERE email = :email");
         $fetchStmt->bindParam(':email', $email);
         $fetchStmt->execute();
         $userData = $fetchStmt->fetch(PDO::FETCH_ASSOC);
@@ -198,7 +214,7 @@ try {
         ], 'success');
     } else {
         // 創建新用戶
-        $stmt = $pdo->prepare("INSERT INTO act2026_bd_newyear_2026 
+        $stmt = $pdo->prepare("INSERT INTO act2026_bd_newyear2026 
             (email, username, ip, play_times_total, created_at, updated_at) 
             VALUES (:email, :username, :ip, 1, NOW(), NOW())");
         
@@ -209,7 +225,7 @@ try {
         
         // 獲取剛創建的用戶數據
         $newId = $pdo->lastInsertId();
-        $fetchStmt = $pdo->prepare("SELECT * FROM act2026_bd_newyear_2026 WHERE id = :id");
+        $fetchStmt = $pdo->prepare("SELECT * FROM act2026_bd_newyear2026 WHERE id = :id");
         $fetchStmt->bindParam(':id', $newId);
         $fetchStmt->execute();
         $userData = $fetchStmt->fetch(PDO::FETCH_ASSOC);

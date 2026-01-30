@@ -129,7 +129,7 @@ export const useRedirectFlow = () => {
       first: isFirstTime ? "1" : "0",
       count: playCount.toString(),
       already_played: alreadyPlayed ? "1" : "0",
-      udnmember: userStore.udnmember || "",
+      udnland: userStore.udnland || "",
       timestamp: Date.now().toString(),
       from_event: "1",
     });

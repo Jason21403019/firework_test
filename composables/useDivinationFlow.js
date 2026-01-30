@@ -18,8 +18,8 @@ export const useDivinationFlow = () => {
       return;
     }
     const played = await apiService.hasPlayedToday(
-      userStore.udnmember,
-      userStore.um2,
+      userStore.udnland,
+      userStore.udngold,
     );
     divinationStore.setPlayedStatus(played);
   };
@@ -97,8 +97,8 @@ export const useDivinationFlow = () => {
       }
 
       const userData = {
-        udnmember: auth.sanitizeInput(userStore.udnmember),
-        um2: auth.sanitizeInput(userStore.um2),
+        udnland: auth.sanitizeInput(userStore.udnland),
+        udngold: auth.sanitizeInput(userStore.udngold),
         email: auth.sanitizeInput(userStore.email),
         turnstile_token: turnstileTokenValue || null,
       };
@@ -154,14 +154,14 @@ export const useDivinationFlow = () => {
       }
 
       console.log("其他 API 錯誤，不更新占卜狀態:", result.message);
-      
+
       // 避免將包含"成功"字樣的訊息當作錯誤訊息
       let errorMessage = result.message || "伺服器錯誤，請稍後再試";
       if (errorMessage.includes("成功")) {
         console.warn("⚠️ 警告: 錯誤訊息包含「成功」字樣，這不應該發生");
         errorMessage = "系統處理異常，請稍後再試";
       }
-      
+
       resolve({ type: "other_error", message: errorMessage });
     });
   };
@@ -170,8 +170,8 @@ export const useDivinationFlow = () => {
   const fetchUserPlayData = async () => {
     try {
       const response = await apiService.fetchUserPlayData(
-        userStore.udnmember,
-        userStore.um2,
+        userStore.udnland,
+        userStore.udngold,
       );
 
       // 處理累計次數資訊
@@ -207,9 +207,9 @@ export const useDivinationFlow = () => {
       createdAt.getFullYear() === today.getFullYear();
 
     if (isCreatedToday) {
-      const udnmember = auth.getCookieValue("udnmember") || "";
-      if (udnmember) {
-        localStorage.setItem(`fate2025_new_user_${udnmember}`, "true");
+      const udnland = auth.getCookieValue("udnland") || "";
+      if (udnland) {
+        localStorage.setItem(`fate2025_new_user_${udnland}`, "true");
         console.log("已標記為新用戶 (首次註冊當天)");
       }
     }

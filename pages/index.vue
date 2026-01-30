@@ -76,7 +76,7 @@
             會員ID:
             {{
               userStore.isLoggedIn
-                ? auth.getCookieValue("udnmember") || "無"
+                ? auth.getCookieValue("udnland") || "無"
                 : "無"
             }}
           </p>
@@ -89,7 +89,7 @@
           <p>
             本地儲存鍵:
             {{
-              `fate2025_last_played_${auth.getCookieValue("udnmember") || ""}`
+              `fate2025_last_played_${auth.getCookieValue("udnland") || ""}`
             }}
           </p>
           <button @click="debugTools.debugCheckDatabase" class="debug-btn">
@@ -178,7 +178,7 @@ const handleRedirectCountdownEnd = () => {
 // ==================== 監聽登入狀態變化 ====================
 // 監聽登入狀態和會員變化，處理會員切換的情況
 watch(
-  () => [userStore.isLoggedIn, userStore.udnmember],
+  () => [userStore.isLoggedIn, userStore.udnland],
   async ([isLoggedIn, currentUser]) => {
     // 只處理從未登入變為已登入，或者換了不同的會員
     if (!isLoggedIn) {

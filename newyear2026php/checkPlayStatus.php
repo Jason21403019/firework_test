@@ -12,7 +12,7 @@ $data = handleApiRequest(['POST'], true);
 if (isset($data['admin_mode']) && $data['admin_mode'] === true) {
     try {
         // 管理模式：返回所有用戶資料
-        $stmt = $pdo->prepare("SELECT * FROM act2026_bd_newyear_2026 ORDER BY id DESC");
+        $stmt = $pdo->prepare("SELECT * FROM act2026_bd_newyear2026 ORDER BY id DESC");
         $stmt->execute();
         $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
@@ -67,27 +67,27 @@ if (isset($data['admin_mode']) && $data['admin_mode'] === true) {
 }
 
 // 以下是原有的一般模式邏輯
-$udnmember = isset($data['udnmember']) ? $data['udnmember'] : null;
-$um2 = isset($data['um2']) ? $data['um2'] : null;
+$udnland = isset($data['udnland']) ? $data['udnland'] : null;
+$udngold = isset($data['udngold']) ? $data['udngold'] : null;
 
 // 驗證必要參數
-if (empty($udnmember)) {
+if (empty($udnland)) {
     JSONReturn('未取得會員資訊，請重新登入', 'error');
 }
 
 try {
-    $memberData = getMemberMail($udnmember);
+    $memberData = getudnland($udnland, $udngold);
     $email = '';
     if ($memberData['verified'] && !empty($memberData['email'])) {
         $email = $memberData['email'];
     } else {
-        $email = $udnmember . '@example.com';
+        $email = $udnland . '@example.com';
     }
     
     // 取得當天日期
     $today = date('Y-m-d');
     
-    $sql = "SELECT * FROM act2026_bd_newyear_2026 WHERE email = ? AND DATE(updated_at) = ?";
+    $sql = "SELECT * FROM act2026_bd_newyear2026 WHERE email = ? AND DATE(updated_at) = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$email, $today]);
     

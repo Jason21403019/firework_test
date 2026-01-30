@@ -58,16 +58,16 @@ export const useAuth = () => {
 
   // 更新登入狀態
   const updateLoginStatus = () => {
-    const udnmember = getCookieValue("udnmember");
-    const um2 = getCookieValue("um2");
-    const isLoggedIn = !!(udnmember && um2);
+    const udnland = getCookieValue("udnland");
+    const udngold = getCookieValue("udngold");
+    const isLoggedIn = !!(udnland && udngold);
 
     userStore.setLoginStatus(isLoggedIn);
     if (isLoggedIn) {
       userStore.setUserData({
-        udnmember,
-        um2,
-        email: udnmember || `user_${Date.now()}@example.com`,
+        udnland,
+        udngold,
+        email: udnland || `user_${Date.now()}@example.com`,
       });
     }
 
@@ -90,7 +90,7 @@ export const useAuth = () => {
       ];
 
       const paths = ["/", "/bd_newyear_2026", "/bd_newyear_2026"];
-      const cookieNames = ["udnmember", "um2", "nickname", "fg_mail"];
+      const cookieNames = ["udnland", "udngold", "nickname", "fg_mail"];
 
       domains.forEach((domain) => {
         paths.forEach((path) => {
@@ -126,7 +126,7 @@ export const useAuth = () => {
     if (typeof window === "undefined") return;
 
     try {
-      const cookieNames = ["udnmember", "um2", "nickname", "fg_mail"];
+      const cookieNames = ["udnland", "udngold", "nickname", "fg_mail"];
 
       const domains = [
         window.location.hostname,
