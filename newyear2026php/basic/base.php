@@ -150,24 +150,20 @@ function verifyTurnstileToken($token) {
 }
 
 // 取得用戶資料
-function getudnland($udnland, $udngold =''){
+function getMemberMail($memberId){
     $email = null;
-    $apiUrl = "https://umapi.udn.com/member/wbs/MemberudngoldCheck";
+    $verified = false;
+    $apiUrl = "https://umapi.udn.com/member/wbs/MemberUm2Check";
 
-    
-    if (empty($udngold)) {
-        $udngold = isset($_COOKIE['udngold']) ? $_COOKIE['udngold'] : '';
-    }
-    if (empty($udnland)) {
-        $udnland = isset($_COOKIE['udnland']) ? $_COOKIE['udnland'] : '';
-    }
+    $udnmember = !empty($_COOKIE['udnmember']) ? $_COOKIE['udnmember'] : ($_COOKIE['udnland'] ?? '');
+    $um2 = $_COOKIE['um2'] ?? '';
 
-    if (!empty($udnland) && !empty($udngold)) {
-        $udngoldEncoded = urlencode($udngold);
+    if (!empty($udnmember) && !empty($um2)) {
+        $um2Encoded = urlencode($um2);
 
         $data = [
-            'account' => $udnland,
-            'udngold' => $udngoldEncoded,
+            'account' => $udnmember,
+            'um2' => $um2Encoded,
             'json' => 'Y',
             'site' => 'fate_event',
             'check_ts' => 'S'
@@ -183,6 +179,10 @@ function getudnland($udnland, $udngold =''){
         ]);
 
         $response = curl_exec($ch);
+        
+        if (curl_error($ch)) {
+            // cURL 錯誤處理 - 不記錄詳細錯誤訊息
+        }
         
         curl_close($ch);
 
@@ -208,14 +208,22 @@ function getudnland($udnland, $udngold =''){
     if (empty($email) && isset($_COOKIE['fg_mail'])) {
         $email = filter_var(urldecode($_COOKIE['fg_mail']), FILTER_SANITIZE_EMAIL);
     }
-    $safeUdnland = sanitizeForLog($udnland, 50); 
-    $safeUdngold = sanitizeForLog($udngold, 50); 
+    $safeMemberId = sanitizeForLog($memberId, 50); 
+    $safeEmail = sanitizeForLog($email ?: 'NULL', 100); 
     return [
-        'udnland' => $udnland,
-        'udngold' => $udngold,
-        'safeUdnland' => $safeUdnland,
-        'safeUdngold' => $safeUdngold,
+        'member_id' => $memberId,
+        'email' => $email,
+        'verified' => $verified
     ];
+}
+
+// 取得用戶 email
+function getMail(){
+    $udnmember = $_COOKIE["udnmember"];
+    $um2 = urlencode($_COOKIE["um2"]);
+    $response = getUdnMember($udnmember, $um2);
+    $email = filter_var($response["response"]["email"], FILTER_SANITIZE_EMAIL);
+    return $email;
 }
 
 // 取得用戶 IP
@@ -251,6 +259,40 @@ function getIP(){
     } else {
         return null;
     }
+}
+
+// 取得用戶名稱
+function getUser(){
+    if (isset($_COOKIE["udnmember"])) {
+        $user = $_COOKIE["udnmember"];
+    } else {
+        $user = getIP();
+    }
+    return $user;
+}
+
+// 檢查 email 是否已是 udn 會員
+function checkEmail($email){
+    $data = array(
+        'email' => "$email",
+        'json' => 'Y',
+    );
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, "https://umapi.udn.com/member/wbs/MemberChkEmail");
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    $response = curl_exec($ch);
+    if (curl_errno($ch)) {
+        $error = curl_error($ch);
+        $arrResponse = json_decode($error, true);
+        $logData = initLog("U02", $arrResponse, getUser());
+        insertFile($logData);
+    } else {
+        $arrResponse = json_decode($response, true);
+    }
+    curl_close($ch);
+    return $arrResponse['status'];
 }
 
 // 設定 CORS 標頭

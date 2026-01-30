@@ -180,8 +180,8 @@ export const useLoginFlow = () => {
     try {
       // 檢查占卜狀態
       const alreadyPlayed = await apiService.hasPlayedToday(
-        userStore.udnland,
-        userStore.udngold,
+        userStore.udnmember,
+        userStore.um2,
       );
 
       // 如果已經占卜過，顯示提示訊息

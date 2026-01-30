@@ -12,8 +12,8 @@ setCorsHeaders('POST, OPTIONS', 'Content-Type, X-CSRF-Token, X-Requested-With');
 $data = handleApiRequest(['POST'], true);
 
 // 從請求中獲取關鍵參數
-$udnland = isset($data['udnland']) ? $data['udnland'] : null;
-$udngold = isset($data['udngold']) ? $data['udngold'] : null;
+$udnmember = isset($data['udnmember']) ? $data['udnmember'] : null;
+$um2 = isset($data['um2']) ? $data['um2'] : null;
 $turnstileToken = isset($data['turnstile_token']) ? $data['turnstile_token'] : null;
 
 // 驗證 CSRF Token（可選，但強烈建議）
@@ -97,27 +97,27 @@ if (!empty($turnstileToken)) {
 }
 
 // 檢查是否取得必要的會員資訊
-if (empty($udnland) || empty($udngold)) {
+if (empty($udnmember) || empty($um2)) {
     error_log("[E101] 未提供會員資訊");
     JSONReturn('請先登入會員（E101）', 'error');
 }
 
 try {
-    $username = $udnland;
+    $username = $udnmember;
     $email = '';
     $isVerified = false;
     
-    if (!empty($udnland)) {
-        $memberData = getudnland($udnland, $udngold);
+    if (!empty($udnmember)) {
+        $memberData = getMemberMail($udnmember);
         if (is_array($memberData)) {
             $isVerified = $memberData['verified'] ?? false;
             
             if ($isVerified && !empty($memberData['email'])) {
                 $email = $memberData['email'];
             } else {
-                if (!empty($udngold)) {
+                if (!empty($um2)) {
                     try {
-                        $userLogin = getudnland($udnland, $udngold);
+                        $userLogin = getUdnMember($udnmember, $um2);
                         if (isset($userLogin['response']['status']) && 
                             $userLogin['response']['status'] === 'success' &&
                             isset($userLogin['response']['email'])) {
@@ -134,8 +134,8 @@ try {
     
     // 如果無法取得 email，使用預設格式
     if (empty($email)) {
-        $email = $udnland . '@example.com';
-        error_log("Warning: Could not fetch email for user {$udnland}, using default: {$email}");
+        $email = $udnmember . '@example.com';
+        error_log("Warning: Could not fetch email for user {$udnmember}, using default: {$email}");
     }
     
     $ip = getIP();

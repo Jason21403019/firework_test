@@ -86,7 +86,7 @@ export default defineNuxtConfig({
             for (i=2;i<_gaA.length;i++) google_id = google_id+_gaA[i]+'.';
             google_id = google_id.substring(0,google_id.length-1);
 
-            var user_id = getCookie("udnland");
+            var user_id = getCookie("udnmember");
             if (typeof user_id === 'undefined' || user_id == '') {
                 user_id = undefined;
                 var auth_type = '未登入';

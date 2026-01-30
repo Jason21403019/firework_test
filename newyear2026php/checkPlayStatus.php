@@ -67,21 +67,21 @@ if (isset($data['admin_mode']) && $data['admin_mode'] === true) {
 }
 
 // 以下是原有的一般模式邏輯
-$udnland = isset($data['udnland']) ? $data['udnland'] : null;
-$udngold = isset($data['udngold']) ? $data['udngold'] : null;
+$udnmember = isset($data['udnmember']) ? $data['udnmember'] : null;
+$um2 = isset($data['um2']) ? $data['um2'] : null;
 
 // 驗證必要參數
-if (empty($udnland)) {
+if (empty($udnmember)) {
     JSONReturn('未取得會員資訊，請重新登入', 'error');
 }
 
 try {
-    $memberData = getudnland($udnland, $udngold);
+    $memberData = getMemberMail($udnmember);
     $email = '';
     if ($memberData['verified'] && !empty($memberData['email'])) {
         $email = $memberData['email'];
     } else {
-        $email = $udnland . '@example.com';
+        $email = $udnmember . '@example.com';
     }
     
     // 取得當天日期

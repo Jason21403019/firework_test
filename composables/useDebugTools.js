@@ -10,9 +10,9 @@ export const useDebugTools = () => {
   const clearPlayRecord = async () => {
     if (typeof window === "undefined") return;
 
-    const udnland = auth.getCookieValue("udnland") || "";
-    const storageKey = udnland
-      ? `fate2025_last_played_${udnland}`
+    const udnmember = auth.getCookieValue("udnmember") || "";
+    const storageKey = udnmember
+      ? `fate2025_last_played_${udnmember}`
       : "fate2025_last_played";
 
     localStorage.removeItem(storageKey);
@@ -24,13 +24,13 @@ export const useDebugTools = () => {
   // 檢查資料庫狀態
   const debugCheckDatabase = async () => {
     try {
-      const udnland = auth.getCookieValue("udnland") || "";
-      const udngold = auth.getCookieValue("udngold") || "";
+      const udnmember = auth.getCookieValue("udnmember") || "";
+      const um2 = auth.getCookieValue("um2") || "";
       const isNewUser =
-        localStorage.getItem(`fate2025_new_user_${udnland}`) === "true";
+        localStorage.getItem(`fate2025_new_user_${udnmember}`) === "true";
       console.log(`是否為新用戶 (首次註冊當天): ${isNewUser}`);
 
-      if (!udnland) {
+      if (!udnmember) {
         Swal.fire({
           icon: "warning",
           title: "未登入",
@@ -49,7 +49,7 @@ export const useDebugTools = () => {
         },
       });
 
-      const response = await apiService.fetchUserPlayData(udnland, udngold);
+      const response = await apiService.fetchUserPlayData(udnmember, um2);
 
       console.log("API 回應:", response);
 

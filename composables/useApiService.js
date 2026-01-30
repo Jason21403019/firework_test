@@ -48,16 +48,16 @@ export const useApiService = () => {
   };
 
   // 檢查用戶今天是否已經占卜過
-  const hasPlayedToday = async (udnland, udngold) => {
+  const hasPlayedToday = async (udnmember, um2) => {
     if (typeof window === "undefined") return false;
 
-    if (!udnland || !udngold) {
+    if (!udnmember || !um2) {
       return false;
     }
 
     try {
       const apiUrl = getApiUrl("checkPlayStatus.php");
-      const requestData = { udnland, udngold };
+      const requestData = { udnmember, um2 };
 
       const response = await axios.post(apiUrl, requestData, {
         headers: { "Content-Type": "application/json" },
@@ -81,13 +81,13 @@ export const useApiService = () => {
   };
 
   // 獲取用戶占卜數據
-  const fetchUserPlayData = async (udnland, udngold) => {
+  const fetchUserPlayData = async (udnmember, um2) => {
     try {
       const apiUrl = getApiUrl("checkPlayStatus.php");
 
       const response = await axios.post(
         apiUrl,
-        { udnland, udngold },
+        { udnmember, um2 },
         {
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
