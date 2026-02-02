@@ -19,21 +19,11 @@
         <div class="banner__wheel-arrow"></div>
 
         <!-- 內圈 (會旋轉) -->
-        <div
-          class="banner__wheel-inner"
-          :class="{ 'is-spinning': isSpinning }"
-        ></div>
+        <div class="banner__wheel-inner" :class="{ 'is-spinning': isSpinning }"></div>
 
         <!-- 按鈕 (點擊區域) -->
-        <a
-          ref="triggerLink"
-          class="banner__wheel-btn"
-          :href="loginUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-          data-action="submit"
-          @click="handleDivination"
-        ></a>
+        <a ref="triggerLink" class="banner__wheel-btn" :href="loginUrl" target="_blank" rel="noopener noreferrer"
+          data-action="submit" @click="handleDivination"></a>
       </div>
     </div>
   </div>
@@ -53,7 +43,34 @@ const props = defineProps({
 const isSpinning = ref(false);
 
 async function handleDivination(event) {
+  // 阻止預設跳轉
+  event.preventDefault();
+
+  // 直接在這裡檢查頻繁操作
+  const browserUtils = useBrowserUtils();
+  const rateLimit = browserUtils.checkRateLimit();
+
+  if (rateLimit.limited) {
+    // 顯示頻繁操作彈窗
+    // 這裡需要從父組件傳入 showUniversalDialog 函式
+    // 或者使用 popupStore
+    const popupStore = usePopupStore();
+    popupStore.openUniversalPopup({
+      icon: "warning",
+      // title: "操作過於頻繁",
+      text: `操作過於頻繁，請稍後再玩`,
+      confirmButtonText: "我知道了",
+      showCancelButton: false,
+    });
+    return; // 不跳轉
+  }
+  browserUtils.setRateLimitCookie();
+
+  // 沒有頻繁操作，繼續流程
   await emit("startDivination");
+
+  // 手動跳轉
+  window.open(props.loginUrl, '_blank', 'noopener,noreferrer');
 }
 
 // 開始轉盤動畫
@@ -96,6 +113,7 @@ defineExpose({
   aspect-ratio: 16 / 9;
   overflow: hidden;
   container-type: inline-size;
+
   @media (max-width: 640px) {
     background-image: url("/imgs/banner_bg_m.png");
     aspect-ratio: 640 / 1080;
@@ -121,6 +139,7 @@ defineExpose({
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
+
     @media (max-width: 640px) {
       aspect-ratio: 550 / 404;
       width: 85cqw;
@@ -141,6 +160,7 @@ defineExpose({
     background-repeat: no-repeat;
     background-position: center;
     z-index: 10;
+
     @media (max-width: 640px) {
       bottom: 5cqw;
       left: 5cqw;
@@ -160,6 +180,7 @@ defineExpose({
     background-repeat: no-repeat;
     background-position: center;
     z-index: 10;
+
     @media (max-width: 640px) {
       bottom: 9cqw;
       left: 62cqw;
@@ -174,6 +195,7 @@ defineExpose({
     bottom: 17cqw;
     width: 31cqw;
     aspect-ratio: 1 / 1;
+
     @media (max-width: 640px) {
       right: 18cqw;
       bottom: 30cqw;
@@ -207,6 +229,7 @@ defineExpose({
     background-position: center;
     pointer-events: none;
     z-index: 10;
+
     @media (max-width: 640px) {
       width: 6cqw;
       top: 5cqw;
@@ -230,6 +253,7 @@ defineExpose({
     &.is-spinning {
       animation: spinWheel 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
     }
+
     @media (max-width: 640px) {
       width: 90%;
       height: 82.6%;
@@ -249,14 +273,28 @@ defineExpose({
     background-position: center;
     cursor: pointer;
     border-radius: 50%;
+    animation: glow 2s ease-in-out infinite;
   }
 
   @keyframes spinWheel {
     0% {
       transform: translate(-50%, -50%) rotate(0deg);
     }
+
     100% {
       transform: translate(-50%, -50%) rotate(1080deg);
+    }
+  }
+
+  @keyframes glow {
+
+    0%,
+    100% {
+      filter: brightness(1) drop-shadow(0 0 0px rgba(255, 255, 255, 0));
+    }
+
+    50% {
+      filter: brightness(1.3) drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
     }
   }
 }

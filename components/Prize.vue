@@ -56,7 +56,7 @@ const prizes = ref([
     id: 6,
     image: "./imgs/points.png",
     title: "馬上好運加點獎",
-    subtitle: "LINE POINTS 5 點\n8,000組 (送完為止)",
+    subtitle: "LINE POINTS 5 點\n5,000組 (送完為止)",
   },
 ]);
 

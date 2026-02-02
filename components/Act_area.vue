@@ -114,6 +114,7 @@ onMounted(() => {
 .act-area {
   // border: 1px solid #ccc;
   padding: 0 12px;
+
   .act-area__title {
     max-width: 650px;
     max-height: 75px;
@@ -121,91 +122,113 @@ onMounted(() => {
     display: flex;
     justify-content: center;
     margin-bottom: 120px;
+
     @media (max-width: 768px) {
       max-width: 520px;
       max-height: 60px;
       margin-bottom: 60px;
     }
+
     img {
       width: 100%;
       max-height: 75px;
+
       @media (max-width: 768px) {
         max-height: 60px;
       }
     }
   }
+
   .act-area__rules {
     // border: 1px solid yellow;
     width: 100%;
+
     &-flow {
       max-width: 910px;
       margin: 0 auto;
+
       @media (max-width: 480px) {
         max-width: 520px;
       }
+
       img {
         width: 100%;
+
         @media (max-width: 480px) {
-          content: url("./imgs/act_container_flowimg_m.png");
+          content: url("/imgs/act_container_flowimg_m.png");
         }
       }
     }
+
     h3,
     h4,
     p {
       color: #fff;
     }
+
     h3 {
       font-size: 24px;
       font-weight: bold;
       margin-bottom: 8px;
+
       @media (max-width: 480px) {
         font-size: 20px;
       }
     }
+
     h4 {
       font-size: 18px;
       font-weight: normal;
       margin-bottom: 30px;
       text-align: justify;
       line-height: 1.5;
+
       @media (max-width: 480px) {
         font-size: 16px;
       }
     }
+
     p {
       font-size: 24px;
       margin-bottom: 20px;
+
       @media (max-width: 480px) {
         font-size: 20px;
       }
     }
+
     ul {
       list-style-type: disc;
       padding-left: 50px;
       margin-bottom: 40px;
+
       @media (max-width: 480px) {
         padding-left: 20px;
         margin-bottom: 20px;
       }
+
       li {
         color: #fff;
         font-size: 18px;
         margin-bottom: 10px;
         text-align: justify;
         line-height: 1.5;
+
         @media (max-width: 480px) {
           font-size: 16px;
         }
       }
     }
   }
+
   .act-area__info {
     // border: 1px solid blue;
     width: 100%;
+
     ul {
       list-style: none;
       padding-left: 20px;
+
       li {
         position: relative;
         padding-left: 35px;
@@ -214,6 +237,7 @@ onMounted(() => {
         margin-bottom: 10px;
         line-height: 1.5;
         text-align: justify;
+
         @media (max-width: 480px) {
           font-size: 16px;
           padding-left: 30px;

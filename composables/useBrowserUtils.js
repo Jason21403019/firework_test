@@ -6,8 +6,8 @@ export const useBrowserUtils = () => {
   // 設置頻繁操作 cookie（2分鐘）
   const setRateLimitCookie = () => {
     const now = Date.now();
-    // const expireTime = now + 2 * 60 * 1000; // 2分鐘後過期
-    const expireTime = now + 5 * 1000; // 1秒後過期
+    const expireTime = now + 2 * 60 * 1000; // 2分鐘後過期
+    // const expireTime = now + 5 * 1000; // 1秒後過期
     document.cookie = `fate2025_rate_limit=${expireTime}; path=/; max-age=120`;
   };
 

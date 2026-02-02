@@ -6,7 +6,7 @@
           <NuxtLink to="https://udn.com/news/index" target="_blank">
             <img src="/imgs/logo.png" alt="logo_udn_Logo" class="navbar__logo-image" />
           </NuxtLink>
-          <NuxtLink to="https://udn.com/news/index" target="_blank">
+          <NuxtLink to="https://orange.udn.com/orange/index" target="_blank">
             <img src="/imgs/og_logo.png" alt="og_logo_udn_Logo" class="navbar__logo-image navbar__logo-image--og" />
           </NuxtLink>
         </div>
@@ -143,7 +143,7 @@ const lineShareUrl = computed(() => {
   background-color: transparent;
   box-shadow: none;
   width: 100%;
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   z-index: 100;

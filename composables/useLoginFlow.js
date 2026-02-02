@@ -13,34 +13,6 @@ export const useLoginFlow = () => {
     try {
       if (typeof window === "undefined") return;
 
-      // 檢查頻繁操作限制
-      const browserUtils = useBrowserUtils();
-      const rateLimit = browserUtils.checkRateLimit();
-
-      if (rateLimit.limited) {
-        // 在舊分頁顯示彈窗提示
-        popupStore.openUniversalPopup({
-          icon: "warning",
-          title: "操作過於頻繁",
-          text: `請稍後再玩`,
-          confirmButtonText: "我知道了",
-          showCancelButton: false,
-        });
-
-        // 設置標記，讓新分頁也能檢測到（但仍允許繼續流程，因為 <a> 標籤會跳轉）
-        localStorage.setItem('fate2025_rate_limit_blocked', JSON.stringify({
-          blocked: true,
-          remainingSeconds: rateLimit.remainingSeconds,
-          timestamp: Date.now()
-        }));
-
-        // 繼續執行流程（讓 <a> 標籤正常跳轉），但設置特殊標記
-        // 注意：不 return false，讓流程繼續
-      } else {
-        // 清除舊的頻繁操作標記（如果有）
-        localStorage.removeItem('fate2025_rate_limit_blocked');
-      }
-
       // 顯示處理中訊息
       popupStore.openLoadingPopup({
         message: "處理中...",
@@ -64,9 +36,6 @@ export const useLoginFlow = () => {
       localStorage.setItem("fate2025_tab_id", tabId);
       localStorage.setItem("fate2025_just_logged_in", "true");
       localStorage.setItem("fate2025_normal_flow", "true");
-
-      // 設置頻繁操作限制 cookie（2分鐘）
-      browserUtils.setRateLimitCookie();
 
       popupStore.closeLoadingPopup();
 
@@ -127,7 +96,7 @@ export const useLoginFlow = () => {
         // 還在冷卻時間內，顯示彈窗
         showUniversalDialogFn({
           icon: "warning",
-          title: "操作過於頻繁",
+          // title: "操作過於頻繁",
           text: `請稍後再玩`,
           confirmButtonText: "我知道了",
           showCancelButton: false,
