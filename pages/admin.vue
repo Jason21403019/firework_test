@@ -705,17 +705,19 @@ onMounted(() => {
 <style lang="scss" scoped>
 @use "sass:color";
 
-$primary-purple: rgb(109, 39, 234);
-$light-purple: color.adjust($primary-purple, $lightness: 10%);
-$dark-purple: color.adjust($primary-purple, $lightness: -10%);
-$purple-bg: color.adjust($primary-purple, $lightness: 45%);
-$accent-purple: rgba(109, 39, 234, 0.1);
+$primary-orange: #D83307;
+$light-orange: #E05C39;
+$dark-orange: #c02d06;
+$gold: #E7C170;
+$light-gold: #FAEBB5;
+$brown: #80552B;
+$accent-orange: rgba(216, 51, 7, 0.1);
 
 .admin-container {
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 250, 245, 0.95);
   min-height: 100vh;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -729,12 +731,12 @@ $accent-purple: rgba(109, 39, 234, 0.1);
   padding: 25px 30px;
   background: white;
   border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(109, 39, 234, 0.1);
-  border-left: 5px solid $primary-purple;
+  box-shadow: 0 4px 15px rgba(216, 51, 7, 0.15);
+  border-left: 5px solid $primary-orange;
 
   h1 {
     margin: 0;
-    color: $primary-purple;
+    color: $primary-orange;
     font-size: 28px;
     font-weight: 700;
   }
@@ -765,109 +767,109 @@ $accent-purple: rgba(109, 39, 234, 0.1);
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(109, 39, 234, 0.2);
+    box-shadow: 0 0 0 3px rgba(216, 51, 7, 0.2);
   }
 
   &.btn-primary {
-    background: linear-gradient(135deg, $primary-purple 0%, $light-purple 100%);
+    background: linear-gradient(135deg, $primary-orange 0%, $light-orange 100%);
     color: white;
-    border: 1px solid $primary-purple;
+    border: 1px solid $primary-orange;
 
     &:hover {
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(109, 39, 234, 0.3);
+      box-shadow: 0 4px 12px rgba(216, 51, 7, 0.3);
       background: linear-gradient(135deg,
-          $dark-purple 0%,
-          $primary-purple 100%);
+          $dark-orange 0%,
+          $primary-orange 100%);
     }
 
     &:active {
       transform: translateY(0);
-      box-shadow: 0 2px 8px rgba(109, 39, 234, 0.2);
+      box-shadow: 0 2px 8px rgba(216, 51, 7, 0.2);
     }
   }
 
   &.btn-secondary {
-    background: #f8f9fa;
-    color: #666;
-    border: 1px solid #e0e0e0;
+    background: #fff9f0;
+    color: $brown;
+    border: 1px solid #f5e6d3;
 
     &:hover {
-      background: #e9ecef;
-      border-color: #ccc;
-      color: #333;
+      background: #fff3e0;
+      border-color: #ead5b8;
+      color: #6b4523;
     }
 
     &:active {
-      background: #dee2e6;
+      background: #ffedd5;
     }
   }
 
   &.btn-success {
-    background: linear-gradient(135deg, #28a745 0%, #34ce57 100%);
-    color: white;
-    border: 1px solid #28a745;
+    background: linear-gradient(135deg, $gold 0%, $light-gold 100%);
+    color: $brown;
+    border: 1px solid $gold;
 
     &:hover {
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-      background: linear-gradient(135deg, #218838 0%, #28a745 100%);
+      box-shadow: 0 4px 12px rgba(231, 193, 112, 0.3);
+      background: linear-gradient(135deg, #ddb560 0%, $gold 100%);
     }
 
     &:active {
       transform: translateY(0);
-      box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
+      box-shadow: 0 2px 8px rgba(231, 193, 112, 0.2);
     }
   }
 
   &.btn-info {
-    background: linear-gradient(135deg, #17a2b8 0%, #20c997 100%);
+    background: linear-gradient(135deg, $light-orange 0%, #f07850 100%);
     color: white;
-    border: 1px solid #17a2b8;
+    border: 1px solid $light-orange;
 
     &:hover {
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
-      background: linear-gradient(135deg, #138496 0%, #17a2b8 100%);
+      box-shadow: 0 4px 12px rgba(224, 92, 57, 0.3);
+      background: linear-gradient(135deg, #d04d2f 0%, $light-orange 100%);
     }
 
     &:active {
       transform: translateY(0);
-      box-shadow: 0 2px 8px rgba(23, 162, 184, 0.2);
+      box-shadow: 0 2px 8px rgba(224, 92, 57, 0.2);
     }
   }
 
   &.btn-warning {
-    background: linear-gradient(135deg, #ffc107 0%, #ffca2c 100%);
-    color: #212529;
-    border: 1px solid #ffc107;
+    background: linear-gradient(135deg, #ffa726 0%, #ffb74d 100%);
+    color: white;
+    border: 1px solid #ffa726;
 
     &:hover {
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
-      background: linear-gradient(135deg, #e0a800 0%, #ffc107 100%);
+      box-shadow: 0 4px 12px rgba(255, 167, 38, 0.3);
+      background: linear-gradient(135deg, #fb8c00 0%, #ffa726 100%);
     }
 
     &:active {
       transform: translateY(0);
-      box-shadow: 0 2px 8px rgba(255, 193, 7, 0.2);
+      box-shadow: 0 2px 8px rgba(255, 167, 38, 0.2);
     }
   }
 
   &.btn-danger {
-    background: linear-gradient(135deg, #dc3545 0%, #e85d75 100%);
+    background: linear-gradient(135deg, #d32f2f 0%, #e57373 100%);
     color: white;
-    border: 1px solid #dc3545;
+    border: 1px solid #d32f2f;
 
     &:hover {
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-      background: linear-gradient(135deg, #c82333 0%, #dc3545 100%);
+      box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+      background: linear-gradient(135deg, #c62828 0%, #d32f2f 100%);
     }
 
     &:active {
       transform: translateY(0);
-      box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
+      box-shadow: 0 2px 8px rgba(211, 47, 47, 0.2);
     }
   }
 
@@ -906,26 +908,26 @@ $accent-purple: rgba(109, 39, 234, 0.1);
     padding: 25px;
     border-radius: 15px;
     text-align: center;
-    box-shadow: 0 4px 15px rgba(109, 39, 234, 0.1);
+    box-shadow: 0 4px 15px rgba(216, 51, 7, 0.15);
     transition:
       transform 0.3s ease,
       box-shadow 0.3s ease;
-    border-top: 4px solid $primary-purple;
+    border-top: 4px solid $primary-orange;
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(109, 39, 234, 0.15);
+      box-shadow: 0 8px 25px rgba(216, 51, 7, 0.2);
     }
 
     .stat-number {
       font-size: 36px;
       font-weight: 700;
-      color: $primary-purple;
+      color: $primary-orange;
       margin-bottom: 8px;
     }
 
     .stat-label {
-      color: #666;
+      color: $brown;
       font-size: 14px;
       font-weight: 500;
     }
@@ -937,7 +939,7 @@ $accent-purple: rgba(109, 39, 234, 0.1);
   padding: 25px;
   border-radius: 15px;
   margin-bottom: 25px;
-  box-shadow: 0 4px 15px rgba(109, 39, 234, 0.1);
+  box-shadow: 0 4px 15px rgba(216, 51, 7, 0.15);
   display: flex;
   gap: 25px;
   flex-wrap: wrap;
@@ -950,22 +952,22 @@ $accent-purple: rgba(109, 39, 234, 0.1);
 
     label {
       font-weight: 600;
-      color: $primary-purple;
+      color: $primary-orange;
       font-size: 14px;
     }
 
     input,
     select {
       padding: 10px 15px;
-      border: 2px solid #e0e0e0;
+      border: 2px solid #f5e6d3;
       border-radius: 8px;
       font-size: 14px;
       transition: border-color 0.3s ease;
 
       &:focus {
         outline: none;
-        border-color: $primary-purple;
-        box-shadow: 0 0 0 3px rgba(109, 39, 234, 0.1);
+        border-color: $primary-orange;
+        box-shadow: 0 0 0 3px rgba(216, 51, 7, 0.1);
       }
     }
   }
@@ -985,30 +987,30 @@ $accent-purple: rgba(109, 39, 234, 0.1);
   }
 
   th {
-    background: #f8f6ff;
+    background: #fff9f0;
     font-weight: 600;
-    color: $primary-purple;
+    color: $primary-orange;
     cursor: pointer;
     user-select: none;
     transition: background-color 0.3s ease;
 
     &:hover {
-      background: color.adjust($purple-bg, $lightness: 5%);
+      background: #fff3e0;
     }
 
     i {
       margin-left: 8px;
       opacity: 0.7;
-      color: $primary-purple;
+      color: $primary-orange;
     }
   }
 
   tr:nth-child(even) {
-    background: #fafafa;
+    background: #fffbf5;
   }
 
   tr:hover {
-    background: $accent-purple;
+    background: $accent-orange;
   }
 
   table-layout: fixed;
@@ -1074,7 +1076,7 @@ $accent-purple: rgba(109, 39, 234, 0.1);
 .data-table-container {
   background: white;
   border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(109, 39, 234, 0.1);
+  box-shadow: 0 4px 15px rgba(216, 51, 7, 0.15);
   overflow: hidden;
 
   .table-header {
@@ -1082,7 +1084,7 @@ $accent-purple: rgba(109, 39, 234, 0.1);
     justify-content: space-between;
     align-items: center;
     padding: 25px;
-    background: linear-gradient(135deg, $primary-purple 0%, $light-purple 100%);
+    background: linear-gradient(135deg, $primary-orange 0%, $light-orange 100%);
     color: white;
 
     h2 {
@@ -1107,8 +1109,8 @@ $accent-purple: rgba(109, 39, 234, 0.1);
 
 .pagination-controls {
   padding: 20px;
-  background: #f8f9fa;
-  border-top: 1px solid #dee2e6;
+  background: #fff9f0;
+  border-top: 1px solid #f5e6d3;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1116,7 +1118,7 @@ $accent-purple: rgba(109, 39, 234, 0.1);
   gap: 15px;
 
   .pagination-info {
-    color: #6c757d;
+    color: $brown;
     font-size: 14px;
   }
 
@@ -1133,13 +1135,13 @@ $accent-purple: rgba(109, 39, 234, 0.1);
       .page-input {
         width: 60px;
         padding: 5px 8px;
-        border: 1px solid #ccc;
+        border: 1px solid #ead5b8;
         border-radius: 4px;
         text-align: center;
       }
 
       span {
-        color: #6c757d;
+        color: $brown;
         font-size: 14px;
       }
     }
@@ -1154,18 +1156,18 @@ $accent-purple: rgba(109, 39, 234, 0.1);
   font-weight: 600;
 
   &.low {
-    background: #e3f2fd;
-    color: #1976d2;
+    background: #fff9f0;
+    color: $brown;
   }
 
   &.medium {
-    background: #fff3e0;
-    color: #f57c00;
+    background: #ffe8cc;
+    color: #d84315;
   }
 
   &.high {
-    background: #ffebee;
-    color: #d32f2f;
+    background: #ffccbc;
+    color: #bf360c;
   }
 }
 
@@ -1176,7 +1178,7 @@ $accent-purple: rgba(109, 39, 234, 0.1);
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(109, 39, 234, 0.3);
+  background: rgba(216, 51, 7, 0.3);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1191,14 +1193,14 @@ $accent-purple: rgba(109, 39, 234, 0.1);
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 10px 30px rgba(109, 39, 234, 0.3);
+  box-shadow: 0 10px 30px rgba(216, 51, 7, 0.3);
 
   .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 25px;
-    background: linear-gradient(135deg, $primary-purple 0%, $light-purple 100%);
+    background: linear-gradient(135deg, $primary-orange 0%, $light-orange 100%);
     color: white;
     border-radius: 15px 15px 0 0;
 
@@ -1243,18 +1245,18 @@ $accent-purple: rgba(109, 39, 234, 0.1);
     align-items: center;
     gap: 15px;
     padding: 15px;
-    background: #f8f6ff;
+    background: #fff9f0;
     border-radius: 8px;
-    border-left: 4px solid $primary-purple;
+    border-left: 4px solid $primary-orange;
 
     label {
       font-weight: 600;
-      color: $primary-purple;
+      color: $primary-orange;
       min-width: 140px;
     }
 
     span {
-      color: #555;
+      color: $brown;
       font-weight: 500;
     }
 
@@ -1275,7 +1277,7 @@ $accent-purple: rgba(109, 39, 234, 0.1);
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 250, 245, 0.95);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -1286,15 +1288,15 @@ $accent-purple: rgba(109, 39, 234, 0.1);
   .loading-spinner {
     width: 50px;
     height: 50px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid $primary-purple;
+    border: 4px solid #f5e6d3;
+    border-top: 4px solid $primary-orange;
     border-radius: 50%;
     animation: spin 1s linear infinite;
   }
 
   p {
     margin-top: 15px;
-    color: $primary-purple;
+    color: $primary-orange;
     font-weight: 600;
   }
 }

@@ -14,7 +14,8 @@
         <div class="navbar__right">
           <div class="navbar__links" :class="{ 'navbar__links--active': isMobileMenuOpen }">
             <NuxtLink to="#activity" class="navbar__link" @click="isMobileMenuOpen = false">活動辦法</NuxtLink>
-            <NuxtLink to="#prizes" class="navbar__link" @click="isMobileMenuOpen = false">馬上開運小秘招</NuxtLink>
+            <a href="https://orange.udn.com/orange/issue/8887/2341" class="navbar__link" target="_blank"
+              rel="noopener noreferrer" @click="isMobileMenuOpen = false">馬上開運小秘招</a>
             <NuxtLink to="/" class="navbar__link navbar__link--button" @click="handleWinnerListClick">中獎名單</NuxtLink>
           </div>
 
@@ -73,7 +74,7 @@ const winnerListPopupData = computed(() => {
     return {
       icon: "warning",
       title: "中獎名單尚未公布",
-      text: `中獎名單將於 ${winnerListConfig.announceDate} 公布，\n敬請期待！`,
+      text: `中獎名單尚未公布，敬請期待！`,
       confirmButtonText: "我知道了",
       showCancelButton: false,
     };
@@ -142,7 +143,7 @@ const lineShareUrl = computed(() => {
   background-color: transparent;
   box-shadow: none;
   width: 100%;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   z-index: 100;
@@ -429,9 +430,7 @@ const lineShareUrl = computed(() => {
     left: 0;
     width: 100%;
     height: 100vh;
-    background: linear-gradient(135deg,
-        rgba(27, 3, 62, 0.6),
-        rgba(109, 39, 234, 0.4));
+    background: linear-gradient(135deg, rgba(216, 51, 7, 0.6), rgba(216, 51, 7, 0.4));
     backdrop-filter: blur(5px) saturate(150%);
     -webkit-backdrop-filter: blur(5px) saturate(150%);
     z-index: 98;

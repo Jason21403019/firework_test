@@ -95,7 +95,7 @@ export const useBrowserUtils = () => {
       showUniversalDialogFn({
         icon: "info",
         title: "頁面停留過久",
-        text: "您已在此頁面停留超過 4 分鐘，\n建議重新整理頁面以獲得最新狀態",
+        text: "您已在此頁面停留超過 5 分鐘，\n建議重新整理頁面以獲得最新狀態",
         confirmButtonText: "立即重新整理",
         showCancelButton: true,
         cancelButtonText: "稍後再說",
@@ -103,7 +103,7 @@ export const useBrowserUtils = () => {
         if (result.isConfirmed) {
           window.location.reload();
         } else {
-          const nextReminderTime = Date.now() + 4 * 60 * 1000;
+          const nextReminderTime = Date.now() + 5 * 60 * 1000;
           localStorage.setItem(
             "fate2025_refresh_reminder_time",
             String(nextReminderTime),

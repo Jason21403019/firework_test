@@ -46,7 +46,7 @@ export default defineNuxtConfig({
         },
         {
           property: "og:image",
-          content: "https://event.udn.com/bd_newyear_2026/imgs/meta_img.png",
+          content: "https://event.udn.com/bd_newyear_2026/imgs/metaimg.jpg",
         },
       ],
       link: [
@@ -155,5 +155,5 @@ export default defineNuxtConfig({
     },
   },
 
-  compatibilityDate: "2025-09-22",
+  compatibilityDate: "2026-03-25",
 });

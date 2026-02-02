@@ -47,7 +47,7 @@
     // 確保樣式已注入
     injectStyles()
 
-    const targetUrl = 'https://orange.udn.com/orange/issue/8887/2341'
+    const targetUrl = 'https://event.udn.com/bd_newyear_2026/'
     const imageUrl = 'https://event.udn.com/bd_newyear_2026/imgs/repeatimg.png'
     const title = '天天轉盤抽紅包，<span style="color: #FAEBB5;">LINE POINTS </span>免費<br class="mobile-br">領、<span style="color: #FAEBB5;">iPhone17 Pro </span>大禮要送你！'
     const buttonText = '立即轉運'
