@@ -26,17 +26,17 @@ if (isset($data['admin_mode']) && $data['admin_mode'] === true) {
         $lastWeek = date('Y-m-d', strtotime('-7 days'));
         
         foreach ($records as $record) {
-            // 計算總占卜次數
+            // 計算總轉運次數
             $totalDivinations += intval($record['play_times_total']);
             
-            // 計算今日占卜次數 - 使用 updated_at 欄位
+            // 計算今日轉運次數 - 使用 updated_at 欄位
             if (!empty($record['updated_at'])) {
                 $recordDate = date('Y-m-d', strtotime($record['updated_at']));
                 if ($recordDate === $today) {
                     $todayDivinations++;
                 }
                 
-                // 計算活躍用戶（最近7天內有占卜）
+                // 計算活躍用戶（最近7天內有轉運）
                 if ($recordDate >= $lastWeek) {
                     $activeUsers++;
                 }

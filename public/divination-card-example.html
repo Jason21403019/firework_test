@@ -3,10 +3,10 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>占卜卡片使用範例</title>
+		<title>轉運卡片使用範例</title>
 		<style>
 			body {
-				font-family:'Noto Sans TC', sans-serif;
+				font-family: 'Noto Sans TC', sans-serif;
 				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 				min-height: 100vh;
 				margin: 0;
@@ -29,73 +29,75 @@
 			}
 
 			.info {
-    background: #f5f5f5;
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 30px;
-}
+				background: #f5f5f5;
+				padding: 20px;
+				border-radius: 10px;
+				margin-bottom: 30px;
+			}
 
-.info pre {
-    overflow-x: auto;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-}
+			.info pre {
+				overflow-x: auto;
+				white-space: pre-wrap;
+				word-wrap: break-word;
+			}
 
-.info code {
-    background: #fff;
-    padding: 2px 6px;
-    border-radius: 4px;
-    color: #d63384;
-    word-break: break-all;
-}
+			.info code {
+				background: #fff;
+				padding: 2px 6px;
+				border-radius: 4px;
+				color: #d63384;
+				word-break: break-all;
+			}
 
-/* 小尺寸優化 */
-@media (max-width: 480px) {
-    .container {
-        padding: 20px;
-    }
-    
-    .info {
-        padding: 15px;
-    }
-    
-    .info h2 {
-        font-size: 16px;
-    }
-    
-    .info p, .info li {
-        font-size: 14px;
-    }
-    
-    .info pre {
-        font-size: 12px;
-        padding: 8px;
-        background: #fff;
-        border-radius: 4px;
-    }
-}
+			/* 小尺寸優化 */
+			@media (max-width: 480px) {
+				.container {
+					padding: 20px;
+				}
 
-@media (max-width: 360px) {
-    body {
-        padding: 10px;
-    }
-    
-    .container {
-        padding: 15px;
-    }
-    
-    .info {
-        padding: 12px;
-    }
-    
-    .info h2 {
-        font-size: 15px;
-    }
-    
-    .info p, .info li {
-        font-size: 13px;
-    }
-}
+				.info {
+					padding: 15px;
+				}
+
+				.info h2 {
+					font-size: 16px;
+				}
+
+				.info p,
+				.info li {
+					font-size: 14px;
+				}
+
+				.info pre {
+					font-size: 12px;
+					padding: 8px;
+					background: #fff;
+					border-radius: 4px;
+				}
+			}
+
+			@media (max-width: 360px) {
+				body {
+					padding: 10px;
+				}
+
+				.container {
+					padding: 15px;
+				}
+
+				.info {
+					padding: 12px;
+				}
+
+				.info h2 {
+					font-size: 15px;
+				}
+
+				.info p,
+				.info li {
+					font-size: 13px;
+				}
+			}
 
 			#divination-container {
 				margin-top: 40px;
@@ -143,19 +145,19 @@
 			.test-btn--already {
 				background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
 			}
-      .test-btn--repeat-normal {
-        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-      }
+			.test-btn--repeat-normal {
+				background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+			}
 		</style>
 	</head>
 	<body>
 		<div class="container">
-			<h1>🎴 占卜卡片使用範例</h1>
+			<h1>🎴 轉運卡片使用範例</h1>
 
 			<div class="info">
 				<h2>📌 當前參數：</h2>
 				<p>是否首次完成：<code id="param-first">-</code></p>
-				<p>占卜次數：<code id="param-count">-</code></p>
+				<p>轉運次數：<code id="param-count">-</code></p>
 				<p>是否重複遊玩：<code id="param-already">-</code></p>
 				<p>會員ID：<code id="param-member">-</code></p>
 			</div>
@@ -168,7 +170,7 @@
 				<p>2. 在 HTML 中加入容器元素：</p>
 				<pre><code>&lt;div id="divination-container"&gt;&lt;/div&gt;</code></pre>
 
-				<p>3. 初始化占卜卡片：</p>
+				<p>3. 初始化轉運卡片：</p>
 				<pre><code>&lt;script&gt;
   DivinationCard.init({
     containerId: 'divination-container',
@@ -179,7 +181,7 @@
 				<p>4. 從活動頁跳轉時會自動帶入以下參數：</p>
 				<ul>
 					<li><code>first</code> - 是否首次完成 (1/0)</li>
-					<li><code>count</code> - 累計占卜次數</li>
+					<li><code>count</code> - 累計轉運次數</li>
 					<li><code>already_played</code> - 是否重複遊玩 (1/0)</li>
 					<li><code>udnmember</code> - 會員ID</li>
 				</ul>
@@ -189,24 +191,18 @@
 				<p>點擊下方按鈕可以直接測試不同狀態的彈窗：</p>
 				<div class="test-buttons">
 					<button class="test-btn test-btn--first" onclick="testFortuneFirst()">測試完成彈窗 - First (count=1)</button>
-					<button class="test-btn test-btn--normal" onclick="testFortuneNormal()">
-						測試完成彈窗 - Normal (count=10)
-					</button>
+					<button class="test-btn test-btn--normal" onclick="testFortuneNormal()">測試完成彈窗 - Normal (count=10)</button>
 					<button class="test-btn test-btn--final" onclick="testFortuneFinal()">測試完成彈窗 - Final (count=25)</button>
-					<button class="test-btn test-btn--already" onclick="testAlreadyPlayed()">
-						測試重複遊玩彈窗 (already_played=1)
-					</button>
-          <button class="test-btn test-btn--repeat-normal" onclick="testAlreadyPlayedNormal()">
-            測試重複遊玩彈窗 - Normal (playCount > 1)
-          </button>
+					<button class="test-btn test-btn--already" onclick="testAlreadyPlayed()">測試重複遊玩彈窗 (already_played=1)</button>
+					<button class="test-btn test-btn--repeat-normal" onclick="testAlreadyPlayedNormal()">測試重複遊玩彈窗 - Normal (playCount > 1)</button>
 				</div>
 			</div>
 
-			<!-- 占卜卡片容器 -->
+			<!-- 轉運卡片容器 -->
 			<div id="divination-container"></div>
 		</div>
 
-		<!-- 引入占卜卡片 JS -->
+		<!-- 引入轉運卡片 JS -->
 		<script src="./divination-card.js"></script>
 
 		<script>
@@ -216,7 +212,7 @@
 			document.getElementById('param-already').textContent = DivinationCard.getUrlParam('already_played') || '無'
 			document.getElementById('param-member').textContent = DivinationCard.getUrlParam('udnmember') || '無'
 
-			// 初始化占卜卡片
+			// 初始化轉運卡片
 			const result = DivinationCard.init({
 				containerId: 'divination-container',
 				showFirstTimePopup: true,
@@ -248,14 +244,14 @@
 				const container = document.getElementById('divination-container')
 				DivinationCard.showAlreadyPlayedCard(container, 1)
 			}
-      // 測試非第一次的重複遊玩彈窗
-      function testAlreadyPlayedNormal() {
-          sessionStorage.removeItem('divination-card-shown')
-          const container = document.getElementById('divination-container')
-          DivinationCard.showAlreadyPlayedCard(container, 5) // playCount > 1，顯示 normal 類型
-      }
+			// 測試非第一次的重複遊玩彈窗
+			function testAlreadyPlayedNormal() {
+				sessionStorage.removeItem('divination-card-shown')
+				const container = document.getElementById('divination-container')
+				DivinationCard.showAlreadyPlayedCard(container, 5) // playCount > 1，顯示 normal 類型
+			}
 
-			console.log('占卜卡片初始化完成:', result)
+			console.log('轉運卡片初始化完成:', result)
 		</script>
 	</body>
 </html>

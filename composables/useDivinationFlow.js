@@ -1,4 +1,4 @@
-// 占卜流程管理
+// 轉運流程管理
 export const useDivinationFlow = () => {
   const userStore = useUserStore();
   const divinationStore = useDivinationStore();
@@ -31,14 +31,14 @@ export const useDivinationFlow = () => {
       return "小提醒：每天都能玩轉盤抽紅包<br>iPhone 17 Pro 大獎要送你！</div>";
     } else if (playCount === 20) {
       // 第二十次：恭喜達成
-      return "<div class='glowing-message'><span class='glowing-message-title'>恭喜達成!</span><br>已完成 20 次占卜，獲得 Dyson 大獎抽獎資格！</div>";
+      return "<div class='glowing-message'><span class='glowing-message-title'>恭喜達成!</span><br>已完成 20 次轉運，獲得 Dyson 大獎抽獎資格！</div>";
     } else {
       // 第 2-19 次和第 21 次之後：一般文案
-      return "<div class='glowing-message'><span class='glowing-message-title'>占卜完成!</span><br>明天繼續來占卜，累積好運！</div>";
+      return "<div class='glowing-message'><span class='glowing-message-title'>轉運完成!</span><br>明天繼續來轉運，累積好運！</div>";
     }
   };
 
-  // 通知其他分頁占卜完成
+  // 通知其他分頁轉運完成
   const notifyOtherTabs = () => {
     localStorage.setItem(
       "fate2025_divination_sync",
@@ -50,13 +50,13 @@ export const useDivinationFlow = () => {
     );
   };
 
-  // 處理成功占卜的輔助函數
+  // 處理成功轉運的輔助函數
   const handleSuccessfulDivination = async (result) => {
-    console.log("🎉 處理占卜結果");
+    console.log("🎉 處理轉運結果");
 
     localStorage.removeItem("temp_turnstile_token");
 
-    // 更新占卜次數
+    // 更新轉運次數
     const oldCount = divinationStore.totalPlayCount;
     if (result.db_info && result.db_info.play_times_total !== undefined) {
       divinationStore.setTotalPlayCount(result.db_info.play_times_total);
@@ -65,7 +65,7 @@ export const useDivinationFlow = () => {
     }
 
     const isFirstTime =
-      result.message && result.message.includes("首次占卜成功");
+      result.message && result.message.includes("首次轉運成功");
 
     divinationStore.checkMilestoneAchievement(
       divinationStore.totalPlayCount,
@@ -76,9 +76,9 @@ export const useDivinationFlow = () => {
     divinationStore.recordPlayToday();
 
     const fortuneData = divinationStore.generateFortuneResult();
-    console.log("🔮 占卜結果:", fortuneData.title);
+    console.log("🔮 轉運結果:", fortuneData.title);
 
-    // 根據占卜次數生成對應訊息
+    // 根據轉運次數生成對應訊息
     let resultMessage = generateResultMessage(divinationStore.totalPlayCount);
 
     notifyOtherTabs();
@@ -119,20 +119,20 @@ export const useDivinationFlow = () => {
     console.log("處理 API 錯誤:", result);
 
     return new Promise((resolve) => {
-      // 只有在明確收到 already_played = true 時才設置為已占卜
+      // 只有在明確收到 already_played = true 時才設置為已轉運
       if (result.already_played === true) {
-        console.log("用戶今天已經占卜過了");
+        console.log("用戶今天已經轉運過了");
 
         // 清理令牌
         localStorage.removeItem("temp_turnstile_token");
 
-        // 更新占卜次數
+        // 更新轉運次數
         if (result.db_info && result.db_info.play_times_total !== undefined) {
           divinationStore.setTotalPlayCount(result.db_info.play_times_total);
-          console.log("更新累計占卜次數為:", divinationStore.totalPlayCount);
+          console.log("更新累計轉運次數為:", divinationStore.totalPlayCount);
         }
 
-        // 只有在確認已占卜時才更新狀態
+        // 只有在確認已轉運時才更新狀態
         divinationStore.setPlayedStatus(true);
 
         resolve({ type: "already_played" });
@@ -153,7 +153,7 @@ export const useDivinationFlow = () => {
         return;
       }
 
-      console.log("其他 API 錯誤，不更新占卜狀態:", result.message);
+      console.log("其他 API 錯誤，不更新轉運狀態:", result.message);
 
       // 避免將包含"成功"字樣的訊息當作錯誤訊息
       let errorMessage = result.message || "伺服器錯誤，請稍後再試";
@@ -166,7 +166,7 @@ export const useDivinationFlow = () => {
     });
   };
 
-  // 獲取用戶占卜數據
+  // 獲取用戶轉運數據
   const fetchUserPlayData = async () => {
     try {
       const response = await apiService.fetchUserPlayData(
@@ -178,7 +178,7 @@ export const useDivinationFlow = () => {
       if (response.status === "success") {
         if (response.play_times_total !== undefined) {
           divinationStore.setTotalPlayCount(response.play_times_total);
-          console.log("📊 占卜次數:", divinationStore.totalPlayCount);
+          console.log("📊 轉運次數:", divinationStore.totalPlayCount);
         }
       }
 
@@ -190,7 +190,7 @@ export const useDivinationFlow = () => {
       // 初始化已完成的最高里程碑
       divinationStore.initializeAchievedMilestone();
     } catch (error) {
-      console.error("❌ 獲取占卜數據錯誤:", error);
+      console.error("❌ 獲取轉運數據錯誤:", error);
     }
   };
 

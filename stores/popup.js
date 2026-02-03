@@ -2,13 +2,13 @@ import { defineStore } from "pinia";
 
 export const usePopupStore = defineStore("popup", {
   state: () => ({
-    // 占卜結果彈窗
+    // 轉運結果彈窗
     showFortuneResultPopup: false,
     fortuneResultData: {},
     fortuneCustomMessage: "",
     fortuneResultType: "normal", // 'first' | 'normal' | 'final'
 
-    // 已占卜過彈窗
+    // 已轉運過彈窗
     showAlreadyPlayedPopup: false,
     alreadyPlayedData: {},
     alreadyPlayedCustomMessage: "",
@@ -31,11 +31,11 @@ export const usePopupStore = defineStore("popup", {
   }),
 
   actions: {
-    // 占卜結果彈窗
+    // 轉運結果彈窗
     openFortuneResultPopup(fortuneData, customMessage = "", resultType = "normal") {
       this.fortuneResultData = fortuneData;
       this.fortuneCustomMessage =
-        customMessage || "<div class='glowing-message'>占卜已完成！</div>";
+        customMessage || "<div class='glowing-message'>轉運已完成！</div>";
       this.fortuneResultType = resultType;
       this.showFortuneResultPopup = true;
     },
@@ -44,7 +44,7 @@ export const usePopupStore = defineStore("popup", {
       this.showFortuneResultPopup = false;
     },
 
-    // 已占卜過彈窗
+    // 已轉運過彈窗
     openAlreadyPlayedPopup(data, customMessage = "", repeatType = "normal") {
       this.alreadyPlayedData = data;
       this.alreadyPlayedCustomMessage = customMessage;

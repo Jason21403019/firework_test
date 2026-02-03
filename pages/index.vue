@@ -6,11 +6,11 @@
     <Notice_popup />
     <!-- <ToTop /> -->
 
-    <!-- 占卜結果彈窗 -->
+    <!-- 轉運結果彈窗 -->
     <Fortune_result_popup :is-visible="popupStore.showFortuneResultPopup" :fortune-data="popupStore.fortuneResultData"
       :custom-message="popupStore.fortuneCustomMessage" :result-type="popupStore.fortuneResultType"
       @close="closeFortune" />
-    <!-- 已經占卜過的彈窗 -->
+    <!-- 已經轉運過的彈窗 -->
     <Already_played_popup :is-visible="popupStore.showAlreadyPlayedPopup"
       :already-played-data="popupStore.alreadyPlayedData" :custom-message="popupStore.alreadyPlayedCustomMessage"
       :repeat-type="popupStore.alreadyPlayedRepeatType" @close="popupStore.closeAlreadyPlayedPopup" />
@@ -58,7 +58,7 @@
         <h4>🗄️ 資料操作</h4>
         <div class="debug-actions">
           <button @click="debugTools.clearPlayRecord" class="debug-btn">
-            清除占卜記錄
+            清除轉運記錄
           </button>
           <button @click="debugTools.resetDatabase" class="debug-btn danger">
             重置資料庫
@@ -80,8 +80,8 @@
                 : "無"
             }}
           </p>
-          <p>今日已占卜: {{ divinationStore.hasPlayed ? "是" : "否" }}</p>
-          <p>總占卜次數: {{ divinationStore.totalPlayCount }}</p>
+          <p>今日已轉運: {{ divinationStore.hasPlayed ? "是" : "否" }}</p>
+          <p>總轉運次數: {{ divinationStore.totalPlayCount }}</p>
           <p>
             驗證狀態:
             {{ turnstile?.isTurnstileVerified?.value ? "已驗證" : "未驗證" }}
@@ -250,10 +250,10 @@ watch(
           return;
         }
 
-        // 更新占卜狀態
+        // 更新轉運狀態
         await divinationFlow.updatePlayedStatus();
 
-        // 獲取最新的占卜次數
+        // 獲取最新的轉運次數
         await divinationFlow.fetchUserPlayData();
 
         // 顯示驗證對話框
@@ -276,38 +276,38 @@ function handleMilestoneAchieved(milestone) {
 // 顯示「今天已經玩過」的提示
 function showAlreadyPlayedMessage() {
   let message = "";
-  let reminder = "小提醒: 每天來占卜，累積好運抽 Dyson 清淨機大獎喔！";
+  let reminder = "小提醒: 每天來轉運，累積好運抽 Dyson 清淨機大獎喔！";
 
   if (divinationStore.totalPlayCount === 1) {
-    message = "已完成第 1 次占卜\n明天再來繼續累積好運！";
+    message = "已完成第 1 次轉運\n明天再來繼續累積好運！";
   } else if (
     divinationStore.totalPlayCount >= 2 &&
     divinationStore.totalPlayCount < 5
   ) {
-    message = `已累積 ${divinationStore.totalPlayCount} 次占卜\n繼續加油，朝下個目標前進！`;
+    message = `已累積 ${divinationStore.totalPlayCount} 次轉運\n繼續加油，朝下個目標前進！`;
   } else if (divinationStore.totalPlayCount === 5) {
-    message = "已完成 5 次占卜\n繼續累積，邁向更高目標！";
+    message = "已完成 5 次轉運\n繼續累積，邁向更高目標！";
   } else if (
     divinationStore.totalPlayCount >= 6 &&
     divinationStore.totalPlayCount < 10
   ) {
-    message = `已累積 ${divinationStore.totalPlayCount} 次占卜\n持續加油，離目標越來越近！`;
+    message = `已累積 ${divinationStore.totalPlayCount} 次轉運\n持續加油，離目標越來越近！`;
   } else if (divinationStore.totalPlayCount === 10) {
-    message = "已完成 10 次占卜\n繼續累積，邁向更高目標！";
+    message = "已完成 10 次轉運\n繼續累積，邁向更高目標！";
   } else if (
     divinationStore.totalPlayCount >= 11 &&
     divinationStore.totalPlayCount < 15
   ) {
-    message = `已累積 ${divinationStore.totalPlayCount} 次占卜\n持續加油，快達成了！`;
+    message = `已累積 ${divinationStore.totalPlayCount} 次轉運\n持續加油，快達成了！`;
   } else if (divinationStore.totalPlayCount === 15) {
-    message = "已完成 15 次占卜\n再 5 次就能獲得 Dyson 大獎資格！";
+    message = "已完成 15 次轉運\n再 5 次就能獲得 Dyson 大獎資格！";
   } else if (
     divinationStore.totalPlayCount >= 16 &&
     divinationStore.totalPlayCount < 20
   ) {
-    message = `已累積 ${divinationStore.totalPlayCount} 次占卜\n距離 Dyson 大獎只差 ${20 - divinationStore.totalPlayCount} 次了！`;
+    message = `已累積 ${divinationStore.totalPlayCount} 次轉運\n距離 Dyson 大獎只差 ${20 - divinationStore.totalPlayCount} 次了！`;
   } else if (divinationStore.totalPlayCount >= 20) {
-    message = "恭喜！已完成 20 次占卜\n已獲得 Dyson 大獎抽獎資格";
+    message = "恭喜！已完成 20 次轉運\n已獲得 Dyson 大獎抽獎資格";
     reminder = "";
   }
 
@@ -317,12 +317,12 @@ function showAlreadyPlayedMessage() {
   });
 }
 
-// 顯示占卜結果
+// 顯示轉運結果
 function showFortuneResult(fortuneData, customResultMessage, resultType = "normal") {
   popupStore.openFortuneResultPopup(fortuneData, customResultMessage, resultType);
 }
 
-// 關閉占卜結果彈窗
+// 關閉轉運結果彈窗
 const closeFortune = () => {
   popupStore.closeFortuneResultPopup();
 
@@ -401,7 +401,7 @@ function testAlreadyPlayedFirst() {
 
   popupStore.openAlreadyPlayedPopup({
     message: "今天已經玩過囉！\n明天再來繼續累積好運！",
-    reminder: "小提醒: 每天來占卜，累積好運抽 Dyson 清淨機大獎喔！",
+    reminder: "小提醒: 每天來轉運，累積好運抽 Dyson 清淨機大獎喔！",
   }, customMessage, "first");
   console.log("🎨 測試第一次重複彈窗");
 }
@@ -416,8 +416,8 @@ function testAlreadyPlayedNormal() {
   console.log("🎨 測試第一次之後重複彈窗");
 }
 
-// ==================== 占卜流程主函數 ====================
-// 1. 占卜流程啟動函數
+// ==================== 轉運流程主函數 ====================
+// 1. 轉運流程啟動函數
 async function startDivination() {
   return await loginFlow.startDivination(
     divinationFlow.updatePlayedStatus,
@@ -425,12 +425,12 @@ async function startDivination() {
   );
 }
 
-// 2. 驗證成功後執行占卜流程（已棄用 - 改用新年活動流程）
+// 2. 驗證成功後執行轉運流程（已棄用 - 改用新年活動流程）
 // 此函數已不再使用，所有流程都改用 proceedToNewYearFlow
 // eslint-disable-next-line no-unused-vars
 async function proceedToPerformDivination() {
   try {
-    console.log("=== 開始執行占卜流程 ===");
+    console.log("=== 開始執行轉運流程 ===");
 
     // 清除登入標記
     localStorage.removeItem("fate2025_just_logged_in");
@@ -443,14 +443,14 @@ async function proceedToPerformDivination() {
       return;
     }
 
-    // 步驟3: 顯示占卜進行中的提示
-    console.log("開始占卜處理...");
+    // 步驟3: 顯示轉運進行中的提示
+    console.log("開始轉運處理...");
     popupStore.openLoadingPopup({
-      message: "占卜中...",
+      message: "轉運中...",
     });
 
     // 步驟4: 調用 API 保存用戶數據
-    console.log("正在發送占卜資料...");
+    console.log("正在發送轉運資料...");
     const turnstileTokenValue =
       turnstile?.turnstileToken?.value ||
       localStorage.getItem("temp_turnstile_token") ||
@@ -469,19 +469,19 @@ async function proceedToPerformDivination() {
       return;
     }
 
-    // 步驟6: 處理成功的占卜結果
+    // 步驟6: 處理成功的轉運結果
     if (result.status === "success") {
       const { fortuneData, resultMessage } =
         await divinationFlow.handleSuccessfulDivination(result);
       showFortuneResult(fortuneData, resultMessage);
     }
   } catch (error) {
-    console.error("占卜流程執行錯誤:", error);
+    console.error("轉運流程執行錯誤:", error);
     popupStore.closeLoadingPopup();
     showUniversalDialog({
       icon: "error",
       title: "系統錯誤",
-      text: "啟動占卜流程時發生錯誤，請稍後再試",
+      text: "啟動轉運流程時發生錯誤，請稍後再試",
     }).then((result) => {
       if (result.isDismissed) {
         showPostLoginVerificationDialog();
@@ -592,7 +592,7 @@ async function handleApiErrorUI(errorType) {
 
   showUniversalDialog({
     icon: "error",
-    title: "占卜失敗",
+    title: "轉運失敗",
     text: displayMessage,
     confirmButtonText: "確定",
     showCancelButton: true,
@@ -659,7 +659,7 @@ onMounted(async () => {
   // 更新登入狀態
   auth.updateLoginStatus();
 
-  // 獲取占卜次數與用戶資料
+  // 獲取轉運次數與用戶資料
   if (userStore.isLoggedIn) {
     await divinationFlow.fetchUserPlayData();
   } else {
@@ -706,11 +706,11 @@ onMounted(async () => {
     sessionStorage.setItem("fate2025_tab_id", newTabId);
   }
 
-  // 檢查占卜狀態
+  // 檢查轉運狀態
   try {
     await divinationFlow.updatePlayedStatus();
   } catch (err) {
-    console.error("更新占卜狀態錯誤:", err);
+    console.error("更新轉運狀態錯誤:", err);
   }
 
   // 登入流程檢查
@@ -729,7 +729,7 @@ onMounted(async () => {
       // 清除檢查標記，避免顯示非正常流程警告
       localStorage.setItem("login_checked", "true");
 
-      // 不論是否已占卜過，都會走完整流程並跳轉到外部網頁
+      // 不論是否已轉運過，都會走完整流程並跳轉到外部網頁
       showPostLoginVerificationDialog();
     }
   } else if (userStore.isLoggedIn && isFirstTimeCheck) {

@@ -19,7 +19,7 @@ const props = defineProps({
   },
   message: {
     type: String,
-    default: "準備進入新年活動",
+    default: "準備揭曉你的新年好運",
   },
   initialCountdown: {
     type: Number,

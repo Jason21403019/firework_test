@@ -6,7 +6,7 @@ export const useDebugTools = () => {
   const auth = useAuth();
   const apiService = useApiService();
 
-  // 清除占卜記錄 (用於測試)
+  // 清除轉運記錄 (用於測試)
   const clearPlayRecord = async () => {
     if (typeof window === "undefined") return;
 
@@ -17,7 +17,7 @@ export const useDebugTools = () => {
 
     localStorage.removeItem(storageKey);
 
-    // 重要：立即更新占卜狀態
+    // 重要：立即更新轉運狀態
     divinationStore.clearPlayRecord();
   };
 

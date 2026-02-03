@@ -1,6 +1,6 @@
 <template>
   <section class="act-area">
-    <h1 class="act-area__title">
+    <h1 class="act-area__title" id="activity">
       <img src="/imgs/activity_title.png" alt="活動標題" />
     </h1>
     <Act_container>
@@ -14,11 +14,11 @@
           <li>活動限會員身分參加，皆需登 ( 加 ) 入會員。</li>
           <li>
             活動期間，每一會員帳號每日皆可玩一次轉盤（每日 00:00
-            起算），累計完成占卜次數，則可抽取指定獎項。
+            起算），累計完成任務，即可抽取指定獎項。
           </li>
           <li>
             參加會員需填 e-mail 和手機號碼等個人資料，以便後續領取 LINE Points
-            點數好禮（限量 8,000 組，送完為止）。
+            點數好禮（限量 5,000 組，送完為止）。
           </li>
         </ul>
         <div class="act-area__rules-flow">

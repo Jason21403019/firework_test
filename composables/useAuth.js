@@ -121,7 +121,7 @@ export const useAuth = () => {
     }
   };
 
-  // 清除占卜後的 Cookies
+  // 清除轉運後的 Cookies
   const clearCookiesAfterDivination = () => {
     if (typeof window === "undefined") return;
 
@@ -157,7 +157,7 @@ export const useAuth = () => {
       sessionStorage.clear();
 
       userStore.clearUserData();
-      console.log("已清除占卜後的 cookie 和認證資料");
+      console.log("已清除轉運後的 cookie 和認證資料");
     } catch (e) {
       console.error("清除 Cookie 過程中發生錯誤:", e);
     }

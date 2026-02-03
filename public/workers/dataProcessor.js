@@ -21,7 +21,7 @@ self.onmessage = function (e) {
       return false;
     }
 
-    // 占卜次數篩選
+    // 轉運次數篩選
     if (filters.playTimes) {
       const playTimes = record.play_times_total || 0;
       switch (filters.playTimes) {

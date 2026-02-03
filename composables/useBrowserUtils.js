@@ -57,7 +57,7 @@ export const useBrowserUtils = () => {
     }
   };
 
-  // 監聽其他分頁的占卜完成
+  // 監聽其他分頁的轉運完成
   const initSimpleSync = (showAlreadyPlayedMessageFn) => {
     window.addEventListener("storage", (event) => {
       if (event.key === "fate2025_divination_sync") {

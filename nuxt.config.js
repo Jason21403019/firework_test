@@ -99,7 +99,7 @@ export default defineNuxtConfig({
                 'user_id': user_id,
                 'google_id': google_id,
                 'cat': ['event', '', '', '', ''],
-                'content_tag': '占卜',
+                'content_tag': '轉運',
                 'auth_type': auth_type,
                 'publication_date': '',
                 'ffid': JSON.parse(localStorage.getItem('UDN_FID'))?.FFID,

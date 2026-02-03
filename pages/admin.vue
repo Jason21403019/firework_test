@@ -2,7 +2,7 @@
   <div class="admin-container">
     <!-- 頁面標題 -->
     <div class="admin-header">
-      <h1>占卜活動後台管理</h1>
+      <h1>轉運活動後台管理</h1>
       <div class="header-actions">
         <button @click="refreshData" class="btn btn-primary">重新整理</button>
         <button @click="exportData" class="btn btn-success">匯出資料</button>
@@ -17,11 +17,11 @@
       </div>
       <div class="stat-card">
         <div class="stat-number">{{ totalDivinations }}</div>
-        <div class="stat-label">總占卜次數</div>
+        <div class="stat-label">總轉運次數</div>
       </div>
       <div class="stat-card">
         <div class="stat-number">{{ todayDivinations }}</div>
-        <div class="stat-label">今日占卜次數</div>
+        <div class="stat-label">今日轉運次數</div>
       </div>
       <div class="stat-card">
         <div class="stat-number">{{ activeUsers }}</div>
@@ -40,7 +40,7 @@
         <input type="text" v-model="filters.ip" placeholder="輸入IP地址" @input="debouncedFilter" />
       </div>
       <div class="filter-group">
-        <label>占卜次數：</label>
+        <label>轉運次數：</label>
         <select v-model="filters.playTimes" @change="applyFilters">
           <option value="">全部</option>
           <option value="1">1次</option>
@@ -63,7 +63,7 @@
     <!-- 數據表格 -->
     <div class="data-table-container">
       <div class="table-header">
-        <h2>占卜記錄</h2>
+        <h2>轉運記錄</h2>
         <div class="pagination-info">
           顯示 {{ (currentPage - 1) * pageSize + 1 }} -
           {{ Math.min(currentPage * pageSize, filteredRecords.length) }}
@@ -92,7 +92,7 @@
                 累計次數 <i :class="getSortIcon('play_times_total')"></i>
               </th>
               <th @click="sortBy('updated_at')">
-                最後占卜時間 <i :class="getSortIcon('updated_at')"></i>
+                最後轉運時間 <i :class="getSortIcon('updated_at')"></i>
               </th>
               <th @click="sortBy('created_at')">
                 註冊時間 <i :class="getSortIcon('created_at')"></i>
@@ -178,13 +178,13 @@
               <span>{{ selectedRecord?.ip || "-" }}</span>
             </div>
             <div class="detail-item">
-              <label>累計占卜次數：</label>
+              <label>累計轉運次數：</label>
               <span class="play-count-badge" :class="getPlayCountClass(selectedRecord?.play_times_total)">
                 {{ selectedRecord?.play_times_total }}
               </span>
             </div>
             <div class="detail-item">
-              <label>最後占卜時間：</label>
+              <label>最後轉運時間：</label>
               <span>{{ formatDate(selectedRecord?.updated_at) }}</span>
             </div>
             <div class="detail-item">
@@ -214,8 +214,8 @@ import axios from "axios";
 import Swal from "sweetalert2";
 
 useSeoMeta({
-  title: "占卜活動後台管理",
-  description: "占卜活動後台管理系統",
+  title: "轉運活動後台管理",
+  description: "轉運活動後台管理系統",
 });
 
 // 基本狀態
@@ -495,8 +495,8 @@ async function exportData() {
       "用戶ID",
       "Email",
       "IP地址",
-      "累計占卜次數",
-      "最後占卜時間",
+      "累計轉運次數",
+      "最後轉運時間",
       "註冊時間",
     ];
     csvContent += headers.join(",") + "\n";
@@ -578,7 +578,7 @@ async function exportData() {
       .toISOString()
       .replace(/[:.]/g, "-")
       .slice(0, 19);
-    link.setAttribute("download", `占卜記錄_${timestamp}.csv`);
+    link.setAttribute("download", `轉運記錄_${timestamp}.csv`);
 
     document.body.appendChild(link);
     link.click();

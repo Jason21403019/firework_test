@@ -37,9 +37,9 @@ export const useRedirectFlow = () => {
 
       // 檢查 API 錯誤
       if (result.status === "error") {
-        // 如果是已經占卜過，仍然要跳轉
+        // 如果是已經轉運過，仍然要跳轉
         if (result.already_played === true) {
-          console.log("已占卜，繼續跳轉");
+          console.log("已轉運，繼續跳轉");
         } else {
           // 記錄原始錯誤訊息
           console.error("❌ API 返回錯誤:", result);
@@ -55,24 +55,24 @@ export const useRedirectFlow = () => {
         }
       }
 
-      // 步驟 4: 判斷是否第一次完成和占卜狀態
+      // 步驟 4: 判斷是否第一次完成和轉運狀態
       const isAlreadyPlayed =
         result.already_played === true ||
         (result.status === "error" && result.already_played === true);
       const isFirstTime =
-        result.message && result.message.includes("首次占卜成功");
+        result.message && result.message.includes("首次轉運成功");
       const playCount =
         result.db_info?.play_times_total || divinationStore.totalPlayCount;
 
-      // 更新占卜次數並儲存占卜結果 ID
+      // 更新轉運次數並儲存轉運結果 ID
       let fortuneId = null;
       if (result.status === "success" && !isAlreadyPlayed) {
-        // 第一次占卜成功
+        // 第一次轉運成功
         const { fortuneData, resultMessage } =
           await divinationFlow.handleSuccessfulDivination(result);
-        fortuneId = fortuneData.id; // 儲存占卜結果 ID
+        fortuneId = fortuneData.id; // 儲存轉運結果 ID
       } else if (isAlreadyPlayed) {
-        // 已經占卜過，更新狀態
+        // 已經轉運過，更新狀態
         divinationStore.setPlayedStatus(true);
         if (result.db_info && result.db_info.play_times_total !== undefined) {
           divinationStore.setTotalPlayCount(result.db_info.play_times_total);
@@ -81,7 +81,7 @@ export const useRedirectFlow = () => {
 
       // 步驟 5: 顯示待跳轉彈窗
       popupStore.openRedirectPopup({
-        message: "準備進入新年活動",
+        message: "準備揭曉你的新年好運",
         countdown: 3,
       });
 
@@ -134,7 +134,7 @@ export const useRedirectFlow = () => {
       from_event: "1",
     });
 
-    // 如果有占卜結果 ID，加入參數
+    // 如果有轉運結果 ID，加入參數
     if (fortuneId) {
       params.set("fortune_id", fortuneId);
     }

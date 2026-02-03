@@ -165,9 +165,9 @@ try {
         $lastUpdatedTimestamp = strtotime($row['updated_at']);
         $lastUpdatedDate = date('Y-m-d', $lastUpdatedTimestamp);
         if ($lastUpdatedDate === $today) {
-           error_log("[E103] 用戶今天已占卜 - Email: {$email}, 累計次數: " . $row['play_times_total']);
+           error_log("[E103] 用戶今天已轉運 - Email: {$email}, 累計次數: " . $row['play_times_total']);
            JSONReturn([
-                'message' => sanitizeOutput('今天已經完成占卜了，明天再來吧！（E103）'),
+                'message' => sanitizeOutput('今天已經完成轉運了，明天再來吧！（E103）'),
                 'already_played' => true,
                 'last_play_date' => sanitizeOutput($lastUpdatedDate),
                 'today' => sanitizeOutput($today),
@@ -200,7 +200,7 @@ try {
         $fetchStmt->execute();
         $userData = $fetchStmt->fetch(PDO::FETCH_ASSOC);
         JSONReturn([
-            'message' => sanitizeOutput('占卜成功！'), 
+            'message' => sanitizeOutput('轉運成功！'), 
             'already_played' => false,
             'db_info' => [
                 'email' => sanitizeOutput($userData['email']),
@@ -229,7 +229,7 @@ try {
         $fetchStmt->execute();
         $userData = $fetchStmt->fetch(PDO::FETCH_ASSOC);
          JSONReturn([
-            'message' => sanitizeOutput('首次占卜成功！'), 
+            'message' => sanitizeOutput('首次轉運成功！'), 
             'already_played' => false,
             'db_info' => [
                 'email' => sanitizeOutput($userData['email']),

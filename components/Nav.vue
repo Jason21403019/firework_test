@@ -73,7 +73,7 @@ const winnerListPopupData = computed(() => {
   } else {
     return {
       icon: "warning",
-      title: "中獎名單尚未公布",
+      title: "中獎名單",
       text: `中獎名單尚未公布，敬請期待！`,
       confirmButtonText: "我知道了",
       showCancelButton: false,

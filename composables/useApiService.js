@@ -47,7 +47,7 @@ export const useApiService = () => {
     return `https://member.udn.com/member/login.jsp?site=bd_newyear_2026&again=y&redirect=${redirectUrl}`;
   };
 
-  // 檢查用戶今天是否已經占卜過
+  // 檢查用戶今天是否已經轉運過
   const hasPlayedToday = async (udnmember, um2) => {
     if (typeof window === "undefined") return false;
 
@@ -68,19 +68,19 @@ export const useApiService = () => {
         response.data.status === "success" &&
         response.data.played_today === true
       ) {
-        console.log("✅ 已占卜");
+        console.log("✅ 已轉運");
         return true;
       }
 
-      console.log("📝 尚未占卜");
+      console.log("📝 尚未轉運");
       return false;
     } catch (error) {
-      console.error("❌ 檢查占卜狀態錯誤:", error);
+      console.error("❌ 檢查轉運狀態錯誤:", error);
       return false;
     }
   };
 
-  // 獲取用戶占卜數據
+  // 獲取用戶轉運數據
   const fetchUserPlayData = async (udnmember, um2) => {
     try {
       const apiUrl = getApiUrl("checkPlayStatus.php");
@@ -96,7 +96,7 @@ export const useApiService = () => {
 
       return response.data;
     } catch (error) {
-      console.error("❌ 獲取占卜數據錯誤:", error);
+      console.error("❌ 獲取轉運數據錯誤:", error);
       throw error;
     }
   };

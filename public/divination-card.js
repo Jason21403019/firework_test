@@ -1,5 +1,5 @@
 /**
- * 占卜卡片獨立模組
+ * 轉運卡片獨立模組
  * 這個檔案可以被其他網站引入使用
  *
  * 使用方式：
@@ -15,7 +15,7 @@
 ; (function (window) {
   'use strict'
 
-  // 占卜結果數據
+  // 轉運結果數據
   const FORTUNE_RESULTS = [
     {
       id: 'fortune_1',
@@ -49,7 +49,7 @@
     return urlParams.get(name)
   }
 
-  // 生成隨機占卜結果（使用權重）
+  // 生成隨機轉運結果（使用權重）
   function generateFortuneResult() {
     const totalWeight = FORTUNE_RESULTS.reduce((sum, fortune) => sum + fortune.weight, 0)
 
@@ -180,7 +180,7 @@
     })
   }
 
-  // 顯示占卜卡片
+  // 顯示轉運卡片
   function showFortuneCard(container, fortuneData, playCount) {
     // 根據次數決定類型和訊息
     let resultType = 'normal'
@@ -346,7 +346,7 @@
       //   line-height: normal;
       // }
 
-      /* ===== 占卜結果卡片樣式 ===== */
+      /* ===== 轉運結果卡片樣式 ===== */
       .fortune-result__overlay {
         position: fixed;
         top: 0;
@@ -970,7 +970,7 @@
       }
     }
 
-    // 生成並顯示占卜結果
+    // 生成並顯示轉運結果
     // 如果有 fortuneId，使用指定的結果；否則隨機生成
     let fortuneData
     if (fortuneId) {

@@ -16,14 +16,14 @@
 
           <!-- 說明文字 -->
           <div class="verification__description">
-            請先完成下方安全驗證以繼續占卜
+            請先完成下方安全驗證以繼續轉運
           </div>
 
           <!-- Turnstile 容器 -->
           <div id="turnstile-container" class="verification__turnstile-wrapper"></div>
 
           <!-- 提示文字 -->
-          <div class="verification__hint">驗證完成後將自動進行占卜</div>
+          <div class="verification__hint">驗證完成後將自動進行轉運</div>
         </div>
       </div>
     </div>

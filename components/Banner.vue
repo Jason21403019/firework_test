@@ -273,8 +273,7 @@ defineExpose({
     background-position: center;
     cursor: pointer;
     border-radius: 50%;
-    animation: glow 2s ease-in-out infinite;
-    animation: big 2s ease-in-out infinite;
+    animation: glow 1s ease-in-out infinite, big 2s ease-in-out infinite;
   }
 
   @keyframes spinWheel {

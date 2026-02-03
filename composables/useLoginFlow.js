@@ -5,7 +5,7 @@ export const useLoginFlow = () => {
   const popupStore = usePopupStore();
   const apiService = useApiService();
 
-  // 1. 占卜流程啟動函數
+  // 1. 轉運流程啟動函數
   const startDivination = async (
     updatePlayedStatusFn,
     showAlreadyPlayedMessageFn,
@@ -16,7 +16,7 @@ export const useLoginFlow = () => {
       // 顯示處理中訊息
       popupStore.openLoadingPopup({
         message: "處理中...",
-        subMessage: "正在準備占卜流程",
+        subMessage: "正在準備轉運流程",
       });
 
       // 1. 先更新狀態
@@ -41,12 +41,12 @@ export const useLoginFlow = () => {
 
       return true;
     } catch (error) {
-      console.error("占卜流程錯誤:", error);
+      console.error("轉運流程錯誤:", error);
       popupStore.closeLoadingPopup();
       popupStore.openUniversalPopup({
         icon: "error",
         title: "系統錯誤",
-        text: "啟動占卜流程時發生錯誤，請稍後再試",
+        text: "啟動轉運流程時發生錯誤，請稍後再試",
       });
     }
   };
@@ -58,8 +58,8 @@ export const useLoginFlow = () => {
 
     showUniversalDialogFn({
       icon: "warning",
-      title: "請使用正確的占卜流程",
-      text: "請從活動首頁點擊「立即占卜」按鈕來完成占卜流程，\n直接使用登入網址將無法取得占卜結果。",
+      title: "請使用正確的轉運流程",
+      text: "請從活動首頁點擊「立即轉運」按鈕來完成轉運流程，\n直接使用登入網址將無法取得轉運結果。",
       confirmButtonText: "我知道了",
       showCancelButton: false,
     });
@@ -130,7 +130,7 @@ export const useLoginFlow = () => {
       showUniversalDialogFn({
         icon: "warning",
         title: "會員驗證失敗",
-        text: "系統檢測到您可能不是從本頁面進行登入，\n請從活動首頁點擊「立即占卜」按鈕來完成占卜流程。",
+        text: "系統檢測到您可能不是從本頁面進行登入，\n請從活動首頁點擊「立即轉運」按鈕來完成轉運流程。",
         confirmButtonText: "我知道了",
         showCancelButton: false,
       });
@@ -147,13 +147,13 @@ export const useLoginFlow = () => {
 
     // 正常流程處理
     try {
-      // 檢查占卜狀態
+      // 檢查轉運狀態
       const alreadyPlayed = await apiService.hasPlayedToday(
         userStore.udnmember,
         userStore.um2,
       );
 
-      // 如果已經占卜過，顯示提示訊息
+      // 如果已經轉運過，顯示提示訊息
       if (alreadyPlayed) {
         showAlreadyPlayedMessageFn();
         return;
@@ -166,7 +166,7 @@ export const useLoginFlow = () => {
       showUniversalDialogFn({
         icon: "error",
         title: "系統錯誤",
-        text: "啟動占卜流程時發生錯誤，請稍後再試",
+        text: "啟動轉運流程時發生錯誤，請稍後再試",
       });
     }
   };

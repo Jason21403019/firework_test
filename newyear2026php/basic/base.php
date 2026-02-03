@@ -281,16 +281,6 @@ function getMemberMail($udnmember, $um2){
         'verified' => true
     ];
 }
-
-// 取得用戶 email
-function getMail(){
-    $udnmember = $_COOKIE["udnmember"];
-    $um2 = urlencode($_COOKIE["um2"]);
-    $response = getUdnMember($udnmember, $um2);
-    $email = filter_var($response["response"]["email"], FILTER_SANITIZE_EMAIL);
-    return $email;
-}
-
 // 取得用戶 IP
 function getIP(){
     if (isset($_SERVER['HTTP_AKACIP'])) {
@@ -324,40 +314,6 @@ function getIP(){
     } else {
         return null;
     }
-}
-
-// 取得用戶名稱
-function getUser(){
-    if (isset($_COOKIE["udnmember"])) {
-        $user = $_COOKIE["udnmember"];
-    } else {
-        $user = getIP();
-    }
-    return $user;
-}
-
-// 檢查 email 是否已是 udn 會員
-function checkEmail($email){
-    $data = array(
-        'email' => "$email",
-        'json' => 'Y',
-    );
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, "https://umapi.udn.com/member/wbs/MemberChkEmail");
-    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-    $response = curl_exec($ch);
-    if (curl_errno($ch)) {
-        $error = curl_error($ch);
-        $arrResponse = json_decode($error, true);
-        $logData = initLog("U02", $arrResponse, getUser());
-        insertFile($logData);
-    } else {
-        $arrResponse = json_decode($response, true);
-    }
-    curl_close($ch);
-    return $arrResponse['status'];
 }
 
 // 設定 CORS 標頭
