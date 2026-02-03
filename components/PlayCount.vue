@@ -16,23 +16,15 @@
     </div>
     <!-- 轉盤抽紅包好禮里程碑數字顯示 - 桌機版 -->
     <div class="play-count__milestones play-count__milestones--desktop">
-      <div
-        v-for="(milestone, index) in milestones"
-        :key="milestone.count"
-        class="play-count__milestone"
-        :class="{
-          'play-count__milestone--achieved': count >= milestone.count,
-        }"
-      >
-        <div
-          class="play-count__milestone-number"
-          :style="{
-            backgroundImage:
-              count >= milestone.count
-                ? 'url(./imgs/open_envelope.png)'
-                : 'url(./imgs/close_envelope.png)',
-          }"
-        >
+      <div v-for="(milestone, index) in milestones" :key="milestone.count" class="play-count__milestone" :class="{
+        'play-count__milestone--achieved': count >= milestone.count,
+      }">
+        <div class="play-count__milestone-number" :style="{
+          backgroundImage:
+            count >= milestone.count
+              ? 'url(./imgs/open_envelope.png)'
+              : 'url(./imgs/close_envelope.png)',
+        }">
           <span class="play-count__milestone-count">{{ milestone.count }}</span>
           <div class="play-count__milestone-prize">{{ milestone.prize }}</div>
         </div>
@@ -40,23 +32,15 @@
     </div>
     <!-- 轉盤抽紅包好禮里程碑數字顯示 - 手機版 -->
     <div class="play-count__milestones play-count__milestones--mobile">
-      <div
-        v-for="(milestone, index) in milestones"
-        :key="milestone.count"
-        class="play-count__milestone"
-        :class="{
-          'play-count__milestone--achieved': count >= milestone.count,
-        }"
-      >
-        <div
-          class="play-count__milestone-number"
-          :style="{
-            backgroundImage:
-              count >= milestone.count
-                ? 'url(./imgs/open_envelope_m.png)'
-                : 'url(./imgs/close_envelope_m.png)',
-          }"
-        >
+      <div v-for="(milestone, index) in milestones" :key="milestone.count" class="play-count__milestone" :class="{
+        'play-count__milestone--achieved': count >= milestone.count,
+      }">
+        <div class="play-count__milestone-number" :style="{
+          backgroundImage:
+            count >= milestone.count
+              ? 'url(./imgs/open_envelope_m.png)'
+              : 'url(./imgs/close_envelope_m.png)',
+        }">
           <span class="play-count__milestone-count">{{ milestone.count }}</span>
         </div>
         <div class="play-count__milestone-prize">{{ milestone.prize }}</div>
@@ -81,7 +65,7 @@ const props = defineProps({
       { count: 5, prize: "熟齡英文開聊\n線上課" },
       { count: 10, prize: "百歲料理課\n線上課" },
       { count: 15, prize: "生活收納課\n線上課" },
-      { count: 20, prize: "7-11 虛擬\n商品卡200元" },
+      { count: 20, prize: "全聯禮券\n500元" },
       { count: 25, prize: "iPhone 17 Pro\n" },
     ],
   },
@@ -120,6 +104,7 @@ watch(
   @media (max-width: 768px) {
     background-position: center -60px;
   }
+
   @media (max-width: 480px) {
     margin-bottom: 60px;
     background-position: center -100px;
@@ -142,11 +127,13 @@ watch(
       height: 100px;
       margin-bottom: 25px;
     }
+
     @media (max-width: 768px) {
       max-width: 600px;
       height: 200px;
       border-radius: 20px;
     }
+
     @media (max-width: 480px) {
       height: 150px;
     }
@@ -156,6 +143,7 @@ watch(
       display: flex;
       align-items: center;
       justify-content: center;
+
       @media (max-width: 768px) {
         flex-direction: column;
         gap: 10px;
@@ -175,12 +163,15 @@ watch(
     font-size: 50px;
     font-weight: 600;
     color: #80552b;
+
     @media (max-width: 1024px) {
       font-size: 40px;
     }
+
     @media (max-width: 768px) {
       font-size: 50px;
     }
+
     @media (max-width: 480px) {
       font-size: 30px;
     }
@@ -197,17 +188,21 @@ watch(
     padding: 10px 60px;
     border-radius: 100px;
     box-sizing: border-box;
+
     @media (max-width: 1024px) {
       margin-left: 20px;
       font-size: 24px;
     }
+
     @media (max-width: 768px) {
       font-size: 36px;
       margin-left: 0;
     }
+
     @media (max-width: 480px) {
       font-size: 20px;
     }
+
     @media (max-width: 360px) {
       font-size: 18px;
     }
@@ -219,12 +214,15 @@ watch(
     font-size: 40px;
     backdrop-filter: blur(4px);
     border-radius: 4px;
+
     @media (max-width: 1024px) {
       font-size: 24px;
     }
+
     @media (max-width: 768px) {
       font-size: 36px;
     }
+
     @media (max-width: 480px) {
       font-size: 20px;
     }
@@ -246,6 +244,7 @@ watch(
 
     &--mobile {
       display: none;
+
       @media (max-width: 768px) {
         display: flex;
         gap: 30px;
@@ -308,6 +307,7 @@ watch(
       justify-content: center;
       transition: all 0.3s ease;
       position: relative;
+
       @media (max-width: 1024px) {
         width: 130px;
         height: 217px;
@@ -318,10 +318,12 @@ watch(
           width: 72px;
           height: 120px;
         }
+
         @media (max-width: 480px) {
           width: 60px;
           height: 100px;
         }
+
         @media (max-width: 360px) {
           width: 50px;
           height: 83px;
@@ -335,6 +337,7 @@ watch(
       color: #9d1c05;
       margin-top: 100px;
       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+
       @media (max-width: 1024px) {
         font-size: 40px;
         margin-top: 70px;
@@ -351,6 +354,7 @@ watch(
           color: #9d1c05;
           text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
+
         @media (max-width: 480px) {
           font-size: 30px;
         }
@@ -370,6 +374,7 @@ watch(
       display: flex;
       align-items: center;
       justify-content: center;
+
       @media (max-width: 1024px) {
         font-size: 18px;
         min-height: 54px;
@@ -384,9 +389,11 @@ watch(
           white-space: nowrap;
           color: #ee772b;
         }
+
         @media (max-width: 480px) {
           font-size: 30px;
         }
+
         @media (max-width: 360px) {
           font-size: 20px;
         }

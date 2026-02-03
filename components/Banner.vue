@@ -274,6 +274,7 @@ defineExpose({
     cursor: pointer;
     border-radius: 50%;
     animation: glow 2s ease-in-out infinite;
+    animation: big 2s ease-in-out infinite;
   }
 
   @keyframes spinWheel {
@@ -296,6 +297,20 @@ defineExpose({
     50% {
       filter: brightness(1.3) drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
     }
+  }
+}
+
+@keyframes big {
+  0% {
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(0.9);
   }
 }
 </style>

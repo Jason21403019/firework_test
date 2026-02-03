@@ -71,18 +71,28 @@ $udnmember = isset($data['udnmember']) ? $data['udnmember'] : null;
 $um2 = isset($data['um2']) ? $data['um2'] : null;
 
 // 驗證必要參數
-if (empty($udnmember)) {
+if (empty($udnmember) || empty($um2)) {
     JSONReturn('未取得會員資訊，請重新登入', 'error');
 }
 
 try {
-    $memberData = getMemberMail($udnmember);
-    $email = '';
-    if ($memberData['verified'] && !empty($memberData['email'])) {
-        $email = $memberData['email'];
-    } else {
-        $email = $udnmember . '@example.com';
+    // 呼叫 API 驗證會員資料
+    $memberData = getMemberMail($udnmember, $um2);
+    
+    // 檢查 API 是否驗證成功
+    if (!is_array($memberData) || !isset($memberData['verified']) || !$memberData['verified']) {
+        $errorCode = $memberData['error'] ?? 'UNKNOWN';
+        error_log("[checkPlayStatus] 會員驗證失敗 - Code: {$errorCode}, Member: {$udnmember}");
+        JSONReturn('會員驗證失敗，請重新登入', 'error');
     }
+    
+    // 檢查是否有 email
+    if (empty($memberData['email'])) {
+        error_log("[checkPlayStatus] 無法取得會員 email - Member: {$udnmember}");
+        JSONReturn('無法取得會員信箱，請聯繫客服', 'error');
+    }
+    
+    $email = $memberData['email'];
     
     // 取得當天日期
     $today = date('Y-m-d');

@@ -104,39 +104,38 @@ if (empty($udnmember) || empty($um2)) {
 
 try {
     $username = $udnmember;
-    $email = '';
-    $isVerified = false;
     
-    if (!empty($udnmember)) {
-        $memberData = getMemberMail($udnmember);
-        if (is_array($memberData)) {
-            $isVerified = $memberData['verified'] ?? false;
-            
-            if ($isVerified && !empty($memberData['email'])) {
-                $email = $memberData['email'];
-            } else {
-                if (!empty($um2)) {
-                    try {
-                        $userLogin = getUdnMember($udnmember, $um2);
-                        if (isset($userLogin['response']['status']) && 
-                            $userLogin['response']['status'] === 'success' &&
-                            isset($userLogin['response']['email'])) {
-                            $email = filter_var($userLogin['response']['email'], FILTER_SANITIZE_EMAIL);
-                            $isVerified = true;
-                        }
-                    } catch (Exception $e) {
-                        $isVerified = false;
-                    }
-                }
-            }
-        }
+    // 呼叫 API 驗證會員資料
+    $memberData = getMemberMail($udnmember, $um2);
+    
+    // 檢查 API 是否驗證成功
+    if (!is_array($memberData) || !isset($memberData['verified']) || !$memberData['verified']) {
+        $errorCode = $memberData['error'] ?? 'UNKNOWN';
+        $errorMessages = [
+            'COOKIE_MISSING' => '登入資料不完整，請重新登入（E102）',
+            'API_CONNECTION_FAILED' => '會員系統連線失敗，請稍後再試（E103）',
+            'API_NO_RESPONSE' => '會員系統無回應，請稍後再試（E104）',
+            'API_INVALID_JSON' => '會員系統回應異常，請稍後再試（E105）',
+            'API_COOKIE_INVALID' => '登入狀態已過期，請重新登入（E106）',
+            'API_VERIFICATION_FAILED' => '會員驗證失敗，請重新登入（E106）',
+            'API_NO_EMAIL' => '無法取得會員信箱，請聯繫客服（E107）',
+            'EMAIL_INVALID_FORMAT' => '會員信箱格式異常，請聯繫客服（E108）',
+            'UNKNOWN' => '會員資料異常，請重新登入（E109）'
+        ];
+        
+        $errorMessage = $errorMessages[$errorCode] ?? $errorMessages['UNKNOWN'];
+        error_log("[{$errorCode}] 會員驗證失敗 - Member: {$udnmember}");
+        JSONReturn($errorMessage, 'error');
     }
     
-    // 如果無法取得 email，使用預設格式
-    if (empty($email)) {
-        $email = $udnmember . '@example.com';
-        error_log("Warning: Could not fetch email for user {$udnmember}, using default: {$email}");
+    // 檢查是否有 email
+    if (empty($memberData['email'])) {
+        error_log("[E107] 無法取得會員 email - Member: {$udnmember}");
+        JSONReturn('無法取得會員信箱，請聯繫客服（E107）', 'error');
     }
+    
+    $email = $memberData['email'];
+    error_log("[OK] 會員驗證成功 - Member: {$udnmember}, Email: {$email}");
     
     $ip = getIP();
     $ipCheckStmt = $pdo->prepare("SELECT MAX(updated_at) AS last_attempt FROM act2026_bd_newyear2026 WHERE ip = :ip");

@@ -150,70 +150,135 @@ function verifyTurnstileToken($token) {
 }
 
 // 取得用戶資料
-function getMemberMail($memberId){
-    $email = null;
-    $verified = false;
+function getMemberMail($udnmember, $um2){
     $apiUrl = "https://umapi.udn.com/member/wbs/MemberUm2Check";
 
-    $udnmember = !empty($_COOKIE['udnmember']) ? $_COOKIE['udnmember'] : ($_COOKIE['udnland'] ?? '');
-    $um2 = $_COOKIE['um2'] ?? '';
-
-    if (!empty($udnmember) && !empty($um2)) {
-        $um2Encoded = urlencode($um2);
-
-        $data = [
-            'account' => $udnmember,
-            'um2' => $um2Encoded,
-            'json' => 'Y',
-            'site' => 'fate_event',
-            'check_ts' => 'S'
+    // 檢查參數是否有值
+    if (empty($udnmember) || empty($um2)) {
+        error_log("[getMemberMail] Cookie 資料不完整");
+        return [
+            'member_id' => $udnmember,
+            'email' => null,
+            'verified' => false,
+            'error' => 'COOKIE_MISSING'
         ];
+    }
 
-        $ch = curl_init();
+    // 注意：um2 從 cookie 來的時候已經是 encoded 的格式，不需要再編碼
+    // 如果再做一次 urlencode 會導致雙重編碼，API 驗證會失敗
+    $data = [
+        'account' => $udnmember,
+        'um2' => $um2,  // 直接使用，不再編碼
+        'json' => 'Y',
+        'site' => 'fate_event',
+        'check_ts' => 'S'
+    ];
 
-        curl_setopt_array($ch, [
-            CURLOPT_URL => $apiUrl,
-            CURLOPT_POSTFIELDS => http_build_query($data),
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_SSL_VERIFYPEER => false
-        ]);
+    $ch = curl_init();
 
-        $response = curl_exec($ch);
-        
-        if (curl_error($ch)) {
-            // cURL 錯誤處理 - 不記錄詳細錯誤訊息
-        }
-        
+    curl_setopt_array($ch, [
+        CURLOPT_URL => $apiUrl,
+        CURLOPT_POSTFIELDS => http_build_query($data),
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_TIMEOUT => 10
+    ]);
+
+    $response = curl_exec($ch);
+    $curlError = curl_error($ch);
+    
+    if ($curlError) {
+        error_log("[getMemberMail] cURL 錯誤: " . $curlError);
         curl_close($ch);
+        return [
+            'member_id' => $udnmember,
+            'email' => null,
+            'verified' => false,
+            'error' => 'API_CONNECTION_FAILED'
+        ];
+    }
+    
+    curl_close($ch);
 
-        if ($response) {
-            $data = json_decode($response, true);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                if (isset($data['response']) && isset($data['response']['status']) && $data['response']['status'] === 'success') {
-                    if (isset($data['response']['email'])) {
-                        $email = filter_var($data['response']['email'], FILTER_SANITIZE_EMAIL);
-                    }
-                    $verified = true;
-                } else {
-                    $verified = false;
-                }
-            } else {
-                $verified = false;
-            }
+    if (!$response) {
+        error_log("[getMemberMail] API 無回應");
+        return [
+            'member_id' => $udnmember,
+            'email' => null,
+            'verified' => false,
+            'error' => 'API_NO_RESPONSE'
+        ];
+    }
+
+    $data = json_decode($response, true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        error_log("[getMemberMail] JSON 解析失敗");
+        return [
+            'member_id' => $udnmember,
+            'email' => null,
+            'verified' => false,
+            'error' => 'API_INVALID_JSON'
+        ];
+    }
+
+    // 檢查 API 是否返回成功狀態
+    if (!isset($data['response']) || 
+        !isset($data['response']['status']) || 
+        $data['response']['status'] !== 'success') {
+        
+        $apiStatus = $data['response']['status'] ?? 'NULL';
+        error_log("[getMemberMail] API 驗證失敗 - status: {$apiStatus}");
+        
+        // 如果 API 明確返回 fail，表示 cookie 可能過期或無效
+        if ($apiStatus === 'fail') {
+            return [
+                'member_id' => $udnmember,
+                'email' => null,
+                'verified' => false,
+                'error' => 'API_COOKIE_INVALID'
+            ];
         }
-    } else {
-        $verified = false;
+        
+        return [
+            'member_id' => $udnmember,
+            'email' => null,
+            'verified' => false,
+            'error' => 'API_VERIFICATION_FAILED'
+        ];
     }
 
-    if (empty($email) && isset($_COOKIE['fg_mail'])) {
-        $email = filter_var(urldecode($_COOKIE['fg_mail']), FILTER_SANITIZE_EMAIL);
+    // 檢查是否有 email
+    if (!isset($data['response']['email']) || empty($data['response']['email'])) {
+        error_log("[getMemberMail] API 未返回 email");
+        return [
+            'member_id' => $udnmember,
+            'email' => null,
+            'verified' => false,
+            'error' => 'API_NO_EMAIL'
+        ];
     }
-    $safeMemberId = sanitizeForLog($memberId, 50); 
-    $safeEmail = sanitizeForLog($email ?: 'NULL', 100); 
+
+    // 驗證並清理 email
+    $email = filter_var($data['response']['email'], FILTER_SANITIZE_EMAIL);
+    if (empty($email)) {
+        error_log("[getMemberMail] Email 格式無效");
+        return [
+            'member_id' => $udnmember,
+            'email' => null,
+            'verified' => false,
+            'error' => 'EMAIL_INVALID_FORMAT'
+        ];
+    }
+
+    // 所有檢查都通過
+    $safeMemberId = sanitizeForLog($udnmember, 50); 
+    $safeEmail = sanitizeForLog($email, 100);
+    error_log("[getMemberMail] 驗證成功 - Member: {$safeMemberId}, Email: {$safeEmail}");
+    
     return [
-        'member_id' => $memberId,
+        'member_id' => $udnmember,
         'email' => $email,
-        'verified' => $verified
+        'verified' => true
     ];
 }
 
