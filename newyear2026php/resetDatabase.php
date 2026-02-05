@@ -34,55 +34,71 @@ if ($submittedKey !== $securityKey) {
     exit;
 }
 
-// 獲取要刪除的 email（使用 filter_var 過濾）
+// 獲取參數
+$resetAll = isset($data['reset_all']) ? (bool)$data['reset_all'] : false;
 $targetEmail = isset($data['email']) ? filter_var($data['email'], FILTER_SANITIZE_EMAIL) : '';
 
-// 如果沒有提供 email，使用預設值
-if (empty($targetEmail)) {
-    $targetEmail = 'jason86100110@gmail.com';
-}
+// 如果不是重置全部，需要驗證 email
+if (!$resetAll) {
+    // 如果沒有提供 email，使用預設值
+    if (empty($targetEmail)) {
+        $targetEmail = 'jason86100110@gmail.com';
+    }
 
-// 驗證 email 格式
-if (!filter_var($targetEmail, FILTER_VALIDATE_EMAIL)) {
-    echo json_encode(['status' => 'error', 'message' => 'Email 格式不正確']);
-    exit;
+    // 驗證 email 格式
+    if (!filter_var($targetEmail, FILTER_VALIDATE_EMAIL)) {
+        echo json_encode(['status' => 'error', 'message' => 'Email 格式不正確']);
+        exit;
+    }
 }
 
 try {
-    // 先檢查該 email 是否存在
-    $checkStmt = $pdo->prepare("SELECT id, username, email, created_at, updated_at FROM act2026_bd_newyear2026 WHERE email = :email");
-    $checkStmt->bindParam(':email', $targetEmail);
-    $checkStmt->execute();
-
-    if ($checkStmt->rowCount() === 0) {
+    if ($resetAll) {
+        // 清空整個資料表並重置 AUTO_INCREMENT
+        $pdo->exec("TRUNCATE TABLE act2026_bd_newyear2026");
+        
         echo json_encode([
-            'status' => 'warning', 
-            'message' => "找不到 email: {$targetEmail} 的記錄",
-            'email' => $targetEmail
+            'status' => 'success', 
+            'message' => '已成功清空資料表並重置 ID',
+            'reset_type' => 'all',
+            'timestamp' => date('Y-m-d H:i:s')
         ]);
-        exit;
+    } else {
+        // 先檢查該 email 是否存在
+        $checkStmt = $pdo->prepare("SELECT id, username, email, created_at, updated_at FROM act2026_bd_newyear2026 WHERE email = :email");
+        $checkStmt->bindParam(':email', $targetEmail);
+        $checkStmt->execute();
+
+        if ($checkStmt->rowCount() === 0) {
+            echo json_encode([
+                'status' => 'warning', 
+                'message' => "找不到 email: {$targetEmail} 的記錄",
+                'email' => $targetEmail
+            ]);
+            exit;
+        }
+        
+        // 獲取要刪除的記錄資訊
+        $recordInfo = $checkStmt->fetch(PDO::FETCH_ASSOC);
+        
+        // 刪除特定 email 的記錄
+        $deleteStmt = $pdo->prepare("DELETE FROM act2026_bd_newyear2026 WHERE email = :email");
+        $deleteStmt->bindParam(':email', $targetEmail);
+        $deleteStmt->execute();
+        
+        $deletedRows = $deleteStmt->rowCount();
+        
+        echo json_encode([
+            'status' => 'success', 
+            'message' => "已成功刪除 {$deletedRows} 筆記錄",
+            'deleted_email' => $targetEmail,
+            'deleted_record' => $recordInfo,
+            'timestamp' => date('Y-m-d H:i:s')
+        ]);
     }
     
-    // 獲取要刪除的記錄資訊
-    $recordInfo = $checkStmt->fetch(PDO::FETCH_ASSOC);
-    
-    // 刪除特定 email 的記錄
-    $deleteStmt = $pdo->prepare("DELETE FROM act2026_bd_newyear2026 WHERE email = :email");
-    $deleteStmt->bindParam(':email', $targetEmail);
-    $deleteStmt->execute();
-    
-    $deletedRows = $deleteStmt->rowCount();
-    
-    echo json_encode([
-        'status' => 'success', 
-        'message' => "已成功刪除 {$deletedRows} 筆記錄",
-        'deleted_email' => $targetEmail,
-        'deleted_record' => $recordInfo,
-        'timestamp' => date('Y-m-d H:i:s')
-    ]);
-    
 } catch(PDOException $e) {
-    echo json_encode(['status' => 'error', 'message' => '刪除記錄失敗: ' . $e->getMessage()]);
+    echo json_encode(['status' => 'error', 'message' => '操作失敗: ' . $e->getMessage()]);
 } catch(Exception $e) {
     echo json_encode(['status' => 'error', 'message' => '系統錯誤: ' . $e->getMessage()]);
 }

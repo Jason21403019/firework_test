@@ -14,22 +14,21 @@
 ; (function (window) {
   'use strict'
 
-  // 檢查是否應該顯示彈窗（一週顯示一次）
+  // 檢查是否應該顯示彈窗（一天顯示一次）
   function shouldShowPopup() {
-    return true
-    // try {
-    //   const lastShownTime = localStorage.getItem('redpacket_popup_last_shown')
-    //   const now = new Date().getTime()
-    //   const oneWeek = 7 * 24 * 60 * 60 * 1000
+    try {
+      const lastShownTime = localStorage.getItem('redpacket_popup_last_shown')
+      const now = new Date().getTime()
+      const oneDay = 24 * 60 * 60 * 1000  // 改成一天
 
-    //   if (!lastShownTime || now - parseInt(lastShownTime) > oneWeek) {
-    //     return true
-    //   }
-    //   return false
-    // } catch (e) {
-    //   console.error('localStorage 不可用:', e)
-    //   return true
-    // }
+      if (!lastShownTime || now - parseInt(lastShownTime) > oneDay) {
+        return true
+      }
+      return false
+    } catch (e) {
+      console.error('localStorage 不可用:', e)
+      return true
+    }
   }
 
   // 檢查活動是否進行中

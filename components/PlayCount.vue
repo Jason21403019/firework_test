@@ -8,8 +8,8 @@
         </div>
         <div class="play-count__banner-right">
           <p class="play-count__text">
-            您已累計轉盤
-            <span class="play-count__number">{{ count }}</span> 次
+            您已抽了
+            <span class="play-count__number">{{ count }}</span> 次紅包
           </p>
         </div>
       </div>
@@ -25,7 +25,8 @@
               ? 'url(./imgs/open_envelope.png)'
               : 'url(./imgs/close_envelope.png)',
         }">
-          <span class="play-count__milestone-count">{{ milestone.count }}</span>
+          <span class="play-count__milestone-count">{{ milestone.count }}<span
+              class="play-count__milestone-count-text">次</span></span>
           <div class="play-count__milestone-prize">{{ milestone.prize }}</div>
         </div>
       </div>
@@ -41,7 +42,8 @@
               ? 'url(./imgs/open_envelope_m.png)'
               : 'url(./imgs/close_envelope_m.png)',
         }">
-          <span class="play-count__milestone-count">{{ milestone.count }}</span>
+          <span class="play-count__milestone-count">{{ milestone.count }}<span
+              class="play-count__milestone-count-text">次</span></span>
         </div>
         <div class="play-count__milestone-prize">{{ milestone.prize }}</div>
       </div>
@@ -210,7 +212,7 @@ watch(
 
   &__number {
     font-weight: bold;
-    color: #f5f5f5;
+    color: #de3507;
     font-size: 40px;
     backdrop-filter: blur(4px);
     border-radius: 4px;
@@ -332,6 +334,9 @@ watch(
     }
 
     &-count {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
       font-weight: bold;
       font-size: 70px;
       color: #9d1c05;
@@ -397,6 +402,18 @@ watch(
         @media (max-width: 360px) {
           font-size: 20px;
         }
+      }
+    }
+
+    &-count-text {
+      color: #ffffff;
+      margin-left: 2px;
+      margin-bottom: 2px;
+      display: none;
+
+      @media (max-width: 768px) {
+        font-size: 12px;
+        display: block;
       }
     }
   }

@@ -15,7 +15,7 @@ export default defineNuxtConfig({
         {
           name: "description",
           content:
-            "馬上有福轉好運，天天來轉紅包禮，新春好禮LINE POINTS免費領，iPhone  豪禮奔向你！",
+            "馬上有福轉好運，天天來轉紅包禮，新春好禮LINE POINTS免費領，iPhone豪禮奔向你！",
         },
         {
           name: "keywords",
@@ -151,9 +151,7 @@ export default defineNuxtConfig({
       turnstileSiteKey: process.env.NUXT_PUBLIC_TURNSTILE_SITE_KEY,
       externalRedirectUrl:
         process.env.NUXT_PUBLIC_EXTERNAL_REDIRECT_URL ||
-        "https://lab7-orange.udn.com/orange/issue/8887/2341",
+        "https://lab7-orange.udn.com/orange/issue/8887/2341?utm_source=eventsite&utm_medium=button&utm_campaign=bd_newyear_2026",
     },
   },
-
-  compatibilityDate: "2026-03-25",
 });

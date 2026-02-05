@@ -10,6 +10,19 @@
  *     showFirstTimePopup: true
  *   });
  * </script>
+ * <!-- 占卜卡片容器 -->
+<div id="divination-container"></div>
+
+<!-- 引入占卜卡片 JS -->
+<script src="https://event.udn.com/bd_newyear_2026/divination-card.js"></script>
+
+<!-- 初始化 -->
+
+<script>
+  DivinationCard.init({
+    containerId: 'divination-container',
+  });
+</script>
  */
 
 ; (function (window) {
@@ -971,38 +984,34 @@
     }
 
     // 生成並顯示轉運結果
-    // 如果有 fortuneId，使用指定的結果；否則隨機生成
+    // 必須有 fortuneId 才顯示，否則不顯示
     let fortuneData
     if (fortuneId) {
       // 根據 ID 找到對應的結果
       fortuneData = FORTUNE_RESULTS.find((f) => f.id === fortuneId)
       if (!fortuneData) {
-        console.warn(`找不到 fortuneId: ${fortuneId}，使用隨機結果`)
-        fortuneData = generateFortuneResult()
-      } else {
-        // 移除 weight 屬性
-        fortuneData = { ...fortuneData }
-        delete fortuneData.weight
+        console.warn(`找不到 fortuneId: ${fortuneId}`)
+        return {
+          playCount,
+          alreadyPlayed: false,
+          fortuneData: null,
+        }
       }
+      // 移除 weight 屬性
+      fortuneData = { ...fortuneData }
+      delete fortuneData.weight
     } else {
-      fortuneData = generateFortuneResult()
+      // 沒有 fortuneId 就不顯示
+      console.log('沒有 fortuneId，不顯示卡片')
+      return {
+        playCount,
+        alreadyPlayed: false,
+        fortuneData: null,
+      }
     }
 
     showFortuneCard(container, fortuneData, playCount)
     sessionStorage.setItem('divination-card-shown', 'true')
-
-    return {
-      playCount,
-      alreadyPlayed,
-      fortuneData,
-    }
-  }
-
-  // Line 分享功能
-  function shareFortune() {
-    const shareUrl = 'https://event.udn.com/bd_newyear_2026'
-    const lineShareUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}`
-    window.open(lineShareUrl, '_blank', 'width=600,height=600')
   }
 
   // 暴露到全域
@@ -1014,7 +1023,4 @@
     getUrlParam: getUrlParam,
     FORTUNE_RESULTS: FORTUNE_RESULTS,
   }
-
-  // 暴露分享功能
-  window.shareFortune = shareFortune
 })(window)

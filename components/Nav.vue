@@ -14,8 +14,9 @@
         <div class="navbar__right">
           <div class="navbar__links" :class="{ 'navbar__links--active': isMobileMenuOpen }">
             <NuxtLink to="#activity" class="navbar__link" @click="isMobileMenuOpen = false">活動辦法</NuxtLink>
-            <a href="https://orange.udn.com/orange/issue/8887/2341" class="navbar__link" target="_blank"
-              rel="noopener noreferrer" @click="isMobileMenuOpen = false">馬上開運小秘招</a>
+            <a href="https://orange.udn.com/orange/issue/8887/2341?utm_source=eventsite&utm_medium=button&utm_campaign=bd_newyear_2026"
+              class="navbar__link" target="_blank" rel="noopener noreferrer"
+              @click="isMobileMenuOpen = false">馬上開運小秘招</a>
             <NuxtLink to="/" class="navbar__link navbar__link--button" @click="handleWinnerListClick">中獎名單</NuxtLink>
           </div>
 
