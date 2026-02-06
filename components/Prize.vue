@@ -11,6 +11,7 @@
         <p class="prize-subtitle">{{ prize.subtitle }}</p>
       </div>
     </component>
+    <div class="prize-grid-footer">以上獎項以實物為主</div>
   </div>
 </template>
 
@@ -87,6 +88,15 @@ const getImageWidth = (prizeId) => {
 
   @media (max-width: 360px) {
     gap: 12px;
+  }
+
+  .prize-grid-footer {
+    font-size: 14px;
+    color: #fff;
+    margin: 20px 0 0 0;
+    text-align: center;
+    width: 100%;
+    flex-basis: 100%;
   }
 }
 
