@@ -28,11 +28,11 @@
       :initial-countdown="popupStore.redirectPopupData.countdown" @countdown-end="handleRedirectCountdownEnd" />
 
     <!-- 開發工具區域 - 按 Shift+D 顯示 -->
-    <div v-if="showDebugTools" class="debug-tools">
-      <h3>開發測試工具</h3>
+    <!-- <div v-if="showDebugTools" class="debug-tools">
+      <h3>開發測試工具</h3> -->
 
-      <!-- 彈窗測試區 -->
-      <div class="debug-section">
+    <!-- 彈窗測試區 -->
+    <!-- <div class="debug-section">
         <h4>🎨 彈窗測試</h4>
         <div class="debug-actions">
           <button @click="testFirstComplete" class="debug-btn">
@@ -51,10 +51,10 @@
             第一次之後重複彈窗
           </button>
         </div>
-      </div>
+      </div> -->
 
-      <!-- 資料操作區 -->
-      <div class="debug-section">
+    <!-- 資料操作區 -->
+    <!-- <div class="debug-section">
         <h4>🗄️ 資料操作</h4>
         <div class="debug-actions">
           <button @click="debugTools.clearPlayRecord" class="debug-btn">
@@ -65,10 +65,10 @@
           </button>
           <button @click="auth.logout" class="debug-btn logout">登出</button>
         </div>
-      </div>
+      </div> -->
 
-      <!-- 狀態資訊區 -->
-      <div class="debug-section">
+    <!-- 狀態資訊區 -->
+    <!-- <div class="debug-section">
         <h4>📊 狀態資訊</h4>
         <div class="debug-info">
           <p>登入狀態: {{ userStore.isLoggedIn ? "已登入" : "未登入" }}</p>
@@ -96,12 +96,12 @@
             檢查資料庫狀態
           </button>
         </div>
-      </div>
+      </div> -->
 
-      <div class="shortcut-info">
+    <!-- <div class="shortcut-info">
         <p>按下 Shift+D 可隱藏此工具</p>
-      </div>
-    </div>
+      </div> -->
+    <!-- </div> -->
   </div>
   <Footer />
 </template>
